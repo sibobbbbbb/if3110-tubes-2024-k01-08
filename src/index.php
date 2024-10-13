@@ -1,4 +1,4 @@
 <?php
 
-echo 'Hello World!';
+echo 'Hello World! wkwk';
 echo '<script src="/public/index.js"></script>';

@@ -1,8 +1,40 @@
+version: "3.8"
+
 services:
-  php:
+  # Development (with Xdebug & Volume binding for refreshing)
+  web-dev:
     build:
       context: .
-      dockerfile: Dockerfile
-    # TODO
+      target: development
+    env_file: .env
+    volumes:
+      - ./src:/var/www/html
+      - ./php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  # Production (without Xdebug & no Volume binding)
+  web-prod:
+    build:
+      context: .
+      target: production
+    env_file: .env
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+
+  # Database
   db:
-# TODO
+    image: postgres:17
+    env_file: .env
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./src/database/migrations:/docker-entrypoint-initdb.d
+
+volumes:
+  db-data:
