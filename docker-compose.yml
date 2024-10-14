@@ -3,20 +3,23 @@ version: "3.8"
 services:
   # Development (with Xdebug & Volume binding for refreshing)
   web-dev:
+    container_name: linkinpurry-web-dev
     build:
       context: .
       target: development
     env_file: .env
     volumes:
-      - ./src:/var/www/html
-      - ./php.ini:/usr/local/etc/php/php.ini
+      - ./:/var/www/
     ports:
       - "8080:80"
     depends_on:
       - db
+    networks:
+      - linkinpurry-network
 
   # Production (without Xdebug & no Volume binding)
   web-prod:
+    container_name: linkinpurry-web-prod
     build:
       context: .
       target: production
@@ -25,9 +28,12 @@ services:
       - "80:80"
     depends_on:
       - db
+    networks:
+      - linkinpurry-network
 
   # Database
   db:
+    container_name: linkinpurry-db
     image: postgres:17
     env_file: .env
     ports:
@@ -38,3 +44,7 @@ services:
 
 volumes:
   db-data:
+
+networks:
+  linkinpurry-network:
+    driver: bridge

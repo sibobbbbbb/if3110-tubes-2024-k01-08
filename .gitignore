@@ -475,3 +475,6 @@ composer.lock
 
 # env
 .env
+
+# Mounted docker
+db-data
