@@ -1,5 +1,10 @@
 <?php
 
+namespace src\database;
+
+use src\core\{Config, ENV_KEY};
+use PDO;
+use PDOException;
 
 // Class for database connection
 class Database
@@ -47,7 +52,7 @@ class Database
     /**
      * Query the database
      */
-    public function query(string $sql, array $params = [])
+    public function query(string $sql, array $params = []): array
     {
         $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
