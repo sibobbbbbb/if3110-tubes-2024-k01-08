@@ -64,7 +64,7 @@ class Application
 
         // Home 
         $homeController = $this->container->get(HomeController::class);
-        $router->addRoute('GET', '/', $homeController, 'renderHome', [$anyAuthMiddleware]);
+        $router->addRoute('GET', '/', $homeController, 'renderHome', []);
         error_log("Home route registered");
 
         // Auth routes
