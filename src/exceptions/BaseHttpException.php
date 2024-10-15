@@ -1,5 +1,9 @@
 <?php
 
+namespace src\exceptions;
+
+use Exception;
+
 class BaseHttpException extends Exception
 {
     // Store http status code in exception code

@@ -1,5 +1,7 @@
 <?php
 
+namespace src\dto;
+
 /**
  * Base DTO class
  */

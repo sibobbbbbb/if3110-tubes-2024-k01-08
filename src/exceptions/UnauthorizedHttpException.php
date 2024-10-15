@@ -1,5 +1,7 @@
 <?php
 
+namespace src\exceptions;
+
 class UnauthorizedHttpException extends BaseHttpException
 {
     public function __construct(string $message)

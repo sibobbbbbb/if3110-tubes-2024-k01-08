@@ -1,5 +1,7 @@
 <?php
 
+namespace src\dto;
+
 /**
  * Dto Factory class to create DTOs
  */

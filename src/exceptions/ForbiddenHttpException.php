@@ -1,5 +1,7 @@
 <?php
 
+namespace src\exceptions;
+
 class ForbiddenHttpException extends BaseHttpException
 {
     public function __construct(string $message)

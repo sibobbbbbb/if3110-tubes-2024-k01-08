@@ -1,5 +1,7 @@
 <?php
 
+namespace src\exceptions;
+
 class HttpExceptionFactory
 {
     static function create(int $code, string $message, array $fieldErrors = null): BaseHttpException
