@@ -2,20 +2,65 @@
 
 ## How To Run
 
-1. Database
+1. Create network
 
-```bash
-docker compose up --build db
-```
+   ```bash
+   make network
+   ```
 
-2. For development
+   or
 
-```bash
-docker compose up --build web-dev
-```
+   ```bash
+   docker network create linkinpurry-network
+   ```
 
-3. For production
+2. Database
 
-```bash
-docker compose up --build web-prod
-```
+   ```bash
+   make db
+   ```
+
+   or
+
+   ```bash
+   docker compose up --build db
+   ```
+
+3. Website
+
+   - For development,
+
+     ```bash
+     make web-dev
+     ```
+
+     or
+
+     ```bash
+     docker compose up --build web-dev
+     ```
+
+   - For production
+
+     ```
+     make web-prod
+     ```
+
+     or
+
+     ```bash
+     docker compose up --build web-prod
+     ```
+
+4. Hard reset (delete database data)
+
+   ```bash
+   make reset
+   ```
+
+   or
+
+   ```bash
+   docker compose down
+   sudo rm -rf ./db-data
+   ```
