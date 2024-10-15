@@ -1,5 +1,8 @@
 <?php
 
+namespace src\core;
+
+
 class Response
 {
     public function json($statusCode, $data)

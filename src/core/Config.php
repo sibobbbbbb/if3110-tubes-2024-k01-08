@@ -1,5 +1,7 @@
 <?php
 
+namespace src\core;
+
 // type hinting for environment variables keys
 enum ENV_KEY: string
 {
@@ -16,7 +18,7 @@ class Config
     // associative array to store configuration
     private $config = [];
 
-    private function __construct()
+    public function __construct()
     {
         foreach ($_ENV as $key => $value) {
             $this->config[$key] = $value;

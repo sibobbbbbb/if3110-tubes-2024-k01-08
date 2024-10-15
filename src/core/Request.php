@@ -1,22 +1,14 @@
 <?php
 
-// Typehinting
-enum RequestMethod: string
-{
-    case GET = 'GET';
-    case POST = 'POST';
-    case PUT = 'PUT';
-    case DELETE = 'DELETE';
-    case PATCH = 'PATCH';
-    case OPTIONS = 'OPTIONS';
-    // Add more if needed
-}
+namespace src\core;
+
+use Exception;
 
 // Request object instance to store each request data (method, query params, path params, uri, body, headers, ect)
 class Request
 {
     // GET, POST, PUT, DELETE, PATCH, etc
-    private RequestMethod $method;
+    private string $method;
 
     // Path of the request (for example: /users/123/)
     private string $reqPath;
@@ -32,19 +24,20 @@ class Request
     private $pathParams;
 
     // Store the parsed body of the request
-    private object $body;
+    private object | null $body;
 
     // Initialize request object
     public function __construct(string $routePath)
     {
         // Method (uppercase)
-        $this->method = strtoupper($_SERVER['REQUEST_METHOD']);
+        $this->method = $_SERVER['REQUEST_METHOD'];
         // Request path
-        $this->reqPath = $_SERVER['REQUEST_URI'] ?? '/';
+        $this->reqPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         // Route path
         $this->routePath = $routePath;
         // Query params
-        $this->queryParams = $_SERVER['QUERY_STRING'] ?? [];
+        parse_str($_SERVER['QUERY_STRING'], $queryParams);
+        $this->queryParams = $queryParams;
         // Parse path params: find {FOO} in the URI and store it in pathParams
         $this->extractPathParams();
         // Parse body
@@ -54,7 +47,7 @@ class Request
     /**
      * Get HTTP method of the request
      */
-    public function getMethod(): RequestMethod
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -122,10 +115,10 @@ class Request
      */
     private function extractBody(): void
     {
-        $this->body = [];
+        $this->body = null;
 
         // If GET or DELETE, no body
-        if ($this->method === RequestMethod::GET || $this->method === RequestMethod::DELETE) {
+        if ($this->method === "GET" || $this->method === "DELETE") {
             return;
         }
 
