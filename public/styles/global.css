@@ -725,3 +725,20 @@ body {
     display: none;
   }
 }
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+  width: 100%;
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+}
