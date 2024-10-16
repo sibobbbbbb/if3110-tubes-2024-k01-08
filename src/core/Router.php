@@ -88,7 +88,6 @@ class Router
                 }
 
                 // Call the handler
-                // echo var_dump($route['handlerFactory']());
                 $handler = $route['handlerFactory']();
                 $controller = $handler['controller'];
                 $method = $handler['method'];

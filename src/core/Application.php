@@ -10,7 +10,7 @@ use src\repositories\UserRepository;
 use src\services\{UserService, AuthService};
 use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware};
 use src\controllers\{AuthController, HomeController};
-
+use src\utils\UserSession;
 
 // Class for the entry point of the application
 class Application
@@ -27,6 +27,9 @@ class Application
         // Initialize routes
         $this->registerRoutes();
         error_log("Routes initialized");
+
+        // Initialize session
+        UserSession::start();
     }
 
     /**

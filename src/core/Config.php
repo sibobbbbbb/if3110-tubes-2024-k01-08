@@ -21,7 +21,6 @@ class Config
     public function __construct()
     {
         foreach ($_ENV as $key => $value) {
-            // echo $key, $value;
             $this->config[$key] = $value;
         }
     }

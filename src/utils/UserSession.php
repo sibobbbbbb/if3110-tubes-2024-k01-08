@@ -1,0 +1,84 @@
+<?php
+
+namespace src\utils;
+
+use src\dao\{UserDao, UserRole};
+
+/**
+ * Class abstraction to access the user session
+ */
+
+class UserSession
+{
+    /**
+     * Start the session if it is not already started
+     */
+    public static function start(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    /**
+     * Set the user session
+     * @param user: UserDao object
+     */
+    public static function setUser(UserDao $user): void
+    {
+        $_SESSION['user'] = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole()
+        ];
+    }
+
+    /**
+     * Get current user id
+     */
+    public static function getUserId(): int | null
+    {
+        if (!isset($_SESSION['user'])) {
+            return null;
+        }
+        return $_SESSION['user']['id'];
+    }
+
+    /**
+     * Get current user email
+     */
+    public static function getUserEmail(): string | null
+    {
+        if (!isset($_SESSION['user'])) {
+            return null;
+        }
+        return $_SESSION['user']['email'];
+    }
+
+    /**
+     * Get current user role
+     */
+    public static function getUserRole(): UserRole | null
+    {
+        if (!isset($_SESSION['user'])) {
+            return null;
+        }
+        return $_SESSION['user']['role'];
+    }
+
+    /**
+     * Check if user is logged in
+     */
+    public static function isLoggedIn(): bool
+    {
+        return isset($_SESSION['user']);
+    }
+
+    /**
+     * Destroy the session
+     */
+    public static function destroy(): void
+    {
+        session_destroy();
+    }
+}

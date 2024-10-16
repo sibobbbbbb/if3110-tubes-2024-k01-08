@@ -6,7 +6,7 @@ use src\core\{Request, Response};
 use src\dao\UserRole;
 use src\exceptions\BadRequestHttpException;
 use src\services\AuthService;
-use src\utils\Validator;
+use src\utils\{UserSession, Validator};
 
 /**
  * Controller for handling authentication
@@ -89,11 +89,7 @@ class AuthController extends Controller
             }
 
             // Set the user in the session
-            $_SESSION['user'] = [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'role' => $user->getRole()
-            ];
+            UserSession::setUser($user);
 
             // If valid, redirect to the dashboard
             $this->redirectIfAuthenticated($req, $res);
@@ -202,8 +198,8 @@ class AuthController extends Controller
      */
     public function redirectIfAuthenticated(Request $req, Response $res): void
     {
-        if (isset($_SESSION['user'])) {
-            if ($_SESSION['user']['role'] === UserRole::JOBSEEKER) {
+        if (UserSession::isLoggedIn()) {
+            if (UserSession::getUserRole() === UserRole::JOBSEEKER) {
                 // If job seeker
                 $res->redirect('/jobs');
                 return;

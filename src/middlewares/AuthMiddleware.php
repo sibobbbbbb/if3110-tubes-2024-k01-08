@@ -3,6 +3,7 @@
 namespace src\middlewares;
 
 use src\core\{Request, Response};
+use src\utils\UserSession;
 
 abstract class AuthMiddleware extends Middleware
 {
@@ -26,7 +27,7 @@ abstract class AuthMiddleware extends Middleware
     public function handle(Request $req, Response $res)
     {
         // If user is not logged in, redirect to sign in page
-        if (!isset($_SESSION['user_id'])) {
+        if (!UserSession::isLoggedIn()) {
             $res->redirect('/auth/sign-in');
             return;
         }
@@ -37,7 +38,7 @@ abstract class AuthMiddleware extends Middleware
         }
 
         // If user is logged in, but not in the specified roles, redirect to error page
-        if (!in_array($_SESSION['role'], $this->roles)) {
+        if (!in_array(UserSession::getUserRole(), $this->roles)) {
             $res->redirect("/error/");
             return;
         }
