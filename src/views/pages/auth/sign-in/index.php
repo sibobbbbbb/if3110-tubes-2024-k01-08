@@ -3,10 +3,10 @@
         <!-- Title -->
         <h1 class="signin__title">Sign In</h1>
         <!-- Form -->
-        <form id="signin-form" class="form" action="/auth/sign-in" method="POST">
+        <form class="form" action="/auth/sign-in" method="POST">
             <!-- Email -->
             <div class="form__group">
-                <label for="email" id="email-label" class="form__label 
+                <label for="email" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['email'])):  ?>
                         <?= htmlspecialchars($errorFields['email'][0] ? 'form__error-message' : '') ?>
                     <?php endif; ?>
@@ -15,14 +15,13 @@
                 </label>
 
                 <input
-                    id="email"
                     name="email"
                     type="text"
                     placeholder="Enter your email"
                     value="<?= htmlspecialchars($fields['email'] ?? '') ?>"
                     class="input" />
 
-                <p id="email-message" class="form__error-message">
+                <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['email'])):  ?>
                         <?= htmlspecialchars($errorFields['email'][0] ?? '') ?>
                     <?php endif; ?>
@@ -31,7 +30,7 @@
 
             <!-- Password -->
             <div class="form__group">
-                <label for="password" id="password-label" class="form__label 
+                <label for="password" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
                         <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '') ?>
                     <?php endif; ?>
@@ -39,19 +38,18 @@
                     Password
                 </label>
                 <input
-                    id="password"
                     name="password"
                     type="password"
                     placeholder="Enter your password"
                     value="<?= htmlspecialchars($fields['password'] ?? '') ?>"
                     class="input" />
-                <p id="password-message" class="form__error-message">
+                <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
                         <?= htmlspecialchars($errorFields['password'][0] ?? '') ?>
                     <?php endif; ?>
                 </p>
             </div>
-            <button id="signin-button" type="submit" class="button button--default">
+            <button type="submit" class="button button--default-size button--default-color">
                 Sign In
             </button>
         </form>

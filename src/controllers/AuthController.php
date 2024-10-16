@@ -4,6 +4,7 @@ namespace src\controllers;
 
 use src\core\{Request, Response};
 use src\dao\UserRole;
+use src\dto\DtoFactory;
 use src\exceptions\BadRequestHttpException;
 use src\services\AuthService;
 use src\utils\{UserSession, Validator};
@@ -94,6 +95,25 @@ class AuthController extends Controller
             // If valid, redirect to the dashboard
             $this->redirectIfAuthenticated($req, $res);
         }
+    }
+
+    /**
+     * Handles the sign out endpoint
+     */
+    public function handleSignOut(Request $req, Response $res): void
+    {
+        // Redirect if user is not authenticated
+        if (!UserSession::isLoggedIn()) {
+            $res->redirect('/');
+            return;
+        }
+
+        // Sign out the user
+        UserSession::destroy();
+
+        // Redirect to the home page
+        $responseData = DtoFactory::createSuccessDto('Sign out successful');
+        $res->json(200, $responseData);
     }
 
     /**
@@ -205,7 +225,7 @@ class AuthController extends Controller
                 return;
             } else {
                 // If employer
-                $res->redirect('/dashboard');
+                $res->redirect('/company/dashboard');
                 return;
             }
         }

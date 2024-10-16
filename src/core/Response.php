@@ -8,7 +8,7 @@ class Response
     public function json($statusCode, $data)
     {
         http_response_code($statusCode);
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         return json_encode($data);
     }
 

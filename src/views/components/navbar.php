@@ -1,4 +1,8 @@
 <?php
+
+use src\dao\UserRole;
+use src\utils\UserSession;
+
 $isUserLoggedIn = false;
 ?>
 
@@ -39,21 +43,43 @@ $isUserLoggedIn = false;
 
         <nav class="nav">
             <!-- Nav links -->
-            <ul id="navbar-links-ul" class="nav__list">
-                <li class="nav__item">
-                    <a href="/jobs" class="nav__link">Find Jobs</a>
-                </li>
+            <?php if (!UserSession::isLoggedIn()): ?>
+                <ul id="navbar-links-ul" class="nav__list">
+                    <li class="nav__item">
+                        <a href="/jobs" class="nav__link">Find Jobs</a>
+                    </li>
+                </ul>
+            <?php elseif (UserSession::getUserRole() == UserRole::JOBSEEKER) : ?>
+                <ul id="navbar-links-ul" class="nav__list">
+                    <li class="nav__item">
+                        <a href="/jobs" class="nav__link">Find Jobs</a>
+                    </li>
 
-                <li class="nav__item">
-                    <a href="/application/history" class="nav__link">My Application</a>
-                </li>
-            </ul>
+                    <li class="nav__item">
+                        <a href="/jobs/applications" class="nav__link">My Applications</a>
+                    </li>
+                </ul>
+            <?php elseif (UserSession::getUserRole() == UserRole::COMPANY) : ?>
+                <ul id="navbar-links-ul" class="nav__list">
+                    <li class="nav__item">
+                        <a href="/company/dashboard" class="nav__link">Dashboard</a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="/company/profile" class="nav__link">Profile</a>
+                    </li>
+                </ul>
+            <?php endif; ?>
 
             <!-- Auth -->
             <div>
-                <a href="/auth/sign-in">
-                    <button id="sign-in-button" class="button button--default sidebar__action-button">Sign In</button>
-                </a>
+                <?php if (UserSession::isLoggedIn()): ?>
+                    <button type="button" id="sign-out-button" class="button button--default-size button--destructive sidebar__action-button">Sign Out</button>
+                <?php else: ?>
+                    <a href="/auth/sign-in">
+                        <button type="button" class="button button--default-size button--default-color sidebar__action-button">Sign In</button>
+                    </a>
+                <?php endif; ?>
             </div>
         </nav>
     </div>

@@ -61,7 +61,7 @@ class SuccessDto extends BaseDto
 /**
  * Dto for success response with paged-based pagination data
  */
-class PagedPaginationMeta
+class PagedPaginationMetaDto
 {
     private int $total;
     private int $page;
@@ -92,15 +92,15 @@ class PagedPaginationMeta
 
 class SuccessPagedPaginationDto extends SuccessDto
 {
-    private PagedPaginationMeta $meta;
+    private PagedPaginationMetaDto $meta;
 
-    public function __construct(string $message, PagedPaginationMeta $meta)
+    public function __construct(string $message, PagedPaginationMetaDto $meta)
     {
         parent::__construct($message);
         $this->meta = $meta;
     }
 
-    public function getMeta(): PagedPaginationMeta
+    public function getMeta(): PagedPaginationMetaDto
     {
         return $this->meta;
     }

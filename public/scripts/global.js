@@ -67,28 +67,27 @@ class NavbarManager {
   }
 
   async handleSignOut() {
-    // Disable logout button
+    // Initialize ajax
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/auth/sign-out", true);
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          window.location.href = "/";
+        } else {
+          alert(xhr.responseText);
+        }
+
+        this.signOutButton.disabled = false;
+      }
+    };
+
+    // Disable logout buttonl
     this.signOutButton.disabled = true;
 
-    // Call logout API
-    try {
-      const response = await fetch("/logout", {
-        method: "GET",
-      });
-
-      const responseBody = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseBody.message);
-      }
-
-      // Reload
-      window.location.reload();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "Unknown error");
-    } finally {
-      this.signOutButton.disabled = false;
-    }
+    // Send
+    xhr.send();
   }
 
   onOpenSidebar() {

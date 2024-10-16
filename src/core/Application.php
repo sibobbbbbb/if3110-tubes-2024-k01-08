@@ -72,6 +72,7 @@ class Application
             return [$this->container->get(JobSeekerAuthMiddleware::class)];
         };
 
+
         // Home 
         $router->get(
             '/',
@@ -84,6 +85,7 @@ class Application
                 ];
             },
         );
+
 
         // Auth routes
         // Sign in (render)
@@ -110,6 +112,20 @@ class Application
                 ];
             },
         );
+
+        // Sign out
+        $router->post(
+            '/auth/sign-out',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'handleSignOut';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
+
         // Sign up
         $router->get(
             '/auth/sign-up',
@@ -122,6 +138,7 @@ class Application
                 ];
             }
         );
+
         // Sign up job seeker
         $router->get(
             '/auth/sign-up/job-seeker',
@@ -134,6 +151,7 @@ class Application
                 ];
             }
         );
+
         // Sign up company
         $router->get(
             '/auth/sign-up/company',
