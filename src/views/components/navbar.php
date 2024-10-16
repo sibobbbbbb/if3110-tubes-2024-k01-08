@@ -51,7 +51,9 @@ $isUserLoggedIn = false;
 
             <!-- Auth -->
             <div>
-                <button id="sign-in-button" class="button button--default sidebar__action-button">Sign In</button>
+                <a href="/auth/sign-in">
+                    <button id="sign-in-button" class="button button--default sidebar__action-button">Sign In</button>
+                </a>
             </div>
         </nav>
     </div>

@@ -22,9 +22,11 @@ class Application
         // Initialize container
         $this->container = new Container();
         $this->registerContainer();
+        error_log("Container initialized");
 
         // Initialize routes
         $this->registerRoutes();
+        error_log("Routes initialized");
     }
 
     /**
@@ -53,27 +55,81 @@ class Application
      **/
     private function registerRoutes()
     {
-        error_log("Registering routes...");
-
         $router = $this->container->get(Router::class);
 
-        // Middlewares
-        $anyAuthMiddleware = $this->container->get(AnyAuthMiddleware::class);
-        $companyAuthMiddleware = $this->container->get(CompanyAuthMiddleware::class);
-        $jobSeekerAuthMiddleware = $this->container->get(JobSeekerAuthMiddleware::class);
+        // Middlewares factory function
+        $anyAuthMiddlewareFactoryFunction = function () {
+            return [$this->container->get(AnyAuthMiddleware::class)];
+        };
+        $companyAuthMiddleware = function () {
+            return [$this->container->get(CompanyAuthMiddleware::class)];
+        };
+        $jobSeekerAuthMiddleware = function () {
+            return [$this->container->get(JobSeekerAuthMiddleware::class)];
+        };
 
         // Home 
-        $homeController = $this->container->get(HomeController::class);
-        $router->addRoute('GET', '/', $homeController, 'renderHome', []);
-        error_log("Home route registered");
+        $router->get(
+            '/',
+            function () {
+                $controller = $this->container->get(HomeController::class);
+                $method = 'renderHome';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
 
         // Auth routes
-        $authController = $this->container->get(AuthController::class);
-        $router->addRoute('GET', '/auth/sign-in', $authController, 'renderSignIn', []);
-        error_log("Login route registered");
-
-        $router->addRoute('GET', '/auth/sign-up', $authController, 'renderSignUp', []);
-        error_log("Register route registered");
+        // Sign In
+        $router->get(
+            '/auth/sign-in',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'renderSignIn';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
+        // Sign up
+        $router->get(
+            '/auth/sign-up',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'renderSignUp';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
+        // Sign up job seeker
+        $router->get(
+            '/auth/sign-up/job-seeker',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'renderSignUpJobSeeker';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
+        // Sign up company
+        $router->get(
+            '/auth/sign-up/company',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'renderSignUpCompany';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
     }
 
     /**
@@ -81,8 +137,6 @@ class Application
      */
     private function registerContainer()
     {
-        error_log("Starting IoC container...");
-
         // Config
         $this->container->bind(
             Config::class,
@@ -113,15 +167,19 @@ class Application
 
         // Repositories
         $this->registerRepositoriesToContainer();
+        error_log("Repositories registered");
 
         // Services
         $this->registerServicesToContainer();
+        error_log("Services registered");
 
         // Middlewares
         $this->registerMiddlewaresToContainer();
+        error_log("Middlewares registered");
 
         // Controllers
         $this->registerControllersToContainer();
+        error_log("Controllers registered");
     }
 
     /**
@@ -168,7 +226,7 @@ class Application
                 return new AnyAuthMiddleware();
             }
         );
-        error_log("AnyAuthMiddleware registered");
+
         // CompanyAuthMiddleware
         $this->container->bind(
             CompanyAuthMiddleware::class,
@@ -176,7 +234,7 @@ class Application
                 return new CompanyAuthMiddleware();
             }
         );
-        error_log("CompanyAuthMiddleware registered");
+
         // JobSeekerAuthMiddleware
         $this->container->bind(
             JobSeekerAuthMiddleware::class,
@@ -184,7 +242,7 @@ class Application
                 return new JobSeekerAuthMiddleware();
             }
         );
-        error_log("JobSeekerAuthMiddleware registered");
+
         // Add more middlewares here
     }
 

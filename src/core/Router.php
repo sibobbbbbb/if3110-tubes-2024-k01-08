@@ -18,21 +18,58 @@ class Router
      * Add a route to the app with certain method, path, handler (Class@method), and middlewares
      * @param string $method
      * @param string $path
-     * @param object $handler: instance of the class that contains the method
-     * @param string $action: method name
-     * @param array $middlewares: array of middlewares
+     * @param callable Factory function that returns the function handler (associative array controller, method) (only 1)
+     * @param callable Factory function that returns the middlewares (>= 0)
      */
-    public function addRoute(string $method, string $path, object $handler, string $action, array $middlewares)
+    private function addRoute(string $method, string $path, callable $handlerFactory, callable $middlewaresFactory = null): void
     {
+        $middlewaresFactory = $middlewaresFactory ?? function () {
+            return [];
+        };
+
         $this->routes[] = [
             'method' => $method,
             'path' => $path,
-            'handler' => $handler,
-            'action' => $action,
-            'middlewares' => $middlewares
+            'handlerFactory' => $handlerFactory,
+            'middlewaresFactory' => $middlewaresFactory,
         ];
     }
 
+    /**
+     * Add a GET route to the app
+     */
+    public function get(string $path, callable $handlerFactory, callable $middlewaresFactory = null)
+    {
+        $this->addRoute('GET', $path, $handlerFactory, $middlewaresFactory);
+    }
+
+    /**
+     * Add a POST route to the app
+     */
+    public function post(string $path, callable $handlerFactory, callable $middlewaresFactory = null)
+    {
+        $this->addRoute('POST', $path, $handlerFactory, $middlewaresFactory);
+    }
+
+    /**
+     * Add a PUT route to the app
+     */
+    public function put(string $path, callable $handlerFactory, callable $middlewaresFactory = null)
+    {
+        $this->addRoute('PUT', $path, $handlerFactory, $middlewaresFactory);
+    }
+
+    /**
+     * Add a DELETE route to the app
+     */
+    public function delete(string $path, callable $handlerFactory, callable $middlewaresFactory = null)
+    {
+        $this->addRoute('DELETE', $path, $handlerFactory, $middlewaresFactory);
+    }
+
+    /**
+     * Dispatch the request to the correct handler
+     */
     public function dispatch(): void
     {
         $res = new Response();
@@ -45,16 +82,18 @@ class Router
                 $req = new Request($route['path']);
 
                 // Call all middlewares
-                foreach ($route['middlewares'] as $middleware) {
-                    $middleware->handle($req, $res);
+                $middlewares = $route['middlewaresFactory']();
+                foreach ($middlewares as $middleware) {
+                    $middleware($req, $res);
                 }
 
                 // Call the handler
-                $handler = $route['handler'];
-                $action = $route['action'];
-                $handler->$action($req, $res);
+                // echo var_dump($route['handlerFactory']());
+                $handler = $route['handlerFactory']();
+                $controller = $handler['controller'];
+                $method = $handler['method'];
+                $controller->$method($req, $res);
 
-                // exit
                 return;
             }
         }

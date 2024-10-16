@@ -1,0 +1,3 @@
+class SignIn {
+  constructor() {}
+}

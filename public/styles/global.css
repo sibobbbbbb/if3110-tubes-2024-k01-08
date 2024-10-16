@@ -451,7 +451,7 @@ video {
 body {
   display: flex;
   flex-direction: column;
-  min-height: 200vh;
+  min-height: 100vh;
   font-family: "Inter", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
@@ -558,6 +558,80 @@ body {
 .button--icon {
   height: 2.5rem;
   width: 2.5rem;
+}
+
+/* Input field */
+.input {
+  display: flex;
+  height: 2.5rem;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--input));
+  background-color: hsl(var(--background));
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.input::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.input[type="file"] {
+  padding: 0;
+}
+
+.input[type="file"]::file-selector-button {
+  border: 0;
+  background-color: transparent;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+/* Link */
+.anchor-link {
+  color: hsl(var(--primary));
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Forms */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form__label {
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.form__error-message {
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: hsl(var(--destructive));
+  margin-top: 4px;
 }
 
 /* Navbar */
@@ -731,7 +805,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 4rem;
+  height: 5rem;
   width: 100%;
   background-color: hsl(var(--accent));
   color: hsl(var(--accent-foreground));
