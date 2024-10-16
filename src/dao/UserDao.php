@@ -10,13 +10,15 @@ class UserDao
     private string $password;
     private UserRole $role;
 
-    public function __construct(int $id, string $name, string $email, string $password, UserRole $role)
+    public function __construct(int $id, string $name, string $email, string $password, string $role)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
-        $this->role = $role;
+
+        // Convert string to UserRole
+        $this->role = UserRole::fromString($role);
     }
 
     public function getId(): int

@@ -42,10 +42,11 @@ class Application
             $router->dispatch();
         } catch (BaseHttpException $e) {
             // Global exception filters
-            // Handle HTTP exceptions
+            // Redirct to /error?code=xxx&message=xxx
             echo "HTTP Exception: " . $e->getMessage();
         } catch (Exception $e) {
             // Handle other exceptions as Internal Server Error
+            // Redirct to /error?code=500&message=xxx
             echo "Internal Server Error: " . $e->getMessage();
         }
     }
@@ -82,12 +83,24 @@ class Application
         );
 
         // Auth routes
-        // Sign In
+        // Sign in (render)
         $router->get(
             '/auth/sign-in',
             function () {
                 $controller = $this->container->get(AuthController::class);
-                $method = 'renderSignIn';
+                $method = 'renderAndHandleSignIn';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
+        // Sign in (form handling request)
+        $router->post(
+            '/auth/sign-in',
+            function () {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'renderAndHandleSignIn';
                 return [
                     'controller' => $controller,
                     'method' => $method
@@ -130,18 +143,6 @@ class Application
                 ];
             }
         );
-        // Register sign in POST endpoint
-        $router->get(
-            '/api/auth/sign-in',
-            function() {
-                $controller = $this->container->get(AuthController::class);
-                $method = 'handleSignIn';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            }
-        );
     }
 
     /**
@@ -163,7 +164,10 @@ class Application
             Database::class,
             function ($c) {
                 $config = $c->get(Config::class);
-                return new Database($config);
+                // initialize db & connect when first created
+                $db = new Database($config);
+                $db->connect();
+                return $db;
             }
         );
         error_log("Database registered");
@@ -224,6 +228,15 @@ class Application
                 return new UserService($userRepository);
             }
         );
+
+        // Authentication Service
+        $this->container->bind(
+            AuthService::class,
+            function ($c) {
+                $userRepository = $c->get(UserRepository::class);
+                return new AuthService($userRepository);
+            }
+        );
     }
 
     /**
@@ -275,8 +288,8 @@ class Application
         $this->container->bind(
             AuthController::class,
             function ($c) {
-                $userService = $c->get(UserService::class);
-                return new AuthController($userService);
+                $authService = $c->get(AuthService::class);
+                return new AuthController($authService);
             }
         );
 

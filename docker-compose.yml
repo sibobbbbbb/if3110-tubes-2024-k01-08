@@ -1,8 +1,27 @@
 version: "3.8"
 
 services:
+  # Database
+  linkinpurry-db:
+    container_name: linkinpurry-db
+    image: postgres:17
+    env_file: .env
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./src/database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - linkinpurry-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}",
+        ]
+
   # Development (with Xdebug & Volume binding for refreshing)
-  web-dev:
+  linkinpurry-web-dev:
     container_name: linkinpurry-web-dev
     build:
       context: .
@@ -13,12 +32,12 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
+      - linkinpurry-db
     networks:
       - linkinpurry-network
 
   # Production (without Xdebug & no Volume binding)
-  web-prod:
+  linkinpurry-web-prod:
     container_name: linkinpurry-web-prod
     build:
       context: .
@@ -27,20 +46,9 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - db
+      - linkinpurry-db
     networks:
       - linkinpurry-network
-
-  # Database
-  db:
-    container_name: linkinpurry-db
-    image: postgres:17
-    env_file: .env
-    ports:
-      - "5436:5432"
-    volumes:
-      - ./db-data:/var/lib/postgresql/data
-      - ./src/database/migrations:/docker-entrypoint-initdb.d
 
 volumes:
   db-data:

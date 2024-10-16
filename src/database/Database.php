@@ -5,6 +5,7 @@ namespace src\database;
 use src\core\{Config, ENV_KEY};
 use PDO;
 use PDOException;
+use src\exceptions\HttpExceptionFactory;
 
 // Class for database connection
 class Database
@@ -31,13 +32,14 @@ class Database
         $dbUser = $this->config->get(ENV_KEY::POSTGRES_USER);
         $dbPass = $this->config->get(ENV_KEY::POSTGRES_PASSWORD);
 
-        $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName};";
+        // $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=$dbName;";
+        $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName};user={$dbUser};password={$dbPass}";
         try {
-            $this->connection = new PDO($dsn, $dbUser, $dbPass);
+            $this->connection = new PDO($dsn);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             // Internal server error
-            echo 'Connection failed: ' . $e->getMessage();
+            throw HttpExceptionFactory::create(500, 'Cannot connect to the database');
         }
     }
 
@@ -50,13 +52,31 @@ class Database
     }
 
     /**
-     * Query the database
+     * Query one row from the database
      */
-    public function query(string $sql, array $params = []): array
+    public function queryOne(string $sql, array $params = []): array | false
+    {
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch();
+    }
+
+    /**
+     * Query many rows the database
+     */
+    public function queryMany(string $sql, array $params = []): array
     {
         $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Get the connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**

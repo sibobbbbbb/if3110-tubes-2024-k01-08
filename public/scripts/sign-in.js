@@ -1,3 +1,0 @@
-class SignIn {
-  constructor() {}
-}

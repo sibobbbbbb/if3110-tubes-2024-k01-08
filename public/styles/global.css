@@ -629,6 +629,11 @@ body {
   font-weight: 500;
   margin-bottom: 8px;
 }
+
+.form__label-error {
+  color: hsl(var(--destructive));
+}
+
 .form__error-message {
   font-size: 14px;
   line-height: 1.25rem;

@@ -23,8 +23,8 @@ class Request
     // Associative array to store path parameters from the URI {fooID} => 123
     private $pathParams;
 
-    // Store the parsed body of the request
-    private object | null $body;
+    // Store the parsed body of the request into associative array
+    private ?array $body;
 
     // Initialize request object
     public function __construct(string $routePath)
@@ -87,7 +87,7 @@ class Request
     /**
      * Get body of the request
      */
-    public function getBody(): object
+    public function getBody(): array | null
     {
         return $this->body;
     }

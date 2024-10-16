@@ -2,6 +2,8 @@
 
 namespace src\repositories;
 
+use PDO;
+use src\dao\UserDao;
 use \src\database\Database;
 
 /**
@@ -18,15 +20,43 @@ class UserRepository extends Repository
         $this->db = $db;
     }
 
-    /**
-     * Find user by id
-     */
-    // public function findById(int $id): User
-    // {
-    //     $query = "SELECT * FROM users WHERE id = :id";
-    //     $arrResult = $this->db->query($query, [':id' => $id]);
-    //     if (count($arrResult) === 0) {
-    //         throw new NotFoundException("User not found");
-    //     }
-    // }
+    // Find a user by email
+    public function findUserByEmail(string $email): UserDao | null
+    {
+        $query = "SELECT * FROM users WHERE email = :email";
+        $params = [':email' => $email];
+
+        // Query the database
+        $result = $this->db->queryOne($query, $params);
+
+        // If not found
+        if ($result == false) return null;
+
+        $user = new UserDao(
+            $result['id'],
+            $result['name'],
+            $result['email'],
+            $result['password'],
+            $result['role'],
+        );
+
+        return $user;
+    }
+
+    // Find a user by id
+    public function findUserById(int $id): UserDao | null
+    {
+        $query = "SELECT * FROM users WHERE id = :id";
+        $params = [':id' => $id];
+
+        // Query the database
+        $result = $this->db->queryOne($query, $params);
+
+        // If not found
+        if ($result == false) {
+            return null;
+        }
+
+        return $result;
+    }
 }

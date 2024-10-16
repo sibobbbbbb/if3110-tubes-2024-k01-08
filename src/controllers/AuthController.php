@@ -4,6 +4,9 @@ namespace src\controllers;
 
 use src\core\{Request, Response};
 use src\dao\UserRole;
+use src\exceptions\BadRequestHttpException;
+use src\services\AuthService;
+use src\utils\Validator;
 
 /**
  * Controller for handling authentication
@@ -11,26 +14,35 @@ use src\dao\UserRole;
  */
 class AuthController extends Controller
 {
+    // Dependency injection
+    private AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Renders the sign in page
+     * Uses php form handling (handles GET & POST requests)
      */
-    public function renderSignIn(Request $req, Response $res): void
+    public function renderAndHandleSignIn(Request $req, Response $res): void
     {
         // Redirect if user is authenticated
         $this->redirectIfAuthenticated($req, $res);
 
         // Render the view
         $viewPathFromPages = 'auth/sign-in/index.php';
+
+        // Data to pass to the view
+        $title = 'LinkInPurry | Sign In';
+        $description = 'Sign in to your LinkInPurry account';
         $linkTag = <<<HTML
                 <link rel="stylesheet" href="/styles/auth/sign-in.css" />
             HTML;
         $scriptTag = <<<HTML
                 <script src="/scripts/auth/sign-in.js" defer></script>
             HTML;
-
-        // Data to pass to the view (SSR)
-        $title = 'LinkInPurry | Sign In';
-        $description = 'Sign in to your LinkInPurry account';
         $additionalTags = [$linkTag, $scriptTag];
         $data = [
             'title' => $title,
@@ -38,7 +50,54 @@ class AuthController extends Controller
             'additionalTags' => $additionalTags,
         ];
 
-        $this->renderPage($viewPathFromPages, $data);
+        if ($req->getMethod() == "GET") {
+            // Get
+            $this->renderPage($viewPathFromPages, $data);
+        } else {
+            // Post
+            $email = $req->getBody()['email'];
+            $password = $req->getBody()['password'];
+
+            $rules = [
+                'email' => ['required', 'email'],
+                'password' => ['required']
+            ];
+
+            $validator = new Validator();
+            $isValid = $validator->validate($req->getBody(), $rules);
+            // Invalid request body
+            if (!$isValid) {
+                $data['errorFields'] = $validator->getErrorFields();
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+
+            try {
+                // Authenticate the user
+                $user = $this->authService->signIn($email, $password);
+            } catch (BadRequestHttpException $e) {
+                // Failed to authenticate
+                $message = $e->getMessage();
+                $data['errorFields'] = [
+                    'email' => [$message],
+                    'password' => [$message],
+                ];
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+
+            // Set the user in the session
+            $_SESSION['user'] = [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole()
+            ];
+
+            // If valid, redirect to the dashboard
+            $this->redirectIfAuthenticated($req, $res);
+        }
     }
 
     /**
@@ -126,15 +185,6 @@ class AuthController extends Controller
         ];
 
         $this->renderPage($viewPathFromPages, $data);
-    }
-
-    /**
-     * Handles the sign in request
-     */
-    public function handleSignIn(Request $req, Response $res): void {
-        // 1. Validasi input
-        // 2. Panggil service
-        // 3. Bikin response (redirect atau kirim json)
     }
 
     /**
