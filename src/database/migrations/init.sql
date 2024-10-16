@@ -1,36 +1,36 @@
 -- Users
-CREATE OR REPLACE TYPE user_role AS ENUM ('jobseeker', 'company');
+CREATE TYPE user_role AS ENUM ('jobseeker', 'company');
 
-CREATE OR REPLACE TABLE users (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  nama VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   role user_role NOT NULL
 );
 
 -- Company Details
-CREATE OR REPLACE TABLE company_details (
+CREATE TABLE company_details (
   user_id INTEGER PRIMARY KEY,
-  lokasi VARCHAR(255) NOT NULL,
+  location VARCHAR(255) NOT NULL,
   about TEXT NOT NULL,
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 
--- Lowongan Kerja
-CREATE OR REPLACE TYPE jenis_pekerjaan_enum AS ENUM ('full-time', 'part-time', 'internship');
+-- job Kerja
+CREATE TYPE job_type_enum AS ENUM ('full-time', 'part-time', 'internship');
 
-CREATE OR REPLACE TYPE jenis_lokasi_enum AS ENUM ('on-site', 'hybrid', 'remote');
+CREATE TYPE location_type_enum AS ENUM ('on-site', 'hybrid', 'remote');
 
-CREATE OR REPLACE TABLE lowongan (
-  lowongan_id SERIAL PRIMARY KEY,
+CREATE TABLE jobs (
+  job_id SERIAL PRIMARY KEY,
   company_id INTEGER NOT NULL,
-  posisi VARCHAR(255) NOT NULL,
-  deskripsi TEXT NOT NULL,
-  jenis_pekerjaan jenis_pekerjaan_enum NOT NULL,
-  jenis_lokasi jenis_lokasi_enum NOT NULL,
+  position VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  job_type job_type_enum NOT NULL,
+  location_type location_type_enum NOT NULL,
   is_open BOOLEAN DEFAULT true NOT NULL,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -38,30 +38,31 @@ CREATE OR REPLACE TABLE lowongan (
   FOREIGN KEY (company_id) REFERENCES users(id)
 );
 
--- Attachment Lowongan
-CREATE OR REPLACE TABLE attachment_lowongan (
+-- Attachment job
+CREATE TABLE job_attachment (
     attachment_id SERIAL PRIMARY KEY,
-    lowongan_id INTEGER NOT NULL,
+    job_id INTEGER NOT NULL,
     file_path VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (lowongan_id) REFERENCES lowongan(lowongan_id) ON DELETE CASCADE
+    FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE
 );
 
--- Lamaran
-CREATE OR REPLACE TYPE lamaran_status AS ENUM ('accepted', 'rejected', 'waiting');
-CREATE OR REPLACE TABLE lamaran (
-    lamaran_id SERIAL PRIMARY KEY,
+-- application
+CREATE TYPE application_status_enum AS ENUM ('accepted', 'rejected', 'waiting');
+
+CREATE TABLE applications (
+    application_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    lowongan_id INTEGER NOT NULL,
+    job_id INTEGER NOT NULL,
     cv_path VARCHAR(255) NOT NULL,
     video_path VARCHAR(255),
-    status lamaran_status DEFAULT 'waiting',
+    status application_status_enum DEFAULT 'waiting',
     status_reason TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (lowongan_id) REFERENCES lowongan(lowongan_id) ON DELETE SET NULL
-    -- ON DELETE SET NULL agar saat lowongan dihapus, tampilkan lowongan tersebut telah dihapus;
+    FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE SET NULL
+    -- ON DELETE SET NULL agar saat job dihapus, tampilkan job tersebut telah dihapus;
 );
 
 -- Trigger for updated at
@@ -74,12 +75,12 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE TRIGGER update_lowongan_updated_at
-BEFORE UPDATE ON lowongan
+CREATE OR REPLACE TRIGGER update_jobs_updated_at
+BEFORE UPDATE ON jobs
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at();
 
--- Trigger to validate that user_id on lowongan and company_details is referencing to a company
+-- Trigger to validate that user_id on jobs and company_details is referencing to a company
 CREATE OR REPLACE FUNCTION validate_company_user()
 RETURNS TRIGGER
 LANGUAGE PLpgSQL AS $$
@@ -92,8 +93,8 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE TRIGGER validate_company_user_on_lowongan
-BEFORE INSERT ON lowongan
+CREATE OR REPLACE TRIGGER validate_company_user_on_jobs
+BEFORE INSERT ON jobs
 FOR EACH ROW
 EXECUTE FUNCTION validate_company_user();
 
@@ -102,7 +103,7 @@ BEFORE INSERT ON company_details
 FOR EACH ROW
 EXECUTE FUNCTION validate_company_user();
 
--- Trigger to validate that user_id on lamaran is referencing to a jobseeker
+-- Trigger to validate that user_id on application is referencing to a jobseeker
 CREATE OR REPLACE FUNCTION validate_jobseeker_user()
 RETURNS TRIGGER
 LANGUAGE PLpgSQL AS $$
@@ -115,7 +116,7 @@ BEGIN
 END
 $$;
 
-CREATE OR REPLACE TRIGGER validate_jobseeker_user_on_lamaran
-BEFORE INSERT ON lamaran
+CREATE OR REPLACE TRIGGER validate_jobseeker_user_on_applications
+BEFORE INSERT ON applications
 FOR EACH ROW
 EXECUTE FUNCTION validate_jobseeker_user();
