@@ -2,9 +2,8 @@
     <section class="signin">
         <!-- Title -->
         <h1 class="signin__title">Sign In</h1>
-
         <!-- Form -->
-        <form id="signin-form" class="form" action="process_signin.php" method="POST">
+        <form id="signin-form" class="form" action="/api/auth/sign-in" method="POST">
             <!-- Email -->
             <div class="form__group">
                 <label for="email" id="email-label" class="form__label">

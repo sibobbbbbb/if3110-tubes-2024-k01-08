@@ -35,7 +35,7 @@ class AuthController extends Controller
         $data = [
             'title' => $title,
             'description' => $description,
-            'additionalTags' => $additionalTags
+            'additionalTags' => $additionalTags,
         ];
 
         $this->renderPage($viewPathFromPages, $data);
@@ -131,7 +131,11 @@ class AuthController extends Controller
     /**
      * Handles the sign in request
      */
-    public function handleSignIn(Request $req, Response $res): void {}
+    public function handleSignIn(Request $req, Response $res): void {
+        // 1. Validasi input
+        // 2. Panggil service
+        // 3. Bikin response (redirect atau kirim json)
+    }
 
     /**
      * Handles the sign up for job seeker endpoint 

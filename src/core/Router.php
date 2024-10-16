@@ -84,7 +84,7 @@ class Router
                 // Call all middlewares
                 $middlewares = $route['middlewaresFactory']();
                 foreach ($middlewares as $middleware) {
-                    $middleware($req, $res);
+                    $middleware->handle($req, $res);
                 }
 
                 // Call the handler

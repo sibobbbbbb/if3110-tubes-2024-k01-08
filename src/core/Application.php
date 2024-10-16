@@ -130,6 +130,18 @@ class Application
                 ];
             }
         );
+        // Register sign in POST endpoint
+        $router->get(
+            '/api/auth/sign-in',
+            function() {
+                $controller = $this->container->get(AuthController::class);
+                $method = 'handleSignIn';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
     }
 
     /**
