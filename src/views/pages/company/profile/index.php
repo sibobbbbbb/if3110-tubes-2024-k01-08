@@ -22,7 +22,7 @@
             <div class="form__group">
                 <label for="name" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['name'])):  ?>
-                        <?= htmlspecialchars($errorFields['name'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['name'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Name
@@ -32,7 +32,7 @@
                     name="name"
                     type="text"
                     placeholder="Fill in your company name"
-                    value="<?= htmlspecialchars($fields['name'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     class="input" />
 
                 <p class="form__error-message">
@@ -47,7 +47,7 @@
             <div class="form__group">
                 <label for="location" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['location'])):  ?>
-                        <?= htmlspecialchars($errorFields['location'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['location'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Location
@@ -57,7 +57,7 @@
                     name="location"
                     type="text"
                     placeholder="Fill in your company location"
-                    value="<?= htmlspecialchars($fields['location'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['location'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     class="input" />
 
                 <p class="form__error-message">
@@ -71,7 +71,7 @@
             <div class="form__group">
                 <label for="about" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['about'])):  ?>
-                        <?= htmlspecialchars($errorFields['about'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['about'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     About

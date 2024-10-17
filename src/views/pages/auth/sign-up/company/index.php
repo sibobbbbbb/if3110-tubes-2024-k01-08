@@ -8,7 +8,7 @@
             <div class="form__group">
                 <label for="name" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['name'])):  ?>
-                        <?= htmlspecialchars($errorFields['name'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['name'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
                     <?php endif; ?>
                 ">
                     Name
@@ -18,7 +18,7 @@
                     name="name"
                     type="text"
                     placeholder="Enter your name"
-                    value="<?= htmlspecialchars($fields['name'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     class="input" />
 
                 <p class="form__error-message">
@@ -32,7 +32,7 @@
             <div class="form__group">
                 <label for="email" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['email'])):  ?>
-                        <?= htmlspecialchars($errorFields['email'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['email'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
                     <?php endif; ?>
                 ">
                     Email
@@ -42,7 +42,7 @@
                     name="email"
                     type="text"
                     placeholder="Enter your email"
-                    value="<?= htmlspecialchars($fields['email'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     class="input" />
 
                 <p class="form__error-message">
@@ -56,7 +56,7 @@
             <div class="form__group">
                 <label for="password" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
-                        <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
                     <?php endif; ?>
                 ">
                     Password
@@ -65,7 +65,7 @@
                     name="password"
                     type="password"
                     placeholder="Enter your password"
-                    value="<?= htmlspecialchars($fields['password'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['password'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     class="input" />
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
@@ -73,12 +73,12 @@
                     <?php endif; ?>
                 </p>
             </div>
-            
+
             <!-- Location -->
             <div class="form__group">
                 <label for="location" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['location'])):  ?>
-                        <?= htmlspecialchars($errorFields['location'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['location'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
                     <?php endif; ?>
                 ">
                     Location
@@ -87,7 +87,7 @@
                     name="location"
                     type="location"
                     placeholder="Enter your company location"
-                    value="<?= htmlspecialchars($fields['location'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['location'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     class="input" />
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['location'])):  ?>
@@ -100,15 +100,15 @@
             <div class="form__group">
                 <label for="about" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['about'])):  ?>
-                        <?= htmlspecialchars($errorFields['about'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['about'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
                     <?php endif; ?>
                 ">
                     About
                 </label>
                 <textarea
-                name="about"
-                placeholder="Tell us about your company"
-                class="textarea"><?= htmlspecialchars($fields['about'] ?? '') ?></textarea>
+                    name="about"
+                    placeholder="Tell us about your company"
+                    class="textarea"><?= htmlspecialchars($fields['about'] ?? '') ?></textarea>
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['about'])):  ?>
                         <?= htmlspecialchars($errorFields['about'][0] ?? '') ?>
