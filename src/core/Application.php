@@ -6,10 +6,10 @@ use Exception;
 use src\exceptions\BaseHttpException;
 use src\core\{Config, Router, Container};
 use src\database\Database;
-use src\repositories\UserRepository;
-use src\services\{UserService, AuthService};
+use src\services\{ApplicationService, UserService, AuthService, CompanyService, JobService};
 use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware};
-use src\controllers\{AuthController, HomeController};
+use src\controllers\{AuthController, CompanyController, HomeController, JobController};
+use src\repositories\{ApplicationRepository, UserRepository, JobRepository};
 use src\utils\UserSession;
 
 // Class for the entry point of the application
@@ -73,7 +73,9 @@ class Application
         };
 
 
-        // Home 
+        /**
+         * Home
+         */
         $router->get(
             '/',
             function () {
@@ -87,32 +89,27 @@ class Application
         );
 
 
-        // Auth routes
+        /**
+         * Auth Routes
+         */
+        $signInFactoryFunction = function () {
+            $controller = $this->container->get(AuthController::class);
+            $method = 'renderAndHandleSignIn';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
         // Sign in (render)
         $router->get(
             '/auth/sign-in',
-            function () {
-                $controller = $this->container->get(AuthController::class);
-                $method = 'renderAndHandleSignIn';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            },
+            $signInFactoryFunction
         );
         // Sign in (form handling request)
         $router->post(
             '/auth/sign-in',
-            function () {
-                $controller = $this->container->get(AuthController::class);
-                $method = 'renderAndHandleSignIn';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            },
+            $signInFactoryFunction
         );
-
         // Sign out
         $router->post(
             '/auth/sign-out',
@@ -125,7 +122,6 @@ class Application
                 ];
             },
         );
-
         // Sign up
         $router->get(
             '/auth/sign-up',
@@ -139,30 +135,27 @@ class Application
             }
         );
 
-        // Sign up job seeker
-        $router->get(
-            '/auth/sign-up/job-seeker',
-            function () {
-                $controller = $this->container->get(AuthController::class);
-                $method = 'renderSignUpJobSeeker';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            }
-        );
 
-        // Sign up company
+        /**
+         * Company Routes
+         */
+        $companyProfileFactoryFunction = function () {
+            $controller = $this->container->get(CompanyController::class);
+            $method = 'renderAndHandleUpdateCompany';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render update company (render)
         $router->get(
-            '/auth/sign-up/company',
-            function () {
-                $controller = $this->container->get(AuthController::class);
-                $method = 'renderSignUpCompany';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            }
+            '/company/profile',
+            $companyProfileFactoryFunction
+        );
+        // Handle update company
+        $router->post(
+            '/company/profile',
+            $companyProfileFactoryFunction
         );
     }
 
@@ -233,7 +226,25 @@ class Application
             }
         );
 
-        // Add more repositories here
+        // Job Repository
+        $this->container->bind(
+            JobRepository::class,
+            function ($c) {
+                $db = $c->get(Database::class);
+                return new JobRepository($db);
+            }
+        );
+
+        // Application Repository
+        $this->container->bind(
+            ApplicationRepository::class,
+            function ($c) {
+                $db = $c->get(Database::class);
+                return new ApplicationRepository($db);
+            }
+        );
+
+        // Add if needed
     }
 
     /**
@@ -241,15 +252,6 @@ class Application
      */
     private function registerServicesToContainer()
     {
-        // UserService
-        $this->container->bind(
-            UserService::class,
-            function ($c) {
-                $userRepository = $c->get(UserRepository::class);
-                return new UserService($userRepository);
-            }
-        );
-
         // Authentication Service
         $this->container->bind(
             AuthService::class,
@@ -258,6 +260,34 @@ class Application
                 return new AuthService($userRepository);
             }
         );
+
+        // User Service
+        $this->container->bind(
+            UserService::class,
+            function ($c) {
+                $userRepository = $c->get(UserRepository::class);
+                return new UserService($userRepository);
+            }
+        );
+
+        // Job Service
+        $this->container->bind(
+            JobService::class,
+            function ($c) {
+                return new JobService();
+            }
+        );
+
+        // Application Service
+        $this->container->bind(
+            ApplicationService::class,
+            function ($c) {
+                return new ApplicationService();
+            }
+        );
+
+        // Add more if needed
+
     }
 
     /**
@@ -314,6 +344,21 @@ class Application
             }
         );
 
-        // Add more controllers here
+        // JobController
+        $this->container->bind(
+            JobController::class,
+            function ($c) {
+                return new JobController();
+            }
+        );
+
+        // CompanyController
+        $this->container->bind(
+            CompanyController::class,
+            function ($c) {
+                $userService = $c->get(UserService::class);
+                return new CompanyController($userService);
+            }
+        );
     }
 }

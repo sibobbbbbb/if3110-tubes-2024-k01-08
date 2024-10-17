@@ -2,6 +2,7 @@
 
 namespace src\controllers;
 
+use Exception;
 use src\core\{Request, Response};
 use src\dao\UserRole;
 use src\dto\DtoFactory;
@@ -53,14 +54,11 @@ class AuthController extends Controller
             $this->renderPage($viewPathFromPages, $data);
         } else {
             // Post
-            $email = $req->getBody()['email'];
-            $password = $req->getBody()['password'];
-
+            // Validate the request body
             $rules = [
                 'email' => ['required', 'email'],
                 'password' => ['required']
             ];
-
             $validator = new Validator();
             $isValid = $validator->validate($req->getBody(), $rules);
             // Invalid request body
@@ -71,8 +69,10 @@ class AuthController extends Controller
                 return;
             }
 
+            // Authenticate the user
             try {
-                // Authenticate the user
+                $email = $req->getBody()['email'];
+                $password = $req->getBody()['password'];
                 $user = $this->authService->signIn($email, $password);
             } catch (BadRequestHttpException $e) {
                 // Failed to authenticate
@@ -84,8 +84,13 @@ class AuthController extends Controller
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
                 return;
+            } catch (Exception $e) {
+                // Internal server error
+                // TODO: render error view
+                return;
             }
 
+            // Success
             // Set the user in the session
             UserSession::setUser($user);
 

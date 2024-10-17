@@ -36,6 +36,7 @@ class Database
         $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName};user={$dbUser};password={$dbPass}";
         try {
             $this->connection = new PDO($dsn);
+            // enable exceptionss
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             // Internal server error
@@ -69,6 +70,17 @@ class Database
         $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Execute a query (insert, update, delete)
+     * Return the number of rows affected
+     */
+    public function execute(string $sql, array $params = []): int
+    {
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->rowCount();
     }
 
     /**

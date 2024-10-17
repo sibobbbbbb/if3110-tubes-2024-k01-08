@@ -45,7 +45,7 @@ class Container implements ContainerInterface
 
         // If factory is not registered, throw an exception
         if (!isset($this->bindings[$key])) {
-            throw new Exception('factory not found');
+            throw new Exception("Factory function not found (check if $key class is registered in the container)");
         }
 
         // Call the factory function to create an instance
