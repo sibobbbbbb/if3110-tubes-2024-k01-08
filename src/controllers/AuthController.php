@@ -41,10 +41,7 @@ class AuthController extends Controller
         $linkTag = <<<HTML
                 <link rel="stylesheet" href="/styles/auth/sign-in.css" />
             HTML;
-        $scriptTag = <<<HTML
-                <script src="/scripts/auth/sign-in.js" defer></script>
-            HTML;
-        $additionalTags = [$linkTag, $scriptTag];
+        $additionalTags = [$linkTag];
         $data = [
             'title' => $title,
             'description' => $description,

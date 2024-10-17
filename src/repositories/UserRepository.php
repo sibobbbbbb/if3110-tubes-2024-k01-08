@@ -32,13 +32,7 @@ class UserRepository extends Repository
         // If not found
         if ($result == false) return null;
 
-        $user = new UserDao(
-            $result['id'],
-            $result['name'],
-            $result['email'],
-            $result['password'],
-            $result['role'],
-        );
+        $user = UserDao::fromRaw($result);
 
         return $user;
     }
@@ -57,6 +51,8 @@ class UserRepository extends Repository
             return null;
         }
 
-        return $result;
+        $user = UserDao::fromRaw($result);
+
+        return $user;
     }
 }

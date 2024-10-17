@@ -21,6 +21,17 @@ class UserDao
         $this->role = UserRole::fromString($role);
     }
 
+    public static function fromRaw(array $raw): UserDao
+    {
+        return new UserDao(
+            $raw['id'],
+            $raw['name'],
+            $raw['email'],
+            $raw['password'],
+            $raw['role'],
+        );
+    }
+
     public function getId(): int
     {
         return $this->id;
