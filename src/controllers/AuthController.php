@@ -129,7 +129,7 @@ class AuthController extends Controller
         // Render the view
         $viewPathFromPages = 'auth/sign-up/index.php';
         $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up.css" />
+                <link rel="stylesheet" href="/styles/auth/sign-up/sign-up.css" />
             HTML;
 
         // Data to pass to the view (SSR)
@@ -178,10 +178,10 @@ class AuthController extends Controller
     /**
      * Render the sign up company page
      */
-    public function renderSignUpCompany(Request $req, Response $res): void
+    public function renderandhandleSignUpCompany(Request $req, Response $res): void
     {
         // Redirect if user is authenticated
-        $this->redirectIfAuthenticated($req, $res);
+        // $this->redirectIfAuthenticated($req, $res);
 
         // Render the view
         $viewPathFromPages = 'auth/sign-up/company/index.php';
@@ -202,7 +202,47 @@ class AuthController extends Controller
             'additionalTags' => $additionalTags
         ];
 
-        $this->renderPage($viewPathFromPages, $data);
+        if ($req->getMethod() == "GET") {
+            // Get
+            $this->renderPage($viewPathFromPages, $data);
+        } else {
+            // Post
+            $name = $req->getBody()['name'];
+            $email = $req->getBody()['email'];
+            $password = $req->getBody()['password'];
+            $location = $req->getBody()['location'];
+            $about = $req->getBody()['about'];
+
+            $rules = [
+                'name' => ['required'],
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+                'location' => ['required'],
+                'about' => ['required']
+            ];
+
+            $validator = new Validator();
+            $isValid = $validator->validate($req->getBody(), $rules);
+            // Invalid request body
+            if (!$isValid) {
+                $data['errorFields'] = $validator->getErrorFields();
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+
+
+            // Authenticate the transaction
+            $transaction = $this->authService->signUpCompany($name,$email, $password, $location, $about);
+            if (!empty($transaction) ) {
+                $data['errorFields'] = $this->handleDatabaseError($transaction);
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+            $res->redirect('/auth/sign-in');
+            return;
+        }
     }
 
     /**
@@ -232,4 +272,18 @@ class AuthController extends Controller
             }
         }
     }
+
+    private function handleDatabaseError(string $errormess): array 
+    {
+        if(strpos($errormess, 'email') == true){
+            $data['errorFields'] = [
+                'email' => ["Email Already Exist"]
+            ];
+            return $data['errorFields'];
+        }
+
+        
+        return $errormess;
+    }
 }
+

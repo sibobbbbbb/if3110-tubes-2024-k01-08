@@ -135,6 +135,24 @@ class Application
             }
         );
 
+        $signUpCompanyFactoryFunction = function () {
+            $controller = $this->container->get(AuthController::class);
+            $method = 'renderandhandleSignUpCompany';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Sign in (render)
+        $router->get(
+            '/auth/sign-up/company',
+            $signUpCompanyFactoryFunction
+        );
+        // Sign in (form handling request)
+        $router->post(
+            '/auth/sign-up/company',
+            $signUpCompanyFactoryFunction
+        );
 
         /**
          * Company Routes

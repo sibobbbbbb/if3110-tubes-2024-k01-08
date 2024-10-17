@@ -24,7 +24,7 @@ CREATE TYPE job_type_enum AS ENUM ('full-time', 'part-time', 'internship');
 
 CREATE TYPE location_type_enum AS ENUM ('on-site', 'hybrid', 'remote');
 
-CREATE TABLE jobs (
+BLE jobs (
   job_id SERIAL PRIMARY KEY,
   company_id INTEGER NOT NULL,
   position VARCHAR(255) NOT NULL,

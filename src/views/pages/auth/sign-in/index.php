@@ -57,7 +57,7 @@
         <!-- Sign up -->
         <p class="signin__register-prompt">
             Don't have an account?
-            <a href="/auth/register.php" class="anchor-link">
+            <a href="/auth/sign-up" class="anchor-link">
                 Register
             </a>
         </p>

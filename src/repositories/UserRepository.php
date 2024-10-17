@@ -118,4 +118,64 @@ class UserRepository extends Repository
             throw $e;
         }
     }
+
+    // Insert Into User and company_details
+    public function insertintouserandcompany(string $name, string $email, string $password, string $location, string $about): string
+    {
+        try {
+
+            $this->db->beginTransaction();
+
+            $id = $this->generateUniqueId();
+
+            // Insert into users table
+            $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'company')";
+            $params_user = [':id' => $id, 
+                            ':name' => $name,
+                            ':email' => $email,
+                            ':password' => $password,
+            ];
+            // var_dump('Insert User Params: ', $params_user);
+
+            $result_user = $this->db->execute($query_insert_user, $params_user);
+            // var_dump('User Insert Result: ', $result_user);
+
+
+            // Insert into company_details table
+            $query_insert_company = "INSERT INTO company_details VALUES (:user_id, :location, :about)";
+            $params_company = [':user_id' => $id,
+                            ':location' => $location,
+                            ':about' => $about,
+            ];
+            // var_dump('Insert Company Params: ', $params_company);
+
+            $result_company = $this->db->execute($query_insert_company, $params_company);
+            // var_dump('Company Insert Result: ', $result_company);
+
+
+            // Commit 
+            $this->db->commit();
+            return "";
+        } catch (Exception $e) {
+            // Rollback 
+            $this->db->rollBack();
+
+            // var_dump('Error Message: ', $e->getMessage());
+
+            return ' Transaction failed: ' . $e->getMessage();
+        }
+    }
+
+    private function generateUniqueId(): int
+    {
+        $query = "SELECT MAX(id) as max_id FROM users";
+        $id = $this->db->queryOne($query);
+
+        if ($id === false || !isset($id['max_id'])) {
+            return 1;
+        }
+        
+        return $id['max_id'] + 1; 
+    }
+
 }
