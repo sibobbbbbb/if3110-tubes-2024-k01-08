@@ -6,6 +6,7 @@ use Exception;
 use PDO;
 use src\dao\{UserDao, CompanyDetailDao};
 use \src\database\Database;
+use src\exceptions\HttpExceptionFactory;
 
 /**
  * Repository for user model
@@ -120,7 +121,39 @@ class UserRepository extends Repository
     }
 
     // Insert Into User and company_details
-    public function insertintouserandcompany(string $name, string $email, string $password, string $location, string $about): string
+    public function insertintouserjobseeker(string $name, string $email, string $password): void
+    {
+        try {
+
+            $this->db->beginTransaction();
+
+            $id = $this->generateUniqueId();
+
+            // Insert into users table
+            $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'jobseeker')";
+            $params_user = [':id' => $id, 
+                            ':name' => $name,
+                            ':email' => $email,
+                            ':password' => $password,
+            ];
+
+            $result_user = $this->db->execute($query_insert_user, $params_user);
+
+
+            $this->db->commit();
+            return;
+        } catch (Exception $e) {
+            // Rollback 
+            $this->db->rollBack();
+
+            throw HttpExceptionFactory::create(400, $e->getMessage());
+
+            return;
+        }
+    }
+
+    // Insert Into User and company_details
+    public function insertintouserandcompany(string $name, string $email, string $password, string $location, string $about): void
     {
         try {
 
@@ -136,7 +169,6 @@ class UserRepository extends Repository
                 ':email' => $email,
                 ':password' => $password,
             ];
-            // var_dump('Insert User Params: ', $params_user);
 
             $result_user = $this->db->executeInsert($query_insert_user, $params_user);
             // var_dump('User Insert Result: ', $result_user);
@@ -149,7 +181,6 @@ class UserRepository extends Repository
                 ':location' => $location,
                 ':about' => $about,
             ];
-            // var_dump('Insert Company Params: ', $params_company);
 
             $result_company = $this->db->executeInsert($query_insert_company, $params_company);
             // var_dump('Company Insert Result: ', $result_company);
@@ -157,14 +188,14 @@ class UserRepository extends Repository
 
             // Commit 
             $this->db->commit();
-            return "";
+            return;
         } catch (Exception $e) {
             // Rollback 
             $this->db->rollBack();
 
-            // var_dump('Error Message: ', $e->getMessage());
+            throw HttpExceptionFactory::create(400, $e->getMessage());
 
-            return ' Transaction failed: ' . $e->getMessage();
+            return;
         }
     }
 
