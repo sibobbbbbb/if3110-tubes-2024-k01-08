@@ -24,7 +24,7 @@ CREATE TYPE job_type_enum AS ENUM ('full-time', 'part-time', 'internship');
 
 CREATE TYPE location_type_enum AS ENUM ('on-site', 'hybrid', 'remote');
 
-BLE jobs (
+CREATE TABLE jobs (
   job_id SERIAL PRIMARY KEY,
   company_id INTEGER NOT NULL,
   position VARCHAR(255) NOT NULL,
@@ -39,7 +39,7 @@ BLE jobs (
 );
 
 -- Attachment job
-CREATE TABLE job_attachment (
+CREATE TABLE job_attachments (
     attachment_id SERIAL PRIMARY KEY,
     job_id INTEGER NOT NULL,
     file_path VARCHAR(255) NOT NULL,
@@ -65,6 +65,7 @@ CREATE TABLE applications (
     -- ON DELETE SET NULL agar saat job dihapus, tampilkan job tersebut telah dihapus;
 );
 
+
 -- Trigger for updated at
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER 
@@ -80,6 +81,7 @@ BEFORE UPDATE ON jobs
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at();
 
+
 -- Trigger to validate that user_id on jobs and company_details is referencing to a company
 CREATE OR REPLACE FUNCTION validate_company_user()
 RETURNS TRIGGER
@@ -93,15 +95,30 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE TRIGGER validate_company_user_on_jobs
-BEFORE INSERT ON jobs
-FOR EACH ROW
-EXECUTE FUNCTION validate_company_user();
-
 CREATE OR REPLACE TRIGGER validate_company_user_on_company_details
 BEFORE INSERT ON company_details
 FOR EACH ROW
 EXECUTE FUNCTION validate_company_user();
+
+
+-- Trigger to validate that company_id on jobs is referencing to a company
+CREATE OR REPLACE FUNCTION validate_company_id()
+RETURNS TRIGGER
+LANGUAGE PLpgSQL AS $$
+BEGIN
+  IF (SELECT role FROM users WHERE id = NEW.company_id) <> 'company' THEN
+    RAISE EXCEPTION 'User with id % is not a company', NEW.company_id;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER validate_company_id_on_jobs
+BEFORE INSERT ON jobs
+FOR EACH ROW
+EXECUTE FUNCTION validate_company_id();
+
 
 -- Trigger to validate that user_id on application is referencing to a jobseeker
 CREATE OR REPLACE FUNCTION validate_jobseeker_user()

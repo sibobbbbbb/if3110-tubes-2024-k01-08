@@ -478,3 +478,4 @@ composer.lock
 
 # Mounted docker
 db-data
+upload-data

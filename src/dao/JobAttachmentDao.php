@@ -2,7 +2,7 @@
 
 namespace src\dao;
 
-class JobAttachment
+class JobAttachmentDao
 {
     private int $attachment_id;
     private int $job_id;
@@ -15,6 +15,10 @@ class JobAttachment
         $this->file_path = $file_path;
     }
 
+    public function setAttachmentId(int $attachment_id): void
+    {
+        $this->attachment_id = $attachment_id;
+    }
     public function getAttachmentId(): int
     {
         return $this->attachment_id;

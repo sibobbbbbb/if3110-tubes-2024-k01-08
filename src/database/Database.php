@@ -76,11 +76,22 @@ class Database
      * Execute a query (insert, update, delete)
      * Return the number of rows affected
      */
-    public function execute(string $sql, array $params = []): int
+    public function executeUpdate(string $sql, array $params = []): int
     {
         $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
         return $stmt->rowCount();
+    }
+
+    /**
+     * Execute a query (insert)
+     * Returns the last inserted id
+     */
+    public function executeInsert(string $sql, array $params = []): int
+    {
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($params);
+        return $this->connection->lastInsertId();
     }
 
     /**

@@ -16,6 +16,9 @@ class JobDao
     private DateTime $created_at;
     private DateTime $updated_at;
 
+    // Denormalized (array of strings) field
+    private array $attachments;
+
     public function __construct(int $job_id, int $company_id, string $position, string $description, JobType $job_type, LocationType $location_type, bool $is_open, DateTime $created_at, DateTime $updated_at)
     {
         $this->job_id = $job_id;
@@ -65,7 +68,16 @@ class JobDao
     {
         return $this->updated_at;
     }
+    public function getAttachments(): array
+    {
+        return $this->attachments;
+    }
 
+
+    public function setJobId(int $job_id): void
+    {
+        $this->job_id = $job_id;
+    }
     public function setPosition(string $position): void
     {
         $this->position = $position;
@@ -85,5 +97,17 @@ class JobDao
     public function setIsOpen(bool $is_open): void
     {
         $this->is_open = $is_open;
+    }
+    public function setCreatedAt(DateTime $created_at): void
+    {
+        $this->created_at = $created_at;
+    }
+    public function setUpdatedAt(DateTime $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+    public function setAttachments(array $attachments): void
+    {
+        $this->attachments = $attachments;
     }
 }

@@ -39,10 +39,9 @@ class AuthController extends Controller
         // Data to pass to the view
         $title = 'LinkInPurry | Sign In';
         $description = 'Sign in to your LinkInPurry account';
-        $linkTag = <<<HTML
+        $additionalTags = <<<HTML
                 <link rel="stylesheet" href="/styles/auth/sign-in.css" />
             HTML;
-        $additionalTags = [$linkTag];
         $data = [
             'title' => $title,
             'description' => $description,
@@ -128,14 +127,13 @@ class AuthController extends Controller
 
         // Render the view
         $viewPathFromPages = 'auth/sign-up/index.php';
-        $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/sign-up.css" />
-            HTML;
 
         // Data to pass to the view (SSR)
         $title = 'LinkInPurry | Sign Up';
         $description = 'Sign up for a LinkInPurry account';
-        $additionalTags = [$linkTag];
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/auth/sign-up/sign-up.css" />
+            HTML;
         $data = [
             'title' => $title,
             'description' => $description,
@@ -155,17 +153,14 @@ class AuthController extends Controller
 
         // Render the view
         $viewPathFromPages = 'auth/sign-up/job-seeker/index.php';
-        $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
-            HTML;
-        $scriptTag = <<<HTML
-                <script src="/scripts/auth/sign-up/job-seeker.js" defer></script>
-            HTML;
 
         // Data to pass to the view (SSR)
         $title = 'LinkInPurry | Job Seeker Sign Up';
         $description = 'Sign up for a LinkInPurry account as a job seeker';
-        $additionalTags = [$linkTag];
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
+                <script src="/scripts/auth/sign-up/job-seeker.js" defer></script>
+            HTML;
         $data = [
             'title' => $title,
             'description' => $description,
@@ -199,16 +194,15 @@ class AuthController extends Controller
 
             // Authenticate the transaction
             try {
-                $transaction = $this->authService->signUpJobSeeker($name,$email, $password);
+                $transaction = $this->authService->signUpJobSeeker($name, $email, $password);
                 $res->redirect('/auth/sign-in');
                 return;
-            } catch(BadRequestHttpException $e) {
+            } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
                 return;
             }
-
         }
     }
 
@@ -222,17 +216,14 @@ class AuthController extends Controller
 
         // Render the view
         $viewPathFromPages = 'auth/sign-up/company/index.php';
-        $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
-            HTML;
-        $scriptTag = <<<HTML
-                <script src="/scripts/auth/sign-up/company.js" defer></script>
-            HTML;
 
         // Data to pass to view (SSR)
         $title = "LinkInPurry | Company Sign Up";
         $description = "Sign up for a LinkInPurry account as a company";
-        $additionalTags = [$linkTag, $scriptTag];
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
+                <script src="/scripts/auth/sign-up/company.js" defer></script>
+            HTML;
         $data = [
             'title' => $title,
             'description' => $description,
@@ -271,10 +262,10 @@ class AuthController extends Controller
 
             // Authenticate the transaction
             try {
-                $transaction = $this->authService->signUpCompany($name,$email, $password, $location, $about);
+                $transaction = $this->authService->signUpCompany($name, $email, $password, $location, $about);
                 $res->redirect('/auth/sign-in');
                 return;
-            } catch(BadRequestHttpException $e) {
+            } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
@@ -305,15 +296,15 @@ class AuthController extends Controller
                 return;
             } else {
                 // If employer
-                $res->redirect('/company/dashboard');
+                $res->redirect('/company/jobs');
                 return;
             }
         }
     }
 
-    private function handleDatabaseError(string $errormess): array 
+    private function handleDatabaseError(string $errormess): array
     {
-        if(strpos($errormess, 'email') == true){
+        if (strpos($errormess, 'email') == true) {
             $data['errorFields'] = [
                 'email' => ["Email Already Exist"]
             ];
@@ -328,4 +319,3 @@ class AuthController extends Controller
         return $data['errorFields'];
     }
 }
-

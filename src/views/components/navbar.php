@@ -62,7 +62,7 @@ $isUserLoggedIn = false;
             <?php elseif (UserSession::getUserRole() == UserRole::COMPANY) : ?>
                 <ul id="navbar-links-ul" class="nav__list">
                     <li class="nav__item">
-                        <a href="/company/dashboard" class="nav__link">Dashboard</a>
+                        <a href="/company/jobs" class="nav__link">Dashboard</a>
                     </li>
 
                     <li class="nav__item">

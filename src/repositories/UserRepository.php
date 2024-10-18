@@ -108,8 +108,8 @@ class UserRepository extends Repository
             $this->db->beginTransaction();
 
             // Execute queries
-            $this->db->execute($query1, $params1);
-            $this->db->execute($query2, $params2);
+            $this->db->executeUpdate($query1, $params1);
+            $this->db->executeUpdate($query2, $params2);
 
             // Commit transaction
             $this->db->commit();
@@ -163,26 +163,27 @@ class UserRepository extends Repository
 
             // Insert into users table
             $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'company')";
-            $params_user = [':id' => $id, 
-                            ':name' => $name,
-                            ':email' => $email,
-                            ':password' => $password,
+            $params_user = [
+                ':id' => $id,
+                ':name' => $name,
+                ':email' => $email,
+                ':password' => $password,
             ];
 
-
-            $result_user = $this->db->execute($query_insert_user, $params_user);
+            $result_user = $this->db->executeInsert($query_insert_user, $params_user);
+            // var_dump('User Insert Result: ', $result_user);
 
 
             // Insert into company_details table
             $query_insert_company = "INSERT INTO company_details VALUES (:user_id, :location, :about)";
-            $params_company = [':user_id' => $id,
-                            ':location' => $location,
-                            ':about' => $about,
+            $params_company = [
+                ':user_id' => $id,
+                ':location' => $location,
+                ':about' => $about,
             ];
 
-
-            $result_company = $this->db->execute($query_insert_company, $params_company);
-
+            $result_company = $this->db->executeInsert($query_insert_company, $params_company);
+            // var_dump('Company Insert Result: ', $result_company);
 
 
             // Commit 
@@ -206,8 +207,7 @@ class UserRepository extends Repository
         if ($id === false || !isset($id['max_id'])) {
             return 1;
         }
-        
-        return $id['max_id'] + 1; 
-    }
 
+        return $id['max_id'] + 1;
+    }
 }
