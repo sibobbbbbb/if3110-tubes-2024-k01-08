@@ -26,9 +26,6 @@ class Request
     // Store the parsed body of the request into associative array
     private array $body;
 
-    // Store fils from multipart form data
-    private array $files;
-
     // Initialize request object
     public function __construct(string $routePath)
     {
@@ -81,11 +78,6 @@ class Request
     public function getQueryParams(string $id): string | null
     {
         return $this->queryParams[$id] ?? null;
-    }
-
-    public function getFiles(): array
-    {
-        return $this->files;
     }
 
     /**

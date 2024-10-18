@@ -1,4 +1,4 @@
-class NavbarManager {
+class Navbar {
   constructor() {
     this.bodyElement = document.querySelector("body");
 
@@ -35,9 +35,8 @@ class NavbarManager {
     linksElement.forEach((linkElement) => {
       const href = linkElement.getAttribute("href");
 
-      if (currentPath === href) {
-        linkElement.classList.remove("font-medium", "hover:text-primary");
-        linkElement.classList.add("text-primary", "font-semibold");
+      if (currentPath.startsWith(href)) {
+        linkElement.classList.add("nav__link--active");
       }
     });
   }
@@ -111,4 +110,4 @@ class NavbarManager {
   }
 }
 
-new NavbarManager();
+new Navbar();

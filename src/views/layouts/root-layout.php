@@ -61,11 +61,7 @@
     <script src="/scripts/global.js" defer></script>
 
     <!-- Additional tags -->
-    <?php
-    foreach ($additionalTags as $tag) {
-        echo $tag;
-    }
-    ?>
+    <?= $additionalTags ?>
 
     <!-- Global Font (Inter)-->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

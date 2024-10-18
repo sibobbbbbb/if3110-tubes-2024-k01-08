@@ -6,7 +6,7 @@ use Exception;
 use src\exceptions\BaseHttpException;
 use src\core\{Config, Router, Container};
 use src\database\Database;
-use src\services\{ApplicationService, UserService, AuthService, CompanyService, JobService};
+use src\services\{ApplicationService, UserService, AuthService, CompanyService, JobService, UploadService};
 use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware};
 use src\controllers\{AuthController, CompanyController, HomeController, JobController};
 use src\repositories\{ApplicationRepository, UserRepository, JobRepository};
@@ -63,13 +63,13 @@ class Application
 
         // Middlewares factory function
         $anyAuthMiddlewareFactoryFunction = function () {
-            return [$this->container->get(AnyAuthMiddleware::class)];
+            return $this->container->get(AnyAuthMiddleware::class);
         };
-        $companyAuthMiddleware = function () {
-            return [$this->container->get(CompanyAuthMiddleware::class)];
+        $companyAuthMiddlewareFactoryFunction = function () {
+            return $this->container->get(CompanyAuthMiddleware::class);
         };
         $jobSeekerAuthMiddleware = function () {
-            return [$this->container->get(JobSeekerAuthMiddleware::class)];
+            return $this->container->get(JobSeekerAuthMiddleware::class);
         };
 
 
@@ -154,9 +154,11 @@ class Application
             $signUpCompanyFactoryFunction
         );
 
+
         /**
          * Company Routes
          */
+        // Update company profile
         $companyProfileFactoryFunction = function () {
             $controller = $this->container->get(CompanyController::class);
             $method = 'renderAndHandleUpdateCompany';
@@ -165,16 +167,64 @@ class Application
                 'method' => $method
             ];
         };
-        // Render update company (render)
+        // Render
         $router->get(
             '/company/profile',
-            $companyProfileFactoryFunction
+            $companyProfileFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
         );
-        // Handle update company
+        // Handle
         $router->post(
             '/company/profile',
-            $companyProfileFactoryFunction
+            $companyProfileFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
         );
+
+        // Create job
+        $createJobFactoryFunction = function () {
+            $controller = $this->container->get(CompanyController::class);
+            $method = 'renderAndHandleCreateJob';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render
+        $router->get(
+            '/company/jobs/create',
+            $createJobFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+        // Handle
+        $router->post(
+            '/company/jobs/create',
+            $createJobFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        // Edit job
+        $editJobFactoryFunction = function () {
+            $controller = $this->container->get(CompanyController::class);
+            $method = 'renderAndHandleEditJob';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render
+        $router->get(
+            '/company/jobs/edit',
+            $editJobFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+        // Handle
+        $router->post(
+            '/company/jobs/edit',
+            $editJobFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        // Delete job
     }
 
     /**
@@ -279,6 +329,14 @@ class Application
             }
         );
 
+        // Upload Service
+        $this->container->bind(
+            UploadService::class,
+            function ($c) {
+                return new UploadService();
+            }
+        );
+
         // User Service
         $this->container->bind(
             UserService::class,
@@ -293,6 +351,17 @@ class Application
             JobService::class,
             function ($c) {
                 return new JobService();
+            }
+        );
+
+        // Company Service
+        $this->container->bind(
+            CompanyService::class,
+            function ($c) {
+                $userRepository = $c->get(UserRepository::class);
+                $jobRepository = $c->get(JobRepository::class);
+                $uploadService = $c->get(UploadService::class);
+                return new CompanyService($userRepository, $jobRepository, $uploadService);
             }
         );
 
@@ -374,8 +443,8 @@ class Application
         $this->container->bind(
             CompanyController::class,
             function ($c) {
-                $userService = $c->get(UserService::class);
-                return new CompanyController($userService);
+                $companyService = $c->get(CompanyService::class);
+                return new CompanyController($companyService);
             }
         );
     }
