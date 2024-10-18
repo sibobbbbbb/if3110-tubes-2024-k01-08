@@ -5,6 +5,7 @@ namespace src\services;
 use src\dao\UserDao;
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\UserRepository;
+use src\exceptions\BadRequestHttpException;
 
 class AuthService extends Service
 {
@@ -40,20 +41,34 @@ class AuthService extends Service
     /**
      * Register a company
      */
-    public function signUpCompany(string $name, string $email, string $password, string $location, string $about): string
+    public function signUpCompany(string $name, string $email, string $password, string $location, string $about): void
     {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        // Find the user by email
-        $transaction = $this->userRepository->insertintouserandcompany($name, $email, $hashed_password, $location, $about);
 
-        $user = $this->userRepository->findUserByEmail($email);
+        try {
+            $transaction = $this->userRepository->insertintouserandcompany($name, $email, $hashed_password, $location, $about);
+            return;
+        } catch(BadRequestHttpException $e) {
 
-        // Check if the user exists
-        // if (!empty($transaction)) {
-        //     throw HttpExceptionFactory::create(400, $transaction);
-        // }
+            throw HttpExceptionFactory::create(400, $e->getMessage());
+            return;
+        }
+    }
 
-        return $transaction;
+    /**
+     * Register a job seeker
+     */
+    public function signUpJobSeeker(string $name, string $email, string $password): void
+    {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            $transaction = $this->userRepository->insertintouserjobseeker($name, $email, $hashed_password);
+            return;
+        } catch(BadRequestHttpException $e) {
+            throw HttpExceptionFactory::create(400, $e->getMessage());
+            return;
+        }
     }
 
 }

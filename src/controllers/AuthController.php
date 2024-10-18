@@ -148,7 +148,7 @@ class AuthController extends Controller
     /**
      * Render the sign up job seeker page
      */
-    public function renderSignUpJobSeeker(Request $req, Response $res): void
+    public function renderandhandleSignUpJobSeeker(Request $req, Response $res): void
     {
         // Redirect if user is authenticated
         $this->redirectIfAuthenticated($req, $res);
@@ -156,7 +156,7 @@ class AuthController extends Controller
         // Render the view
         $viewPathFromPages = 'auth/sign-up/job-seeker/index.php';
         $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/job-seeker.css" />
+                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
             HTML;
         $scriptTag = <<<HTML
                 <script src="/scripts/auth/sign-up/job-seeker.js" defer></script>
@@ -172,7 +172,44 @@ class AuthController extends Controller
             'additionalTags' => $additionalTags
         ];
 
-        $this->renderPage($viewPathFromPages, $data);
+        if ($req->getMethod() == "GET") {
+            // Get
+            $this->renderPage($viewPathFromPages, $data);
+        } else {
+            // Post
+            $name = $req->getBody()['name'];
+            $email = $req->getBody()['email'];
+            $password = $req->getBody()['password'];
+
+            $rules = [
+                'name' => ['required'],
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+            ];
+
+            $validator = new Validator();
+            $isValid = $validator->validate($req->getBody(), $rules);
+            // Invalid request body
+            if (!$isValid) {
+                $data['errorFields'] = $validator->getErrorFields();
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+
+            // Authenticate the transaction
+            try {
+                $transaction = $this->authService->signUpJobSeeker($name,$email, $password);
+                $res->redirect('/auth/sign-in');
+                return;
+            } catch(BadRequestHttpException $e) {
+                $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
+                $data['fields'] = $req->getBody();
+                $this->renderPage($viewPathFromPages, $data);
+                return;
+            }
+
+        }
     }
 
     /**
@@ -186,7 +223,7 @@ class AuthController extends Controller
         // Render the view
         $viewPathFromPages = 'auth/sign-up/company/index.php';
         $linkTag = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/company.css" />
+                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
             HTML;
         $scriptTag = <<<HTML
                 <script src="/scripts/auth/sign-up/company.js" defer></script>
@@ -233,15 +270,16 @@ class AuthController extends Controller
 
 
             // Authenticate the transaction
-            $transaction = $this->authService->signUpCompany($name,$email, $password, $location, $about);
-            if (!empty($transaction) ) {
-                $data['errorFields'] = $this->handleDatabaseError($transaction);
+            try {
+                $transaction = $this->authService->signUpCompany($name,$email, $password, $location, $about);
+                $res->redirect('/auth/sign-in');
+                return;
+            } catch(BadRequestHttpException $e) {
+                $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
                 return;
             }
-            $res->redirect('/auth/sign-in');
-            return;
         }
     }
 
@@ -282,8 +320,12 @@ class AuthController extends Controller
             return $data['errorFields'];
         }
 
-        
-        return $errormess;
+        $data['errorFields'] = [
+            'name' => [$errormess],
+            'email' => [$errormess],
+            'password' => [$errormess],
+        ];
+        return $data['errorFields'];
     }
 }
 

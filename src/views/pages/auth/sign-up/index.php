@@ -8,7 +8,7 @@
         <div class="signup__options">
           <div class="signup__opt">
             <h3 class="signup__opt-title">Are You a Job Seeker?</h3>
-            <a href="/auth/sign-up/jobseeker" class="signup__button">
+            <a href="/auth/sign-up/job-seeker" class="signup__button">
               Click here
             </a>
           </div>

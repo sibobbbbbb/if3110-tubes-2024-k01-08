@@ -154,6 +154,25 @@ class Application
             $signUpCompanyFactoryFunction
         );
 
+        $signUpJobSeekerFactoryFunction = function () {
+            $controller = $this->container->get(AuthController::class);
+            $method = 'renderandhandleSignUpJobSeeker';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+
+        $router->get(
+            '/auth/sign-up/job-seeker',
+            $signUpJobSeekerFactoryFunction
+        );
+        // Sign in (form handling request)
+        $router->post(
+            '/auth/sign-up/job-seeker',
+            $signUpJobSeekerFactoryFunction
+        );
+
         /**
          * Company Routes
          */
