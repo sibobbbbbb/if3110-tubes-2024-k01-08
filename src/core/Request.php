@@ -117,7 +117,8 @@ class Request
         foreach ($route as $index => $part) {
             // Check if { is in the first index and } is in the last index
             if (strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1) {
-                $this->pathParams[$part] = htmlspecialchars($path[$index], ENT_QUOTES, 'UTF-8');
+                $this->pathParams[$part] = $path[$index];
+                // $this->pathParams[$part] = htmlspecialchars($path[$index], ENT_QUOTES, 'UTF-8');
             }
         }
     }
@@ -134,7 +135,8 @@ class Request
             foreach ($queryParams as $param) {
                 $param = explode('=', $param);
                 if (count($param) === 2) {
-                    $this->queryParams[$param[0]] = htmlspecialchars($param[1], ENT_QUOTES, 'UTF-8');
+                    // $this->queryParams[$param[0]] = htmlspecialchars($param[1], ENT_QUOTES, 'UTF-8');
+                    $this->queryParams[$param[0]] = $param[1];
                 }
             }
         }
@@ -160,17 +162,18 @@ class Request
                 } else {
                     throw new Exception('Invalid JSON payload');
                 }
-                $this->sanitizeBody();
+                // $this->sanitizeBody();
             }
             // Parse URL-encoded form data
             elseif (strpos($contentType, 'application/x-www-form-urlencoded') !== false) {
                 parse_str(file_get_contents('php://input'), $this->body);
-                $this->sanitizeBody();
+                // $this->sanitizeBody();
             }
             // Parse multipart form data
             elseif (strpos($contentType, 'multipart/form-data') !== false) {
                 foreach ($_POST as $key => $value) {
-                    $this->body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+                    // $this->body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+                    $this->body[$key] = $value;
                 }
 
                 foreach ($_FILES as $key => $file) {
@@ -183,13 +186,13 @@ class Request
         // $this->sanitizeBody();
     }
 
-    private function sanitizeBody(): void
-    {
-        array_walk_recursive($this->body, function (&$value) {
-            if (is_string($value)) {
-                $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-                $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-            }
-        });
-    }
+    // private function sanitizeBody(): void
+    // {
+    //     array_walk_recursive($this->body, function (&$value) {
+    //         if (is_string($value)) {
+    //             $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    //             $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    //         }
+    //     });
+    // }
 }

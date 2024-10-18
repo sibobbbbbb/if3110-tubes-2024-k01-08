@@ -8,7 +8,7 @@
             <div class="form__group">
                 <label for="email" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['email'])):  ?>
-                        <?= htmlspecialchars($errorFields['email'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['email'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Email
@@ -18,7 +18,7 @@
                     name="email"
                     type="text"
                     placeholder="Enter your email"
-                    value="<?= htmlspecialchars($fields['email'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     class="input" />
 
                 <p class="form__error-message">
@@ -32,7 +32,7 @@
             <div class="form__group">
                 <label for="password" class="form__label 
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
-                        <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '') ?>
+                        <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Password
@@ -41,7 +41,7 @@
                     name="password"
                     type="password"
                     placeholder="Enter your password"
-                    value="<?= htmlspecialchars($fields['password'] ?? '') ?>"
+                    value="<?= htmlspecialchars($fields['password'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     class="input" />
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
