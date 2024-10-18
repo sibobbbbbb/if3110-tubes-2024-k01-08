@@ -158,7 +158,7 @@ class AuthController extends Controller
         $title = 'LinkInPurry | Job Seeker Sign Up';
         $description = 'Sign up for a LinkInPurry account as a job seeker';
         $additionalTags = <<<HTML
-                <link rel="stylesheet" href="/styles/auth/sign-up/job-seeker.css" />
+                <link rel="stylesheet" href="/styles/auth/sign-up/register.css" />
                 <script src="/scripts/auth/sign-up/job-seeker.js" defer></script>
             HTML;
         $data = [
@@ -194,16 +194,15 @@ class AuthController extends Controller
 
             // Authenticate the transaction
             try {
-                $transaction = $this->authService->signUpJobSeeker($name,$email, $password);
+                $transaction = $this->authService->signUpJobSeeker($name, $email, $password);
                 $res->redirect('/auth/sign-in');
                 return;
-            } catch(BadRequestHttpException $e) {
+            } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
                 return;
             }
-
         }
     }
 
@@ -263,10 +262,10 @@ class AuthController extends Controller
 
             // Authenticate the transaction
             try {
-                $transaction = $this->authService->signUpCompany($name,$email, $password, $location, $about);
+                $transaction = $this->authService->signUpCompany($name, $email, $password, $location, $about);
                 $res->redirect('/auth/sign-in');
                 return;
-            } catch(BadRequestHttpException $e) {
+            } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
