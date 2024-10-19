@@ -14,7 +14,7 @@ class Validator
     {
         foreach ($rules as $field => $rule) {
             $fieldInMessage = ucfirst(str_replace("-", " ", $field));
-            $value = $data[$field];
+            $value = isset($data[$field]) ? $data[$field] : null;
 
             foreach ($rule as $validation => $param) {
                 // If doesn't receive param
