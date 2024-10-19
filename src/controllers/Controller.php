@@ -23,7 +23,7 @@ abstract class Controller
 
         // Check if the layout and content files exist
         if (!file_exists($layoutPath) || !file_exists($contentPath)) {
-            throw HttpExceptionFactory::create(404, "Page Not Found");
+            throw HttpExceptionFactory::createNotFound("Page Not Found");
         }
 
         // Start output buffering
@@ -37,5 +37,7 @@ abstract class Controller
         // Render the layout
         require $layoutPath;
         echo ob_get_clean();
+
+        exit();
     }
 }

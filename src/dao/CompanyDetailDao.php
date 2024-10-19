@@ -8,7 +8,7 @@ class CompanyDetailDao
     private string $location;
     private string $about;
 
-    // Denormalized from User
+    // Denormalized from User (only for GET)
     private string $name;
 
     public function __construct(int $user_id, string $name, string $location, string $about)

@@ -1,5 +1,4 @@
-console.log(QuillEditor);
-
+// Initialize quill editor
 new QuillEditor(
   "#description-quill-editor",
   "create-job-form",

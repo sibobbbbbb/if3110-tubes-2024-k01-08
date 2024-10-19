@@ -11,12 +11,13 @@ class UploadService
 {
     /**
      * Uploads a file to a certain target directory
+     * @param directoryFromPublic: target directory to upload the file
      * @param file: file array 
-     * @param targetDirectory: target directory to upload the file
+     * @return string: the file directory from the public directory
      * I.S. file is already validated at the start of controller
      * F.S. file is uploaded to the target directory
      */
-    public function uploadOneFile(array $normalizedFile, string $directoryFromPublic): string
+    public function uploadOneFile(string $directoryFromPublic, array $normalizedFile): string
     {
         $originalFileName = $normalizedFile['name'];
         // Remove illegal characters from the
@@ -43,7 +44,12 @@ class UploadService
         return $fileDirectoryFromPublic;
     }
 
-    public function uploadMultipleFiles(array $rawFiles, string $directoryFromPublic): array
+    /**
+     * Uploads multiple files to a certain target directory
+     * @param directoryFromPublic: target directory to upload the file
+     * @param rawFiles: raw files array
+     */
+    public function uploadMultipleFiles(string $directoryFromPublic, array $rawFiles): array
     {
         $uploadedFiles = [];
 
@@ -56,9 +62,26 @@ class UploadService
                 'size' => $rawFiles['size'][$i],
             ];
 
-            $uploadedFiles[] = self::uploadOneFile($normalizedFile, $directoryFromPublic);
+            $uploadedFiles[] = self::uploadOneFile($directoryFromPublic, $normalizedFile);
         }
 
         return $uploadedFiles;
+    }
+
+    /**
+     * Deletes a file from the public directory
+     * @param fileDirectoryFromPublic: file directory from the public directory
+     */
+    public function deleteOneFile(string $fileDirectoryFromPublic)
+    {
+        $fileDirectoryToDelete = PathResolver::resolve(__DIR__ . '/../../public/' . $fileDirectoryFromPublic);
+
+        if (!file_exists($fileDirectoryToDelete)) {
+            throw new \Exception('File not found');
+        }
+
+        if (!unlink($fileDirectoryToDelete)) {
+            throw new \Exception('Failed to delete file');
+        }
     }
 }

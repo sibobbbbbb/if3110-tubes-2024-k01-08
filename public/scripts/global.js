@@ -1,4 +1,4 @@
-class Navbar {
+class NavbarManager {
   constructor() {
     this.bodyElement = document.querySelector("body");
 
@@ -110,4 +110,4 @@ class Navbar {
   }
 }
 
-new Navbar();
+new NavbarManager();

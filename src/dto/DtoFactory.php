@@ -10,33 +10,37 @@ class DtoFactory
     /**
      * Create a success dto response (no data)
      */
-    public static function createSuccessDto(string $message): SuccessDto
+    public static function createSuccessDto(string $message): array
     {
-        return new SuccessDto($message);
+        $dto = new SuccessDto($message);
+        return $dto->toArray();
     }
 
     /**
      * Create a success dto response with data
      */
-    public static function createSuccessDtoWithData(string $message, object $data): SuccessDto
+    public static function createSuccessDtoWithData(string $message, object $data): array
     {
-        return new SuccessDto($message, $data);
+        $dto = new SuccessDto($message, $data);
+        return $dto->toArray();
     }
 
     /**
      * Create a success dto response with paged-based pagination data
      */
-    public static function createSuccessDtoWithPagination(string $message, object $data, object $pagination): SuccessPagedPaginationDto
+    public static function createSuccessDtoWithPagination(string $message, object $data, object $pagination): array
     {
-        return new SuccessPagedPaginationDto($message, $data, $pagination);
+        $dto = new SuccessPagedPaginationDto($message, $data, $pagination);
+        return $dto->toArray();
     }
 
     /**
      * Create an error dto response
      */
-    public static function createErrorDto(string $message, array $errorFields): ErrorDto
+    public static function createErrorDto(string $message, array $errorFields = []): array
     {
-        return new ErrorDto($message, $errorFields);
+        $dto = new ErrorDto($message, $errorFields);
+        return $dto->toArray();
     }
 
     /**
