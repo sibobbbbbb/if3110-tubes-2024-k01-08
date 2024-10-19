@@ -93,8 +93,8 @@ class JobRepository extends Repository
             ':company_id' => $companyId,
             ':position' => $position,
             ':description' => $description,
-            ':job_type' => $jobType,
-            ':location_type' => $locationType
+            ':job_type' => $jobType->value,
+            ':location_type' => $locationType->value
         ];
 
         $newJobId = $this->db->executeInsert($query, $params);

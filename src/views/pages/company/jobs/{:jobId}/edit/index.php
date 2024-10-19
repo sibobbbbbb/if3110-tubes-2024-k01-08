@@ -178,15 +178,6 @@
 
             <!-- Attachments -->
             <div class="form__group">
-                <!-- Current value -->
-                <div>
-                    <?php if (isset($fields['attachments'])): ?>
-                        <?php foreach ($fields['attachments'] as $attachment): ?>
-                            <img src="<?= htmlspecialchars($attachment, ENT_QUOTES, 'UTF-8'); ?>" alt="Attachment" class="attachment">
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-
                 <label for="attachments" class="form__label 
                         <?php if (isset($errorFields) && isset($errorFields['attachments'])):  ?>
                             <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
@@ -194,6 +185,24 @@
                     ">
                     Attachments
                 </label>
+
+                <!-- Current value -->
+                <div id="form-attachments" class="form__attachments">
+                    <?php foreach ($fields['attachments'] as $attachment): ?>
+                        <div class="attachment">
+                            <img class="attachment__image" src="<?= htmlspecialchars($attachment->getFilePath(), ENT_QUOTES, 'UTF-8'); ?>" alt="Attachment" class="attachment">
+                            <button data-attachment-id="<?= htmlspecialchars($attachment->getAttachmentId(), ENT_QUOTES, 'UTF-8'); ?>" type="button" class="button--destructive button attachment__delete-button">
+                                <svg class="attachment__delete-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2">
+                                    <path d="M3 6h18" />
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                    <line x1="10" x2="10" y1="11" y2="17" />
+                                    <line x1="14" x2="14" y1="11" y2="17" />
+                                </svg>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
 
                 <input class="input" name="attachments[]" type="file" accept="image/*" multiple />
 
@@ -205,8 +214,8 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="button button--default-size button--default-color">
-                Update
+            <button id="edit-job-submit" type="submit" class="button button--default-size button--default-color">
+                Edit
             </button>
         </form>
     </section>
