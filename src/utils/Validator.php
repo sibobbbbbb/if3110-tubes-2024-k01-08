@@ -14,13 +14,8 @@ class Validator
     {
         foreach ($rules as $field => $rule) {
             $fieldInMessage = ucfirst(str_replace("-", " ", $field));
-
-            if (!isset($data[$field])) {
-                $this->addError($field, ucfirst("$fieldInMessage is required"));
-                continue;
-            }
-
             $value = $data[$field];
+
             foreach ($rule as $validation => $param) {
                 // If doesn't receive param
                 if (is_numeric($validation)) {
@@ -32,8 +27,18 @@ class Validator
                     case 'required':
                         if (empty($value)) {
                             // echo "in required";
+                            // if 0 or false is passed, it is not empty
+                            if ($value === 0 || $value === "0" || $value === false) {
+                                continue 2;
+                            }
+
                             $message = ucfirst("$fieldInMessage is required");
                             $this->addError($field, $message);
+                        }
+                        break;
+                    case 'optional':
+                        if (empty($value)) {
+                            continue 2;
                         }
                         break;
                     case 'min':
@@ -64,6 +69,13 @@ class Validator
                             $this->addError($field, $message);
                         }
                         break;
+                    case 'boolean':
+                        if (($value !== '0' && $value !== '1')) {
+                            // echo "in boolean";
+                            $message = ucfirst("$fieldInMessage must be a boolean");
+                            $this->addError($field, $message);
+                        }
+                        break;
                     case 'requiredFile':
                         foreach ($value['error'] as $key => $error) {
                             if ($error == 4) {
@@ -73,6 +85,10 @@ class Validator
                         }
                         break;
                     case 'file':
+                        // only check if file exists
+                        if ($value['error'][0] == 4) {
+                            continue 2;
+                        }
                         // allowed types
                         if (!in_array($value['type'], $param['allowedTypes'])) {
                             $message = ucfirst("$fieldInMessage must be one of " . implode(', ', $param['allowedTypes']));
@@ -85,6 +101,10 @@ class Validator
                         }
                         break;
                     case 'files':
+                        // only check if file exists
+                        if ($value['error'][0] == 4) {
+                            continue 2;
+                        }
                         // allowed types
                         foreach ($value['type'] as $key => $type) {
                             if (!in_array($type, $param['allowedTypes'])) {

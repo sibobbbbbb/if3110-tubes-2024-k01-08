@@ -4,21 +4,33 @@ namespace src\exceptions;
 
 class HttpExceptionFactory
 {
-    static function create(int $code, string $message, array $fieldErrors = null): BaseHttpException
+    static function createBadRequest(string $message, array $fieldErrors = null): BadRequestHttpException
     {
-        switch ($code) {
-            case 400:
-                return new BadRequestHttpException($message, $fieldErrors);
-            case 401:
-                return new UnauthorizedHttpException($message);
-            case 403:
-                return new ForbiddenHttpException($message);
-            case 404:
-                return new NotFoundHttpException($message);
-            case 500:
-                return new InternalServerErrorHttpException($message);
-            default:
-                return new BaseHttpException($code, $message);
-        }
+        return new BadRequestHttpException($message, $fieldErrors);
+    }
+
+    static function createUnauthorized(string $message): UnauthorizedHttpException
+    {
+        return new UnauthorizedHttpException($message);
+    }
+
+    static function createForbidden(string $message): ForbiddenHttpException
+    {
+        return new ForbiddenHttpException($message);
+    }
+
+    static function createNotFound(string $message): NotFoundHttpException
+    {
+        return new NotFoundHttpException($message);
+    }
+
+    static function createInternalServerError(string $message): InternalServerErrorHttpException
+    {
+        return new InternalServerErrorHttpException($message);
+    }
+
+    static function createFromBase(int $code, string $message): BaseHttpException
+    {
+        return new BaseHttpException($code, $message);
     }
 }

@@ -94,7 +94,7 @@ class Router
         }
 
         // If not found, default redirect to 404 page
-        throw HttpExceptionFactory::create(404, 'Route not found');
+        throw HttpExceptionFactory::createNotFound('Route not found');
     }
 
     private function matchPath(string $router, string $uri): bool

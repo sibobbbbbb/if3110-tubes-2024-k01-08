@@ -107,10 +107,10 @@ class Request
 
         $this->pathParams = [];
         foreach ($route as $index => $part) {
-            // Check if { is in the first index and } is in the last index
-            if (strpos($part, '{') === 0 && strpos($part, '}') === strlen($part) - 1) {
-                $this->pathParams[$part] = $path[$index];
-                // $this->pathParams[$part] = htmlspecialchars($path[$index], ENT_QUOTES, 'UTF-8');
+            // Check if the first two character is {: and the last character is }
+            if (substr($part, 0, 2) === '{:' && substr($part, -1) === '}') {
+                $parsedKey = substr($part, 2, -1);
+                $this->pathParams[$parsedKey] = $path[$index];
             }
         }
     }

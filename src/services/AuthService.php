@@ -27,12 +27,12 @@ class AuthService extends Service
 
         // Check if the user exists
         if (!isset($user)) {
-            throw HttpExceptionFactory::create(400, 'Username or password is incorrect');
+            throw HttpExceptionFactory::createBadRequest('Username or password is incorrect');
         }
 
         // Check if the password is correct
         if (!password_verify($password, $user->getHashedPassword())) {
-            throw HttpExceptionFactory::create(400, 'Username or password is incorrect');
+            throw HttpExceptionFactory::createBadRequest('Username or password is incorrect');
         }
 
         return $user;
@@ -48,9 +48,9 @@ class AuthService extends Service
         try {
             $transaction = $this->userRepository->insertintouserandcompany($name, $email, $hashed_password, $location, $about);
             return;
-        } catch(BadRequestHttpException $e) {
+        } catch (BadRequestHttpException $e) {
 
-            throw HttpExceptionFactory::create(400, $e->getMessage());
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
             return;
         }
     }
@@ -65,10 +65,9 @@ class AuthService extends Service
         try {
             $transaction = $this->userRepository->insertintouserjobseeker($name, $email, $hashed_password);
             return;
-        } catch(BadRequestHttpException $e) {
-            throw HttpExceptionFactory::create(400, $e->getMessage());
+        } catch (BadRequestHttpException $e) {
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
             return;
         }
     }
-
 }

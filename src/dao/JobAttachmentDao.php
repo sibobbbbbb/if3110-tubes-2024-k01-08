@@ -15,6 +15,11 @@ class JobAttachmentDao
         $this->file_path = $file_path;
     }
 
+    public static function fromRaw(array $raw): JobAttachmentDao
+    {
+        return new JobAttachmentDao($raw['attachment_id'], $raw['job_id'], $raw['file_path']);
+    }
+
     public function setAttachmentId(int $attachment_id): void
     {
         $this->attachment_id = $attachment_id;

@@ -19,4 +19,12 @@ class SuccessDto extends BaseDto
     {
         return $this->data;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "message" => $this->getMessage(),
+            "data" => $this->data
+        ];
+    }
 }

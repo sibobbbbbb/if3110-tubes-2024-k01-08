@@ -153,7 +153,7 @@ class Application
             '/auth/sign-up/company',
             $signUpCompanyFactoryFunction
         );
-      
+
         $signUpJobSeekerFactoryFunction = function () {
             $controller = $this->container->get(AuthController::class);
             $method = 'renderandhandleSignUpJobSeeker';
@@ -231,18 +231,47 @@ class Application
         };
         // Render
         $router->get(
-            '/company/jobs/edit',
+            '/company/jobs/{:jobId}/edit',
             $editJobFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
         // Handle
         $router->post(
-            '/company/jobs/edit',
+            '/company/jobs/{:jobId}/edit',
             $editJobFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
 
         // Delete job
+        $router->delete(
+            '/company/jobs/{:jobId}',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'handleDeleteJob';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+
+        /**
+         * Delete a job attachment
+         */
+        $router->delete(
+            '/company/jobs/attachments/{:attachmentId}',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'handleDeleteJobAttachment';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
     }
 
     /**

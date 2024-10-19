@@ -16,4 +16,12 @@ class SuccessPagedPaginationDto extends SuccessDto
     {
         return $this->meta;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "message" => $this->getMessage(),
+            "meta" => $this->meta
+        ];
+    }
 }

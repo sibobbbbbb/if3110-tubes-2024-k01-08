@@ -19,4 +19,11 @@ class ErrorDto extends BaseDto
     {
         return $this->errorFields;
     }
+
+    public function toArray(): array
+    {
+        return [
+            "message" => $this->getMessage(),
+        ];
+    }
 }

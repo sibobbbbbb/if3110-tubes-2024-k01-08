@@ -5,7 +5,9 @@ namespace src\controllers;
 use Exception;
 use src\core\{Response, Request};
 use src\dao\{LocationType, JobType};
+use src\dto\DtoFactory;
 use src\exceptions\BadRequestHttpException;
+use src\exceptions\BaseHttpException;
 use src\exceptions\HttpExceptionFactory;
 use src\services\{CompanyService, UserService};
 use src\utils\{UserSession, Validator};
@@ -36,9 +38,9 @@ class CompanyController extends Controller
         $additionalTags = <<<HTML
                 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js" defer></script>
                 <script src="/scripts/quill-editor.js" defer></script>
-                <script src="/scripts/company/form-job.js" defer></script>
+                <script src="/scripts/company/create-job-form.js" defer></script>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css">
-                <link rel="stylesheet" href="/styles/company/form-job.css" />                
+                <link rel="stylesheet" href="/styles/company/job-form.css" />                
                 <link rel="stylesheet" href="/styles/quill-editor.css">
             HTML;
         $data = [
@@ -69,7 +71,6 @@ class CompanyController extends Controller
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
 
             // Create job
@@ -82,11 +83,11 @@ class CompanyController extends Controller
 
                 $this->companyService->createJob($currentUserId, $position, $description, $jobType, $locationType, $attachments);
             } catch (HttpExceptionFactory $e) {
-                // Render error view
+                // TODO: Render error view
                 throw $e;
                 return;
             } catch (Exception $e) {
-                // Internal server error
+                // TODO: Render Internal server error
                 throw $e;
                 return;
             }
@@ -102,7 +103,128 @@ class CompanyController extends Controller
      * I.S. user authenticated & authorized as company (from middleware)
      * F.S. render the edit job page
      */
-    public function renderAndHandleEditJob(Request $req, Response $res): void {}
+    public function renderAndHandleEditJob(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/{:jobId}/edit/index.php';
+        $currentUserId = UserSession::getUserId();
+        $currentJobId = $req->getPathParams("jobId");
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Edit Job';
+        $description = 'Edit job';
+        $additionalTags = <<<HTML
+                <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js" defer></script>
+                <script src="/scripts/quill-editor.js" defer></script>
+                <script src="/scripts/company/edit-job-form.js" defer></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css">
+                <link rel="stylesheet" href="/styles/company/job-form.css" />                
+                <link rel="stylesheet" href="/styles/quill-editor.css">
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags,
+            'currentJobId' => $currentJobId
+        ];
+
+        // Get initial data
+        $jobDetail = $this->companyService->getJobDetail($currentJobId);
+
+        if ($req->getMethod() == "GET") {
+            // GET
+            $data['fields'] = [
+                'position' => $jobDetail->getPosition(),
+                'description' => $jobDetail->getDescription(),
+                'is-open' => $jobDetail->getIsOpen(),
+                'job-type' => $jobDetail->getJobType()->value,
+                'location-type' => $jobDetail->getLocationType()->value,
+                'attachments' => $jobDetail->getAttachments(),
+            ];
+
+            // Render
+            $this->renderPage($viewPathFromPages, $data);
+        } else if ($req->getMethod() == "POST") {
+            // POST
+            // Validate request body
+            $rules = [
+                'position' => ['required', "max" => 128],
+                'description' => ['required', "max" => 2048],
+                'is-open' => ['required', 'boolean'],
+                'job-type' => ['required', "enum" => JobType::getValues()],
+                'location-type' => ['required', "enum" => LocationType::getValues()],
+                'attachments' => ['optional', "files" => ['maxSize' => 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
+            ];
+
+            $validator = new Validator();
+            $isValid = $validator->validate($req->getBody(), $rules);
+            if (!$isValid) {
+                $data['errorFields'] = $validator->getErrorFields();
+                // Keep user input for position, description, job-type, location-type
+                $data['fields'] = $req->getBody();
+                $data['fields']['attachments'] = $jobDetail->getAttachments();
+
+                $this->renderPage($viewPathFromPages, $data);
+            }
+
+            // Edit job
+            try {
+                $position = $req->getBody()['position'];
+                $description = $req->getBody()['description'];
+                $isOpen = (bool)$req->getBody()['is-open'];
+                $jobType = JobType::fromString($req->getBody()['job-type']);
+                $locationType = LocationType::fromString($req->getBody()['location-type']);
+                $attachments = $req->getBody()['attachments'];
+
+                $this->companyService->editJob($currentUserId, $currentJobId, $position, $description, $isOpen, $jobType, $locationType, $attachments);
+            } catch (HttpExceptionFactory $e) {
+                // TODO: Render error view
+                throw $e;
+                return;
+            } catch (Exception $e) {
+                // TODO: Render Internal server error
+                throw $e;
+                return;
+            }
+
+            // Reset form state (redirect to the same page)
+            $res->redirect("/company/jobs/$currentJobId/edit");
+        }
+    }
+
+
+    /**
+     * Delete a job
+     */
+    public function handleDeleteJob(Request $req, Response $res): void {}
+
+
+    /**
+     * Handle delete job attachment
+     * company/jobs/attachment/{:attachmentId}
+     */
+    public function handleDeleteJobAttachment(Request $req, Response $res): void
+    {
+        error_log("Delete job attachment");
+        $attachmentId = $req->getPathParams('attachmentId');
+        $currentUserId = UserSession::getUserId();
+
+        // Delete attachment
+        try {
+            $this->companyService->deleteJobAttachment($currentUserId, $attachmentId);
+        } catch (BaseHttpException $e) {
+            // Http exception
+            $responseDto = DtoFactory::createErrorDto($e->getMessage());
+            $res->json($e->getCode(), $responseDto);
+        } catch (Exception $e) {
+            // Treat as internal server error
+            $responseDto = DtoFactory::createErrorDto("An error occurred while deleting job attachment");
+            $res->json(500, $responseDto);
+        }
+
+        // Success
+        $responseDto = DtoFactory::createSuccessDto("Job attachment deleted successfully");
+        $res->json(200, $responseDto);
+    }
 
 
     /**
@@ -154,7 +276,6 @@ class CompanyController extends Controller
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
 
             // Update company profile
@@ -174,7 +295,6 @@ class CompanyController extends Controller
                 ];
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             } catch (Exception $e) {
                 // Internal server error
                 // TODO: render error view

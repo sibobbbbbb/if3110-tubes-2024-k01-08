@@ -16,20 +16,27 @@ class JobDao
     private DateTime $created_at;
     private DateTime $updated_at;
 
-    // Denormalized (array of strings) field
+    // Denormalized data (only for GET)
+    // array of JobAttachmentDao
     private array $attachments;
 
-    public function __construct(int $job_id, int $company_id, string $position, string $description, JobType $job_type, LocationType $location_type, bool $is_open, DateTime $created_at, DateTime $updated_at)
+    public function __construct(int $job_id, int $company_id, string $position, string $description, string $job_type, string $location_type, bool $is_open, DateTime $created_at, DateTime $updated_at)
     {
         $this->job_id = $job_id;
         $this->company_id = $company_id;
         $this->position = $position;
         $this->description = $description;
-        $this->job_type = $job_type;
-        $this->location_type = $location_type;
+        $this->job_type = JobType::fromString($job_type);
+        $this->location_type = LocationType::fromString($location_type);
         $this->is_open = $is_open;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
+        $this->attachments = [];
+    }
+
+    public static function fromRaw(array $raw): JobDao
+    {
+        return new JobDao($raw['job_id'], $raw['company_id'], $raw['position'], $raw['description'], $raw['job_type'], $raw['location_type'], $raw['is_open'], new DateTime($raw['created_at']), new DateTime($raw['updated_at']));
     }
 
     public function getJobId(): int
@@ -72,7 +79,6 @@ class JobDao
     {
         return $this->attachments;
     }
-
 
     public function setJobId(int $job_id): void
     {

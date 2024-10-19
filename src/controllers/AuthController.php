@@ -65,7 +65,7 @@ class AuthController extends Controller
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
+                exit();
             }
 
             // Authenticate the user
@@ -82,11 +82,11 @@ class AuthController extends Controller
                 ];
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
+                exit();
             } catch (Exception $e) {
                 // Internal server error
                 // TODO: render error view
-                return;
+                exit();
             }
 
             // Success
@@ -106,7 +106,6 @@ class AuthController extends Controller
         // Redirect if user is not authenticated
         if (!UserSession::isLoggedIn()) {
             $res->redirect('/');
-            return;
         }
 
         // Sign out the user
@@ -189,19 +188,16 @@ class AuthController extends Controller
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
 
             // Authenticate the transaction
             try {
                 $transaction = $this->authService->signUpJobSeeker($name, $email, $password);
                 $res->redirect('/auth/sign-in');
-                return;
             } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
         }
     }
@@ -256,7 +252,6 @@ class AuthController extends Controller
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
 
 
@@ -264,12 +259,10 @@ class AuthController extends Controller
             try {
                 $transaction = $this->authService->signUpCompany($name, $email, $password, $location, $about);
                 $res->redirect('/auth/sign-in');
-                return;
             } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-                return;
             }
         }
     }
@@ -293,11 +286,9 @@ class AuthController extends Controller
             if (UserSession::getUserRole() === UserRole::JOBSEEKER) {
                 // If job seeker
                 $res->redirect('/jobs');
-                return;
             } else {
                 // If employer
                 $res->redirect('/company/jobs');
-                return;
             }
         }
     }

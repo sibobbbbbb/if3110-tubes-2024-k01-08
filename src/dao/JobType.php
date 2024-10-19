@@ -17,13 +17,13 @@ enum JobType: string
         ];
     }
 
-    public static function fromString(string $role): JobType
+    public static function fromString(string $jobType): JobType
     {
-        return match ($role) {
+        return match ($jobType) {
             'full-time' => JobType::FULL_TIME,
             'part-time' => JobType::PART_TIME,
             'internship' => JobType::INTERNSHIP,
-            default => throw new \InvalidArgumentException("Invalid role: $role")
+            default => throw new \InvalidArgumentException("Invalid job type: $jobType")
         };
     }
 }

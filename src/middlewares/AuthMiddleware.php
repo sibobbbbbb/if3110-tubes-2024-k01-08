@@ -29,7 +29,6 @@ abstract class AuthMiddleware extends Middleware
         // If user is not logged in, redirect to sign in page
         if (!UserSession::isLoggedIn()) {
             $res->redirect('/auth/sign-in');
-            return;
         }
 
         // If no roles specified, any role can access the route
@@ -40,7 +39,6 @@ abstract class AuthMiddleware extends Middleware
         // If user is logged in, but not in the specified roles, redirect to error page
         if (!in_array(UserSession::getUserRole(), $this->roles)) {
             $res->redirect("/error/");
-            return;
         }
 
         // continue

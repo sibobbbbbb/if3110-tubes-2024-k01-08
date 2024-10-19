@@ -131,14 +131,14 @@ class UserRepository extends Repository
 
             // Insert into users table
             $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'jobseeker')";
-            $params_user = [':id' => $id, 
-                            ':name' => $name,
-                            ':email' => $email,
-                            ':password' => $password,
+            $params_user = [
+                ':id' => $id,
+                ':name' => $name,
+                ':email' => $email,
+                ':password' => $password,
             ];
 
-            $result_user = $this->db->execute($query_insert_user, $params_user);
-
+            $result_user = $this->db->executeInsert($query_insert_user, $params_user);
 
             $this->db->commit();
             return;
@@ -146,7 +146,7 @@ class UserRepository extends Repository
             // Rollback 
             $this->db->rollBack();
 
-            throw HttpExceptionFactory::create(400, $e->getMessage());
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
 
             return;
         }
@@ -193,7 +193,7 @@ class UserRepository extends Repository
             // Rollback 
             $this->db->rollBack();
 
-            throw HttpExceptionFactory::create(400, $e->getMessage());
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
 
             return;
         }

@@ -40,7 +40,7 @@ class Database
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             // Internal server error
-            throw HttpExceptionFactory::create(500, 'Cannot connect to the database');
+            throw HttpExceptionFactory::createInternalServerError('Cannot connect to the database');
         }
     }
 
@@ -81,6 +81,15 @@ class Database
         $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
         return $stmt->rowCount();
+    }
+
+    /**
+     * Execute a delete query
+     * Return the number of rows affected
+     */
+    public function executeDelete(string $sql, array $params = []): int
+    {
+        return $this->executeUpdate($sql, $params);
     }
 
     /**
