@@ -1,9 +1,6 @@
 <?php
 
 namespace src\controllers;
-
-
-
 class ErrorController extends Controller
 {
     public function __construct()

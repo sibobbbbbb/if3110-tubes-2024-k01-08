@@ -290,7 +290,17 @@ class Application
             [$companyAuthMiddlewareFactoryFunction]
         );
 
-        // $this->renderError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
+        $router->get(
+            '/history',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderandHandleHistory';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
     }
 
     /**
