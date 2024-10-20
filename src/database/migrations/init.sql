@@ -155,13 +155,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Users
-INSERT INTO users (id, name, email, password, role) VALUES
-(1, 'jobseeker1', 'jobseeker1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
-(2, 'jobseeker2', 'jobseeker2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
-(3, 'jobseeker3', 'jobseeker3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
-(4, 'company1', 'company1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
-(5, 'company2', 'company2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
-(6, 'company3', 'company3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company');
+INSERT INTO users (name, email, password, role) VALUES
+('jobseeker1', 'jobseeker1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker2', 'jobseeker2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker3', 'jobseeker3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('company1', 'company1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company2', 'company2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company3', 'company3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('Dewo', 'dewo@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('Travis', 'travis@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker');
 
 -- Company Details
 INSERT INTO company_details (user_id, location, about) VALUES
@@ -207,3 +209,15 @@ SELECT
     END,
     now() - (random() * (interval '60 days'))
 FROM generate_series(1, 150);
+
+-- Update users sequence
+SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
+
+-- Update jobs sequence
+SELECT setval(pg_get_serial_sequence('jobs', 'job_id'), (SELECT MAX(job_id) FROM jobs));
+
+-- Update job_attachments sequence
+SELECT setval(pg_get_serial_sequence('job_attachments', 'attachment_id'), (SELECT MAX(attachment_id) FROM job_attachments));
+
+-- Update applications sequence
+SELECT setval(pg_get_serial_sequence('applications', 'application_id'), (SELECT MAX(application_id) FROM applications));
