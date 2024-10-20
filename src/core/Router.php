@@ -101,7 +101,34 @@ class Router
     {
         // Parse path parameters /{id}/ into regex
         // and match from the beginning to the end of the string
-        $regex = '#^' . preg_replace('/{[^}]+}/', '([^/]+)', $router) . '$#';
-        return preg_match($regex, $uri);
+
+        // ignore trailing slashes
+        $parsedUri = rtrim($uri, '/');
+
+        // explode /
+        $routerPaths = explode('/', $router);
+        $uriPaths = explode('/', $parsedUri);
+
+        // if the number of paths is different, return false
+        if (count($routerPaths) !== count($uriPaths)) {
+            return false;
+        }
+
+        // if the paths are different, return false
+        for ($i = 0; $i < count($routerPaths); $i++) {
+            // if the path is equal, continue
+            if ($routerPaths[$i] === $uriPaths[$i]) {
+                continue;
+            }
+
+            // if the path not a parameter, return false
+            if ($routerPaths[$i][0] !== '[' || $routerPaths[$i][strlen($routerPaths[$i]) - 1] !== ']') {
+                return false;
+            }
+
+            // if the path is a parameter, continue
+        }
+
+        return true;
     }
 }

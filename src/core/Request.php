@@ -13,7 +13,7 @@ class Request
     // Path of the request (for example: /users/123/)
     private string $reqPath;
 
-    // Path of the route (for example: /users/{id}/)
+    // Path of the route (for example: /users/[id]/)
     // This value should be the same as the route path if no path parameters
     private string $routePath;
 
@@ -97,7 +97,7 @@ class Request
     }
 
     /**
-     * Extract path parameters from the URI /wkwk/{:FOO}/{:BAR}
+     * Extract path parameters from the URI /wkwk/[FOO]/[BAR]
      * and store it in pathParams
      */
     private function extractPathParams(): void
@@ -106,11 +106,14 @@ class Request
         $route = explode('/', $this->routePath);
 
         $this->pathParams = [];
-        foreach ($route as $index => $part) {
-            // Check if the first two character is {: and the last character is }
-            if (substr($part, 0, 2) === '{:' && substr($part, -1) === '}') {
-                $parsedKey = substr($part, 2, -1);
-                $this->pathParams[$parsedKey] = $path[$index];
+
+        for ($i = 0; $i < count($route); $i++) {
+            if ($route[$i] === $path[$i]) {
+                continue;
+            }
+
+            if (preg_match('/\[(.*?)\]/', $route[$i], $matches)) {
+                $this->pathParams[$matches[1]] = $path[$i];
             }
         }
     }

@@ -140,7 +140,7 @@ class CompanyController extends Controller
             'page' => $req->getQueryParams('page')
         ];
 
-        echo var_dump($rawQueryParams);
+        // echo var_dump($rawQueryParams);
 
         // Parse query parameters
         // echo var_dump($rawQueryParams);
@@ -156,7 +156,7 @@ class CompanyController extends Controller
      */
     public function renderAndHandleEditJob(Request $req, Response $res): void
     {
-        $viewPathFromPages = 'company/jobs/{:jobId}/edit/index.php';
+        $viewPathFromPages = 'company/jobs/[jobId]/edit/index.php';
         $currentUserId = UserSession::getUserId();
         $currentJobId = $req->getPathParams("jobId");
 
@@ -251,7 +251,7 @@ class CompanyController extends Controller
 
     /**
      * Handle delete job attachment
-     * company/jobs/attachment/{:attachmentId}
+     * company/jobs/attachment/[attachmentId]
      */
     public function handleDeleteJobAttachment(Request $req, Response $res): void
     {

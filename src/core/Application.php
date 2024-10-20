@@ -247,20 +247,20 @@ class Application
         };
         // Render
         $router->get(
-            '/company/jobs/{:jobId}/edit',
+            '/company/jobs/[jobId]/edit',
             $editJobFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
         // Handle
         $router->post(
-            '/company/jobs/{:jobId}/edit',
+            '/company/jobs/[jobId]/edit',
             $editJobFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
 
         // Delete job
         $router->delete(
-            '/company/jobs/{:jobId}',
+            '/company/jobs/[jobId]',
             function () {
                 $controller = $this->container->get(CompanyController::class);
                 $method = 'handleDeleteJob';
@@ -277,7 +277,7 @@ class Application
          * Delete a job attachment
          */
         $router->delete(
-            '/company/jobs/attachments/{:attachmentId}',
+            '/company/jobs/attachments/[attachmentId]',
             function () {
                 $controller = $this->container->get(CompanyController::class);
                 $method = 'handleDeleteJobAttachment';
