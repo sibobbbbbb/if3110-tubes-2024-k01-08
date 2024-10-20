@@ -41,7 +41,12 @@ if (UserSession::isLoggedIn()) {
                         <path d="m21 21-4.3-4.3" />
                     </svg>
 
-                    <input type="text" name="search" class="input header__search-input" placeholder="Search for jobs" />
+                    <input type="text" name="search" class="input header__search-input" placeholder="Search for jobs"
+                        <?php if (isset($filters['search'])) : ?>
+                        value="<?= htmlspecialchars($filters['search'], ENT_QUOTES, 'utf-8') ?>"
+                        <?php else: ?>
+                        value=""
+                        <?php endif; ?> />
                 </form>
             </search>
         </div>
