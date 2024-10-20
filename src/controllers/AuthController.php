@@ -197,7 +197,7 @@ class AuthController extends Controller
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
-            } catch(InternalServerErrorHttpException $e){
+            } catch (InternalServerErrorHttpException $e) {
                 $Errorcontrol = new ErrorController();
                 $Errorcontrol->handleError(500, "Internal Server Error", "Oops! Something went wrong on our end. Please try again later.");
                 exit();

@@ -50,11 +50,11 @@ class AuthService extends Service
             $companyDetails = new CompanyDetailDao(0,  $name, $location, $about);
             $this->userRepository->createUserandCompany($user, $companyDetails);
             return;
-        } catch(\PDOException $e){
-            if($e->getCode() == "23505"){
+        } catch (\PDOException $e) {
+            if ($e->getCode() == "23505") {
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
             }
-            HttpExceptionFactory::createInternalServerError("An error occurred while creating your account"); 
+            HttpExceptionFactory::createInternalServerError("An error occurred while creating your account");
         }
     }
     /**
@@ -67,11 +67,11 @@ class AuthService extends Service
         try {
             $user = new UserDao(0, $name, $email, $hashed_password, 'jobseeker');
             $this->userRepository->createUser($user);
-        } catch(\PDOException $e){
-            if($e->getCode() == "23505"){
+        } catch (\PDOException $e) {
+            if ($e->getCode() == "23505") {
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
-            }   
-            HttpExceptionFactory::createInternalServerError("An error occurred while creating user"); 
+            }
+            HttpExceptionFactory::createInternalServerError("An error occurred while creating user");
         }
     }
 }

@@ -44,9 +44,9 @@ class UserDao
     {
         return $this->email;
     }
-    public function getRole(): string
+    public function getRole(): UserRole
     {
-        return $this->role->value;
+        return $this->role;
     }
     public function getHashedPassword(): string
     {

@@ -131,7 +131,7 @@ class UserRepository extends Repository
             ':name' => $user->getName(),
             ':email' => $user->getEmail(),
             ':password' => $user->getHashedPassword(),
-            ':role' => $user->getRole()
+            ':role' => $user->getRole()->value
         ];
 
         $newUserId = $this->db->executeInsert($query, $params);
@@ -154,7 +154,7 @@ class UserRepository extends Repository
                 ':name' => $user->getName(),
                 ':email' => $user->getEmail(),
                 ':password' => $user->getHashedPassword(),
-                ':role' => $user->getRole()
+                ':role' => $user->getRole()->value
             ];
 
             $newUserId = $this->db->executeInsert($queryUser, $paramsUser);
