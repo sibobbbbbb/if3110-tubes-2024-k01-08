@@ -138,6 +138,25 @@ class CompanyService extends Service
         return $job;
     }
 
+    /**
+     * Get many company's jobs with filter (job type, location type, is open) 
+     */
+    public function getCompanyJobs(int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, ?int $page): array
+    {
+        // Set limit to only 10
+        $limit = 10;
+
+        // Get company's jobs with filter
+        try {
+            [$jobs, $meta] = $this->jobRepository->getJobsWithFilter($companyId, $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
+        }
+
+        return [$jobs, $meta];
+    }
+
 
     /**
      * Edit a job posting for current logged in company
