@@ -78,7 +78,7 @@ class Validator
                         break;
                     case 'requiredFile':
                         foreach ($value['error'] as $key => $error) {
-                            if ($error == 4) {
+                            if ($error == UPLOAD_ERR_NO_FILE) {
                                 $message = ucfirst("$fieldInMessage is required");
                                 $this->addError($field, $message);
                             }
@@ -86,7 +86,7 @@ class Validator
                         break;
                     case 'file':
                         // only check if file exists
-                        if ($value['error'][0] == 4) {
+                        if ($value['error'][0] == UPLOAD_ERR_NO_FILE) {
                             continue 2;
                         }
                         // allowed types
@@ -102,7 +102,7 @@ class Validator
                         break;
                     case 'files':
                         // only check if file exists
-                        if ($value['error'][0] == 4) {
+                        if ($value['error'][0] == UPLOAD_ERR_NO_FILE) {
                             continue 2;
                         }
                         // allowed types

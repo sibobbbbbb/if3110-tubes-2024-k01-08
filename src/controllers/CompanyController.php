@@ -62,7 +62,7 @@ class CompanyController extends Controller
                 'description' => ['required', "max" => 2048],
                 'job-type' => ['required', "enum" => JobType::getValues()],
                 'location-type' => ['required', "enum" => LocationType::getValues()],
-                'attachments' => ['requiredFile', "files" => ['maxSize' => 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
+                'attachments' => ['requiredFile', "files" => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
             ];
 
             $validator = new Validator();
@@ -95,6 +95,57 @@ class CompanyController extends Controller
             // Redirect to company jobs list page
             $res->redirect('/company/jobs');
         }
+    }
+
+    /**
+     * Render and handle the company jobs list page
+     * I.S. user authenticated & authorized as company (from middleware)
+     * F.S. render the company jobs list page
+     * sorts (ony one at a time): sortCreatedAtAsc (default false)
+     * filters: (no filter => all jobs)
+     *  - open/closed (key=is-open, value=true/false)
+     *  - job type (key=job-types, value=enum)
+     *  - location type (key=location-types, value=enum)
+     *  - daterange (key=created-at-from, value=date) & (key=created-at-to, value=timestamp)
+     *  - search bar (position, location, job type) (key=search, value=string)
+     *  - pagination (key=page, value=integer) (note: limit is fixed to 20)
+     *  Invalid query parameters will be ignored (no error response)
+     */
+    public function renderCompanyJobs(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/index.php';
+        $currentUserId = UserSession::getUserId();
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Company Jobs';
+        $description = 'List of jobs posted by your company';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/company/job-list.css" />
+                <script src="/scripts/company/job-list.js" defer></script>
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags
+        ];
+
+        // Get query parameters
+        $rawQueryParams = [
+            'is-open' => $req->getQueryParams('is-open'),
+            'job-types' => $req->getQueryParams('job-types'),
+            'location-types' => $req->getQueryParams('location-types'),
+            'created-at-from' => $req->getQueryParams('created-at-from'),
+            'created-at-to' => $req->getQueryParams('created-at-to'),
+            'search' => $req->getQueryParams('search'),
+            'page' => $req->getQueryParams('page')
+        ];
+
+        echo var_dump($rawQueryParams);
+
+        // Parse query parameters
+        // echo var_dump($rawQueryParams);
+
+        $this->renderPage($viewPathFromPages, $data);
     }
 
     /**
@@ -152,7 +203,7 @@ class CompanyController extends Controller
                 'is-open' => ['required', 'boolean'],
                 'job-type' => ['required', "enum" => JobType::getValues()],
                 'location-type' => ['required', "enum" => LocationType::getValues()],
-                'attachments' => ['optional', "files" => ['maxSize' => 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
+                'attachments' => ['optional', "files" => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
             ];
 
             $validator = new Validator();

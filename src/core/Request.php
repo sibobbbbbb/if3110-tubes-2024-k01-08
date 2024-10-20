@@ -75,7 +75,7 @@ class Request
     /**
      * Get query parameters from the URI
      */
-    public function getQueryParams(string $id): string | null
+    public function getQueryParams(string $id): string | array | null
     {
         return $this->queryParams[$id] ?? null;
     }
@@ -121,16 +121,13 @@ class Request
     private function parseQueryParams(): void
     {
         $this->queryParams = [];
-        $query = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
-        if ($query) {
-            $queryParams = explode('&', $query);
-            foreach ($queryParams as $param) {
-                $param = explode('=', $param);
-                if (count($param) === 2) {
-                    // $this->queryParams[$param[0]] = htmlspecialchars($param[1], ENT_QUOTES, 'UTF-8');
-                    $this->queryParams[$param[0]] = $param[1];
-                }
-            }
+
+        if ($this->method !== 'GET') {
+            return;
+        }
+
+        foreach ($_GET as $key => $value) {
+            $this->queryParams[$key] = $value;
         }
     }
 

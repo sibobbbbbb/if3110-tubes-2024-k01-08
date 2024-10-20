@@ -5,7 +5,7 @@
     flex: auto;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 5rem);
+    min-height: calc(100vh - 4.5rem);
     background-color: hsl(var(--accent));
     padding: 20px;
   }

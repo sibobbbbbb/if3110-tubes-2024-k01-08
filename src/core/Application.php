@@ -110,6 +110,7 @@ class Application
             '/auth/sign-in',
             $signInFactoryFunction
         );
+
         // Sign out
         $router->post(
             '/auth/sign-out',
@@ -122,6 +123,7 @@ class Application
                 ];
             },
         );
+
         // Sign up
         $router->get(
             '/auth/sign-up',
@@ -143,12 +145,12 @@ class Application
                 'method' => $method
             ];
         };
-        // Sign in (render)
+        // Sign up (render)
         $router->get(
             '/auth/sign-up/company',
             $signUpCompanyFactoryFunction
         );
-        // Sign in (form handling request)
+        // Sign up (form handling request)
         $router->post(
             '/auth/sign-up/company',
             $signUpCompanyFactoryFunction
@@ -162,12 +164,12 @@ class Application
                 'method' => $method
             ];
         };
-
+        // Sign up (render)
         $router->get(
             '/auth/sign-up/job-seeker',
             $signUpJobSeekerFactoryFunction
         );
-        // Sign in (form handling request)
+        // Sign up (form handling request)
         $router->post(
             '/auth/sign-up/job-seeker',
             $signUpJobSeekerFactoryFunction
@@ -176,28 +178,6 @@ class Application
         /**
          * Company Routes
          */
-        // Update company profile
-        $companyProfileFactoryFunction = function () {
-            $controller = $this->container->get(CompanyController::class);
-            $method = 'renderAndHandleUpdateCompany';
-            return [
-                'controller' => $controller,
-                'method' => $method
-            ];
-        };
-        // Render
-        $router->get(
-            '/company/profile',
-            $companyProfileFactoryFunction,
-            [$companyAuthMiddlewareFactoryFunction]
-        );
-        // Handle
-        $router->post(
-            '/company/profile',
-            $companyProfileFactoryFunction,
-            [$companyAuthMiddlewareFactoryFunction]
-        );
-
         // Create job
         $createJobFactoryFunction = function () {
             $controller = $this->container->get(CompanyController::class);
@@ -217,6 +197,42 @@ class Application
         $router->post(
             '/company/jobs/create',
             $createJobFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        // Get company jobs
+        $router->get(
+            '/company/jobs',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'renderCompanyJobs';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        // Update company profile
+        $companyProfileFactoryFunction = function () {
+            $controller = $this->container->get(CompanyController::class);
+            $method = 'renderAndHandleUpdateCompany';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render
+        $router->get(
+            '/company/profile',
+            $companyProfileFactoryFunction,
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+        // Handle
+        $router->post(
+            '/company/profile',
+            $companyProfileFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
 

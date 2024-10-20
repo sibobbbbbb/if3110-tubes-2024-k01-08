@@ -2,7 +2,7 @@
     <!-- Card -->
     <section class="card">
         <!-- Back button -->
-        <a href="/company" class="card__back">
+        <a href="/company/jobs" class="card__back">
             <svg class="back__icon" xmlns="hsttp://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left">
                 <path d="m12 19-7-7 7-7" />
                 <path d="M19 12H5" />
@@ -121,7 +121,7 @@
 
                     <div class="select-wrapper--full">
                         <select class="custom-select" name="job-type" aria-label="Select an option">
-                            <option value="" disabled
+                            <option value="" disabled hidden
                                 <?= (!isset($fields['job-type']) || $fields['job-type'] === '') ? 'selected' : '' ?>>Select an option</option>
                             <option value="full-time"
                                 <?= (isset($fields['job-type']) && $fields['job-type'] === 'full-time') ? 'selected' : '' ?>>Full-Time</option>
@@ -130,7 +130,7 @@
                             <option value="internship"
                                 <?= (isset($fields['job-type']) && $fields['job-type'] === 'internship') ? 'selected' : '' ?>>Internship</option>
                         </select>
-                        <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="custom-select__chevron-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="m6 9 6 6 6-6" />
                         </svg>
                     </div>
@@ -154,7 +154,7 @@
 
                     <div class="select-wrapper--full">
                         <select class="custom-select" name="location-type" aria-label="Select an option">
-                            <option value="" disabled
+                            <option value="" disabled hidden
                                 <?= (!isset($fields['location-type']) || $fields['location-type'] === '') ? 'selected' : '' ?>>Select an option</option>
                             <option value="on-site"
                                 <?= (isset($fields['location-type']) && $fields['location-type'] === 'on-site') ? 'selected' : '' ?>>On-Site</option>
@@ -163,7 +163,7 @@
                             <option value="remote"
                                 <?= (isset($fields['location-type']) && $fields['location-type'] === 'remote') ? 'selected' : '' ?>>Remote</option>
                         </select>
-                        <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="custom-select__chevron-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="m6 9 6 6 6-6" />
                         </svg>
                     </div>
