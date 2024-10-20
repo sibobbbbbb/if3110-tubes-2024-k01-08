@@ -137,3 +137,73 @@ CREATE OR REPLACE TRIGGER validate_jobseeker_user_on_applications
 BEFORE INSERT ON applications
 FOR EACH ROW
 EXECUTE FUNCTION validate_jobseeker_user();
+
+-- Seed data
+-- Function to generate random text
+CREATE OR REPLACE FUNCTION random_text(min_length INT, max_length INT) RETURNS TEXT AS $$
+DECLARE
+    result TEXT := '';
+    possible_chars TEXT := 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
+    text_length INT;
+BEGIN
+    text_length := floor(random() * (max_length - min_length + 1) + min_length)::INT;
+    FOR i IN 1..text_length LOOP
+        result := result || substr(possible_chars, floor(random() * length(possible_chars) + 1)::INT, 1);
+    END LOOP;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Users
+INSERT INTO users (id, name, email, password, role) VALUES
+(1, 'jobseeker1', 'jobseeker1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+(2, 'jobseeker2', 'jobseeker2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+(3, 'jobseeker3', 'jobseeker3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+(4, 'company1', 'company1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+(5, 'company2', 'company2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+(6, 'company3', 'company3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company');
+
+-- Company Details
+INSERT INTO company_details (user_id, location, about) VALUES
+(4, 'New York, USA', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
+(5, 'London, UK', 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
+(6, 'Tokyo, Japan', 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.');
+
+-- Jobs (300 jobs, 100 for each company)
+INSERT INTO jobs (job_id, company_id, position, description, job_type, location_type, is_open, created_at, updated_at)
+SELECT 
+    generate_series,
+    (CASE WHEN generate_series <= 100 THEN 4 WHEN generate_series <= 200 THEN 5 ELSE 6 END),
+    'Position ' || generate_series,
+    '<h2>Job Description</h2><p>' || random_text(100, 500) || '</p><h3>Requirements</h3><ul><li>' || random_text(10, 50) || '</li><li>' || random_text(10, 50) || '</li><li>' || random_text(10, 50) || '</li></ul>',
+    (ARRAY['full-time', 'part-time', 'internship']::job_type_enum[])[floor(random() * 3 + 1)],
+    (ARRAY['on-site', 'hybrid', 'remote']::location_type_enum[])[floor(random() * 3 + 1)],
+    random() > 0.2,
+    now() - (random() * (interval '90 days')),
+    now() - (random() * (interval '30 days'))
+FROM generate_series(1, 300);
+
+-- Job Attachments (3 attachments per job, 900 total)
+INSERT INTO job_attachments (attachment_id, job_id, file_path)
+SELECT 
+    generate_series,
+    ceil(generate_series / 3.0),
+    '/uploads/jobs/attachment_' || generate_series || '.jpg'
+FROM generate_series(1, 900);
+
+-- Applications (50 applications per job seeker, 150 total)
+INSERT INTO applications (application_id, user_id, job_id, cv_path, video_path, status, status_reason, created_at)
+SELECT 
+    generate_series,
+    ceil(generate_series / 50.0),
+    (SELECT job_id FROM jobs ORDER BY random() LIMIT 1),
+    '/uploads/applications/cv_' || generate_series || '.pdf',
+    CASE WHEN random() > 0.5 THEN '/uploads/applications/video_' || generate_series || '.mp4' ELSE NULL END,
+    (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)],
+    CASE 
+        WHEN (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)] = 'rejected' 
+        THEN '<p>We regret to inform you that your application has been rejected. ' || random_text(50, 200) || '</p>'
+        ELSE NULL
+    END,
+    now() - (random() * (interval '60 days'))
+FROM generate_series(1, 150);
