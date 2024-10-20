@@ -379,7 +379,27 @@ class CompanyController extends Controller
     /**
      * Delete a job
      */
-    public function handleDeleteJob(Request $req, Response $res): void {}
+    public function handleDeleteJob(Request $req, Response $res): void
+    {
+        $currentUserId = UserSession::getUserId();
+        $currentJobId = $req->getPathParams('jobId');
+
+        try {
+            $this->companyService->deleteJob($currentUserId, $currentJobId);
+        } catch (BaseHttpException $e) {
+            // Http exception
+            $responseDto = DtoFactory::createErrorDto($e->getMessage());
+            $res->json($e->getCode(), $responseDto);
+        } catch (Exception $e) {
+            // Treat as internal server error
+            $responseDto = DtoFactory::createErrorDto("An error occurred while deleting job");
+            $res->json(500, $responseDto);
+        }
+
+        // Success
+        $responseDto = DtoFactory::createSuccessDto("Job deleted successfully");
+        $res->json(200, $responseDto);
+    }
 
 
     /**

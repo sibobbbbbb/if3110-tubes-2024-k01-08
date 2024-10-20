@@ -84,4 +84,15 @@ class UploadService
             throw new \Exception('Failed to delete file');
         }
     }
+
+    /**
+     * Deletes multiple files from the public directory
+     * @param fileDirectoriesFromPublic: file directories from the public directory
+     */
+    public function deleteMultipleFiles(array $fileDirectoriesFromPublic)
+    {
+        foreach ($fileDirectoriesFromPublic as $fileDirectoryFromPublic) {
+            self::deleteOneFile($fileDirectoryFromPublic);
+        }
+    }
 }

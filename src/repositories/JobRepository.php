@@ -53,9 +53,7 @@ class JobRepository extends Repository
 
     /**
      * Get company's job
-     * @param ?int $companyId - The company id
-     * if null => get all jobs from all company (job seeker)
-     * if not null => get all jobs from the company (company)
+     * @param int $companyId - The company id
      * @param ?array isOpens - The job is open or not
      * @param ?array jobTypes - The job types
      * @param ?array locationTypes - The location types
@@ -67,20 +65,11 @@ class JobRepository extends Repository
      * @param ?int limit - The limit
      * @returns [array of JobDao, meta dao] - The jobs
      */
-    public function getJobsWithFilter(?int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
+    public function getCompanyJobsWithFilter(int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
     {
-        $totalItemsQuery = "SELECT COUNT(*) FROM jobs WHERE 1=1";
-        $query = "SELECT * FROM jobs WHERE 1=1";
-        $params = [];
-
-        if ($companyId !== null) {
-            $commonQuery = " AND company_id = :company_id";
-
-            $query .= $commonQuery;
-            $totalItemsQuery .= $commonQuery;
-
-            $params[':company_id'] = $companyId;
-        }
+        $totalItemsQuery = "SELECT COUNT(*) FROM jobs WHERE company_id = :company_id";
+        $query = "SELECT * FROM jobs WHERE company_id = :company_id";
+        $params = [':company_id' => $companyId];
 
         if ($isOpens !== null) {
             $commonQuery = " AND is_open = ANY(:is_opens)";
@@ -187,6 +176,18 @@ class JobRepository extends Repository
 
         return $jobAttachments;
     }
+
+    /**
+     * Delete a job posting with attachments (cascade delete job attachments)
+     */
+    public function deleteJobAndAttachments(JobDao $job): void
+    {
+        $query = "DELETE FROM jobs WHERE job_id = :job_id;";
+        $params = [':job_id' => $job->getJobId()];
+
+        $this->db->executeDelete($query, $params);
+    }
+
 
     /**
      * Create a new job posting

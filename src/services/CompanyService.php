@@ -148,7 +148,7 @@ class CompanyService extends Service
 
         // Get company's jobs with filter
         try {
-            [$jobs, $meta] = $this->jobRepository->getJobsWithFilter($companyId, $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
+            [$jobs, $meta] = $this->jobRepository->getCompanyJobsWithFilter($companyId, $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
         } catch (Exception $e) {
             echo $e->getMessage();
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
@@ -230,7 +230,47 @@ class CompanyService extends Service
 
     /**
      * Delete a job posting for current logged in company
+     * Deletes the job and its attachments (database & server). Sets the user's application to be null.
+     * @param string $currentUserId - The user id
+     * @param string $jobId - The job id
      */
+    public function deleteJob(string $currentUserId, string $jobId): void
+    {
+        // Validate job
+        try {
+            $job = $this->jobRepository->getJobByIdWithAttachments($jobId);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job posting");
+        }
+
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Check if authorized
+        if ($job->getCompanyId() != $currentUserId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to delete this job posting");
+        }
+
+        // Delete job
+        try {
+            $this->jobRepository->deleteJob($job);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job posting");
+        }
+
+        // Delete files from server
+        // NOTE: DUMMY DATA DOESN'T ACTUALLY STORE FILE PATHS
+        // try {
+        //     $fileDirectories = array_map(fn($attachment) => $attachment->getFilePath(), $job->getAttachments());
+        //     if (count($fileDirectories) > 0) {
+        //         $this->uploadService->deleteMultipleFiles($fileDirectories);
+        //     }
+        // } catch (Exception $e) {
+        //     throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job attachments");
+        // }
+    }
 
 
     /**

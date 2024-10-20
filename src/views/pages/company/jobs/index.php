@@ -230,7 +230,7 @@ use src\dao\LocationType;
             </div>
         <?php else: ?>
             <!-- Non empty -->
-            <ul class="job-list">
+            <ul class="job-list" id="job-list">
                 <?php foreach ($jobs as $job): ?>
                     <li>
                         <article class="job-article">
@@ -271,7 +271,7 @@ use src\dao\LocationType;
                             <!-- Actions -->
                             <div class="job-article__actions">
                                 <!-- View -->
-                                <a href="/company/jobs/1">
+                                <a href="/company/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>">
                                     <button class="button button--outline button--sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye icon--sm--margin">
                                             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
@@ -284,7 +284,7 @@ use src\dao\LocationType;
                                 </a>
 
                                 <!-- Edit -->
-                                <a href="/company/jobs/<?= htmlspecialchars($job->getJobId()) ?>/edit">
+                                <a href="/company/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>/edit">
                                     <button class="button button--secondary button--sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line icon--sm--margin">
                                             <path d="M12 20h9" />
@@ -299,7 +299,7 @@ use src\dao\LocationType;
                                 </a>
 
                                 <!-- Delete (Ajax) -->
-                                <button aria-label="delete job button" type="button" class="button button--destructive button--icon button--icon--sm">
+                                <button data-job-id="<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>" aria-label="delete job button" type="button" class="button button--destructive button--icon button--icon--sm job-list__delete-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 icon--sm">
                                         <path d="M3 6h18" />
                                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
