@@ -58,16 +58,19 @@ class AuthService extends Service
     /**
      * Register a job seeker
      */
-    public function signUpJobSeeker(string $name, string $email, string $password): void
+    public function createJobSeeker(string $name, string $email, string $password): void
     {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $transaction = $this->userRepository->insertintouserjobseeker($name, $email, $hashed_password);
-            return;
-        } catch (BadRequestHttpException $e) {
+            $user = new UserDao(0, $name, $email, $hashed_password, 'jobseeker');
+            $this->userRepository->createUser($user);
+        } catch(\PDOException $e){
+            if($e->getCode() == "23505"){
+                throw HttpExceptionFactory::createBadRequest($e->getMessage());
+            }    
+        }catch(\Exception $e) {
             throw HttpExceptionFactory::createBadRequest($e->getMessage());
-            return;
         }
     }
 }

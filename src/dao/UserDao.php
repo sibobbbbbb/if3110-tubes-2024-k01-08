@@ -44,12 +44,37 @@ class UserDao
     {
         return $this->email;
     }
-    public function getRole(): UserRole
+    public function getRole(): string
     {
-        return $this->role;
+        return $this->role->value;
     }
     public function getHashedPassword(): string
     {
         return $this->password;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function setPassword(string $password): void
+    {
+        $this->password = $password;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = UserRole::fromString($role);
     }
 }

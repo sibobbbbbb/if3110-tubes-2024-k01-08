@@ -103,6 +103,7 @@ class Database
         return $this->connection->lastInsertId();
     }
 
+
     /**
      * Get the connection
      */

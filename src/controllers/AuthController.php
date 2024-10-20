@@ -192,13 +192,14 @@ class AuthController extends Controller
 
             // Authenticate the transaction
             try {
-                $transaction = $this->authService->signUpJobSeeker($name, $email, $password);
-                $res->redirect('/auth/sign-in');
+                $this->authService->createJobSeeker($name, $email, $password);
             } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
             }
+
+            $res->redirect('/auth/sign-in');
         }
     }
 

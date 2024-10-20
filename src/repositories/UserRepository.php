@@ -121,35 +121,21 @@ class UserRepository extends Repository
     }
 
     // Insert Into User and company_details
-    public function insertintouserjobseeker(string $name, string $email, string $password): void
+    public function createUser(UserDao $user): void
     {
-        try {
+        // Insert into users table
+        $query = "INSERT INTO users (name, email, password, role) 
+              VALUES (:name, :email, :password, :role)";
+    
+        $params = [
+            ':name' => $user->getName(),
+            ':email' => $user->getEmail(),
+            ':password' => $user->getHashedPassword(),
+            ':role' => $user->getRole()
+        ];
 
-            $this->db->beginTransaction();
-
-            $id = $this->generateUniqueId();
-
-            // Insert into users table
-            $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'jobseeker')";
-            $params_user = [
-                ':id' => $id,
-                ':name' => $name,
-                ':email' => $email,
-                ':password' => $password,
-            ];
-
-            $result_user = $this->db->executeInsert($query_insert_user, $params_user);
-
-            $this->db->commit();
-            return;
-        } catch (Exception $e) {
-            // Rollback 
-            $this->db->rollBack();
-
-            throw HttpExceptionFactory::createBadRequest($e->getMessage());
-
-            return;
-        }
+        $newUserId = $this->db->executeInsert($query, $params);
+        $user->setId($newUserId);
     }
 
     // Insert Into User and company_details
@@ -197,17 +183,5 @@ class UserRepository extends Repository
 
             return;
         }
-    }
-
-    private function generateUniqueId(): int
-    {
-        $query = "SELECT MAX(id) as max_id FROM users";
-        $id = $this->db->queryOne($query);
-
-        if ($id === false || !isset($id['max_id'])) {
-            return 1;
-        }
-
-        return $id['max_id'] + 1;
     }
 }
