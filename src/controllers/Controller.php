@@ -40,4 +40,37 @@ abstract class Controller
 
         exit();
     }
+
+    /**
+     * Render an error page
+     * @param int $statusCode The HTTP status code to send
+     * @param string $subheading The error subheading
+     * @param string $message The error message
+     */
+    public function renderError(array $data = []): void
+    {
+        $contentPath = __DIR__ . '/../views/error/index.php';
+
+        // Set HTTP status code immediately
+        // http_response_code($statusCode);
+        
+
+        // Check if the content file exists
+        if (!file_exists($contentPath)) {
+            // If error page doesn't exist, fallback to simple error display
+            throw HttpExceptionFactory::createNotFound("Page Not Found");
+        }
+
+        // Start output buffering
+        ob_start();
+
+        // Get error page content
+        extract($data);
+        require $contentPath;
+
+        // Output the content
+        echo ob_get_clean();
+
+        exit();
+    }
 }

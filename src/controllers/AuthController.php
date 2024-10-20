@@ -6,7 +6,7 @@ use Exception;
 use src\core\{Request, Response};
 use src\dao\UserRole;
 use src\dto\DtoFactory;
-use src\exceptions\BadRequestHttpException;
+use src\exceptions\{BadRequestHttpException, InternalServerErrorHttpException};
 use src\services\AuthService;
 use src\utils\{UserSession, Validator};
 
@@ -197,6 +197,10 @@ class AuthController extends Controller
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $this->renderPage($viewPathFromPages, $data);
+            } catch(InternalServerErrorHttpException $e){
+                $Errorcontrol = new ErrorController();
+                $Errorcontrol->handleError(500, "Internal Server Error", "Oops! Something went wrong on our end. Please try again later.");
+                exit();
             }
 
             $res->redirect('/auth/sign-in');

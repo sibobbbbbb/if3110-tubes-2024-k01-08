@@ -3,15 +3,17 @@
 namespace src\core;
 
 use src\exceptions\HttpExceptionFactory;
+use src\controllers\ErrorController;
 
 class Router
 {
     // Store registered routes for the app
     private $routes;
-
+    private $controller;
     public function __construct()
     {
         $this->routes = [];
+        $this->controller = new ErrorController();
     }
 
     /**
@@ -94,7 +96,8 @@ class Router
         }
 
         // If not found, default redirect to 404 page
-        throw HttpExceptionFactory::createNotFound('Route not found');
+        $this->controller->handleError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
+        // throw HttpExceptionFactory::createNotFound('Route not found');
     }
 
     private function matchPath(string $router, string $uri): bool

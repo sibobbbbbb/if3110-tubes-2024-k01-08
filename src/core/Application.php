@@ -12,6 +12,7 @@ use src\controllers\{AuthController, CompanyController, HomeController, JobContr
 use src\repositories\{ApplicationRepository, UserRepository, JobRepository};
 use src\utils\UserSession;
 
+
 // Class for the entry point of the application
 class Application
 {
@@ -77,7 +78,7 @@ class Application
          * Home
          */
         $router->get(
-            '/',
+            '/home',
             function () {
                 $controller = $this->container->get(HomeController::class);
                 $method = 'renderHome';
@@ -288,6 +289,8 @@ class Application
             },
             [$companyAuthMiddlewareFactoryFunction]
         );
+
+        // $this->renderError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
     }
 
     /**
