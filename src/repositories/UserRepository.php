@@ -139,49 +139,46 @@ class UserRepository extends Repository
     }
 
     // Insert Into User and company_details
-    public function insertintouserandcompany(string $name, string $email, string $password, string $location, string $about): void
+    public function createUserandCompany(UserDao $user, CompanyDetailDao $companyDetail): void
     {
         try {
 
             $this->db->beginTransaction();
 
-            $id = $this->generateUniqueId();
 
             // Insert into users table
-            $query_insert_user = "INSERT INTO users  VALUES (:id, :name, :email, :password, 'company')";
-            $params_user = [
-                ':id' => $id,
-                ':name' => $name,
-                ':email' => $email,
-                ':password' => $password,
+            $queryUser = "INSERT INTO users (name, email, password, role) 
+                        VALUES (:name, :email, :password, :role)";
+  
+            $paramsUser = [
+                ':name' => $user->getName(),
+                ':email' => $user->getEmail(),
+                ':password' => $user->getHashedPassword(),
+                ':role' => $user->getRole()
             ];
 
-            $result_user = $this->db->executeInsert($query_insert_user, $params_user);
-            // var_dump('User Insert Result: ', $result_user);
+            $newUserId = $this->db->executeInsert($queryUser, $paramsUser);
+
 
 
             // Insert into company_details table
-            $query_insert_company = "INSERT INTO company_details VALUES (:user_id, :location, :about)";
-            $params_company = [
-                ':user_id' => $id,
-                ':location' => $location,
-                ':about' => $about,
+            $queryCompany = "INSERT INTO company_details VALUES (:user_id, :location, :about)";
+            $paramsCompany = [
+                ':user_id' => $newUserId,
+                ':location' => $companyDetail->getLocation(),
+                ':about' => $companyDetail->getAbout(),
             ];
 
-            $result_company = $this->db->executeInsert($query_insert_company, $params_company);
-            // var_dump('Company Insert Result: ', $result_company);
+            $this->db->executeInsert($queryCompany, $paramsCompany);
 
 
             // Commit 
             $this->db->commit();
-            return;
         } catch (Exception $e) {
             // Rollback 
             $this->db->rollBack();
 
-            throw HttpExceptionFactory::createBadRequest($e->getMessage());
-
-            return;
+            throw $e;
         }
     }
 }

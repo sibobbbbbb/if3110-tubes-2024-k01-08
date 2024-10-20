@@ -2,7 +2,7 @@
 
 namespace src\services;
 
-use src\dao\UserDao;
+use src\dao\{UserDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\UserRepository;
 use src\exceptions\BadRequestHttpException;
@@ -41,20 +41,22 @@ class AuthService extends Service
     /**
      * Register a company
      */
-    public function signUpCompany(string $name, string $email, string $password, string $location, string $about): void
+    public function createCompany(string $name, string $email, string $password, string $location, string $about): void
     {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         try {
-            $transaction = $this->userRepository->insertintouserandcompany($name, $email, $hashed_password, $location, $about);
+            $user = new UserDao(0, $name, $email, $hashed_password, 'company');
+            $companyDetails = new CompanyDetailDao(0,  $name, $location, $about);
+            $this->userRepository->createUserandCompany($user, $companyDetails);
             return;
-        } catch (BadRequestHttpException $e) {
-
-            throw HttpExceptionFactory::createBadRequest($e->getMessage());
-            return;
+        } catch(\PDOException $e){
+            if($e->getCode() == "23505"){
+                throw HttpExceptionFactory::createBadRequest($e->getMessage());
+            }
+            HttpExceptionFactory::createInternalServerError("An error occurred while creating your account"); 
         }
     }
-
     /**
      * Register a job seeker
      */
@@ -68,9 +70,8 @@ class AuthService extends Service
         } catch(\PDOException $e){
             if($e->getCode() == "23505"){
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
-            }    
-        }catch(\Exception $e) {
-            throw HttpExceptionFactory::createBadRequest($e->getMessage());
+            }   
+            HttpExceptionFactory::createInternalServerError("An error occurred while creating user"); 
         }
     }
 }

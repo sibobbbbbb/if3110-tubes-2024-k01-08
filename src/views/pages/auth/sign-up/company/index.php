@@ -118,7 +118,7 @@
 
             <!-- submit button -->
             <button type="submit" class="button button--default-size button--default-color">
-                Register
+                Register Your Company
             </button>
         </form>
 
