@@ -70,64 +70,51 @@ class JobRepository extends Repository
         $query = "SELECT * FROM jobs";
 
         $params = [];
+        $conditions = [];
 
         if ($isOpens !== null) {
-            $commonQuery = " WHERE is_open = ANY(:is_opens)";
-
-            $query .= $commonQuery;
-            $totalItemsQuery .= $commonQuery;
-
+            $conditions[] = "is_open = ANY(:is_opens)";
             $params[":is_opens"] = '{' . implode(',', array_map(function ($isOpen) {
                 return $isOpen ? 't' : 'f';
             }, $isOpens)) . '}';
         }
 
         if ($jobTypes !== null) {
-            $commonQuery = " AND job_type = ANY(:job_types)";
-
-            $query .= $commonQuery;
-            $totalItemsQuery .= $commonQuery;
-
+            $conditions[] = "job_type = ANY(:job_types)";
             $params[":job_types"] = '{' . implode(',', array_map(function ($jobType) {
                 return $jobType->value;
             }, $jobTypes)) . '}';
         }
 
         if ($locationTypes !== null) {
-            $commonQuery = " AND location_type = ANY(:location_types)";
-
-            $query .= $commonQuery;
-            $totalItemsQuery .= $commonQuery;
-
+            $conditions[] = "location_type = ANY(:location_types)";
             $params[":location_types"] = '{' . implode(',', array_map(function ($locationType) {
                 return $locationType->value;
             }, $locationTypes)) . '}';
         }
 
         if ($createdAtFrom !== null) {
-            $query .= " AND created_at >= :created_at_from";
-            $totalItemsQuery .= " AND created_at >= :created_at_from";
-
-            // from the date at 00:00:00
+            $conditions[] = "created_at >= :created_at_from";
             $createdAtFrom->setTime(0, 0, 0);
             $params[':created_at_from'] = $createdAtFrom->format('Y-m-d H:i:s');
         }
 
         if ($createdAtTo !== null) {
-            $query .= " AND created_at <= :created_at_to";
-            $totalItemsQuery .= " AND created_at <= :created_at_to";
-
-            // to the date at 23:59:59
+            $conditions[] = "created_at <= :created_at_to";
             $createdAtTo->setTime(23, 59, 59);
             $params[':created_at_to'] = $createdAtTo->format('Y-m-d H:i:s');
         }
 
         if ($search !== null) {
-            $query .= " AND (position ILIKE :search OR description ILIKE :search)";
-            $totalItemsQuery .= " AND (position ILIKE :search OR description ILIKE :search)";
+            $conditions[] = "(position ILIKE :search OR description ILIKE :search)";
             $params[':search'] = "%$search%";
         }
-        
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+            $totalItemsQuery .= " WHERE " . implode(" AND ", $conditions);
+        }
+
         // Get the total count  
         $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
 
@@ -266,7 +253,7 @@ class JobRepository extends Repository
 
             $this->editJob($job);
 
-            $jobAttachments =  $this->createJobAttachments($job->getJobId(), $attachmentPaths);
+            $jobAttachments = $this->createJobAttachments($job->getJobId(), $attachmentPaths);
 
             $this->db->commit();
         } catch (Exception $e) {
@@ -317,7 +304,7 @@ class JobRepository extends Repository
     /**
      * Get a job by id
      */
-    public function getJobById(int $jobId): JobDao | null
+    public function getJobById(int $jobId): JobDao|null
     {
         $query = "SELECT * FROM jobs WHERE job_id = :job_id;";
         $params = [':job_id' => $jobId];
@@ -333,7 +320,7 @@ class JobRepository extends Repository
     /**
      * Get job by id with attachments also (denormliazed into jobDao)
      */
-    public function getJobByIdWithAttachments(int $jobId): JobDao | null
+    public function getJobByIdWithAttachments(int $jobId): JobDao|null
     {
         $job = $this->getJobById($jobId);
         if ($job === null) {
@@ -437,7 +424,7 @@ class JobRepository extends Repository
     /**
      * Get job attachment
      */
-    public function getJobAttachmentById(int $attachmentId): JobAttachmentDao | null
+    public function getJobAttachmentById(int $attachmentId): JobAttachmentDao|null
     {
         $query = "SELECT * FROM job_attachments WHERE attachment_id = :attachment_id;";
         $params = [':attachment_id' => $attachmentId];
