@@ -58,28 +58,8 @@ class Application
      **/
     private function registerRoutes()
     {
-        $router = $this->container->get(Router::class);
-
-        // Middlewares factory function
-        $anyAuthMiddlewareFactoryFunction = function () {
-            return $this->container->get(AnyAuthMiddleware::class);
-        };
-        $jobSeekerAuthMiddleware = function () {
-            return $this->container->get(JobSeekerAuthMiddleware::class);
-        };
-
-        // Home
-        $router->get(
-            '/home',
-            function () {
-                $controller = $this->container->get(HomeController::class);
-                $method = 'renderHome';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            },
-        );
+        // Misc
+        $this->registerMiscRoutes();
 
         // Auth Routes
         $this->registerAuthRoutes();
@@ -89,6 +69,29 @@ class Application
 
         // Company routes
         $this->registerCompanyRoutes();
+    }
+
+    /**
+     * Register miscellaneous routes
+     */
+    private function registerMiscRoutes()
+    {
+        $router = $this->container->get(Router::class);
+
+        /**
+         * Home
+         */
+        $router->get(
+            '/',
+            function () {
+                $controller = $this->container->get(HomeController::class);
+                $method = 'renderHome';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
     }
 
     /**

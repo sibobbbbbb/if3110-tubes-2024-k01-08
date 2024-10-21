@@ -17,7 +17,7 @@
             <p><?= $message ?></p>
 
             <?php if ($statusCode === 404): ?>
-                <button class="go-back-btn" onclick="window.location.href='/home'">Go to Home</button>
+                <button class="go-back-btn" onclick="window.location.href='/'">Go to Home</button>
             <?php else: ?>
                 <button class="go-back-btn" onclick="location.reload()">Refresh</button>
             <?php endif; ?>

@@ -102,7 +102,15 @@ class Router
 
     private function matchPath(string $router, string $uri): bool
     {
-        // Parse path parameters /{id}/ into regex
+        // If root
+        if ($router === '/') {
+            // Seperate the query params if any
+            $uri = explode('?', $uri)[0];
+            return $uri === '/';
+        }
+
+        // Not root
+        // Parse path parameters /[id]/ into regex
         // and match from the beginning to the end of the string
 
         // ignore trailing slashes
