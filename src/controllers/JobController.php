@@ -53,53 +53,53 @@ class JobController extends Controller {
         ];
 
         // Get query parameters
-        // $rawIsOpens = $req->getQueryParams('is-opens');
-        // $rawJobTypes = $req->getQueryParams('job-types');
-        // $rawLocationTypes = $req->getQueryParams('location-types');
-        // $rawCreatedAtFrom = $req->getQueryParams('created-at-from');
-        // $rawCreatedAtTo = $req->getQueryParams('created-at-to');
-        // $rawSearch = $req->getQueryParams('search');
-        // $rawSortCreatedAt = $req->getQueryParams('sort-created-at');
-        // $rawPage = $req->getQueryParams('page');
+        $rawIsOpens = $req->getQueryParams('is-opens');
+        $rawJobTypes = $req->getQueryParams('job-types');
+        $rawLocationTypes = $req->getQueryParams('location-types');
+        $rawCreatedAtFrom = $req->getQueryParams('created-at-from');
+        $rawCreatedAtTo = $req->getQueryParams('created-at-to');
+        $rawSearch = $req->getQueryParams('search');
+        $rawSortCreatedAt = $req->getQueryParams('sort-created-at');
+        $rawPage = $req->getQueryParams('page');
 
         // Parse query parameters
-        // $queryParams = $this->parseCompanyJobQueryParams($rawIsOpens, $rawJobTypes, $rawLocationTypes, $rawCreatedAtFrom, $rawCreatedAtTo, $rawSearch, $rawSortCreatedAt, $rawPage);
-        // $parsedIsOpens = $queryParams['is-opens'];
-        // $parsedJobTypes = $queryParams['job-types'];
-        // $parsedLocationTypes = $queryParams['location-types'];
-        // $parsedCreatedAtFrom = $queryParams['created-at-from'];
-        // $parsedCreatedAtTo = $queryParams['created-at-to'];
-        // $parsedSearch = $queryParams['search'];
-        // $parsedSortCreatedAt = $queryParams['is-created-at-asc'];
-        // $parsedPage = $queryParams['page'];
+        $queryParams = $this->parseJobQueryParams($rawIsOpens, $rawJobTypes, $rawLocationTypes, $rawCreatedAtFrom, $rawCreatedAtTo, $rawSearch, $rawSortCreatedAt, $rawPage);
+        $parsedIsOpens = $queryParams['is-opens'];
+        $parsedJobTypes = $queryParams['job-types'];
+        $parsedLocationTypes = $queryParams['location-types'];
+        $parsedCreatedAtFrom = $queryParams['created-at-from'];
+        $parsedCreatedAtTo = $queryParams['created-at-to'];
+        $parsedSearch = $queryParams['search'];
+        $parsedSortCreatedAt = $queryParams['is-created-at-asc'];
+        $parsedPage = $queryParams['page'];
 
-        // try {
-        //     // Get jobs data
-        //     [$jobs, $meta] = $this->jobService->getJobs($currentUserId, $parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
+        try {
+            // Get jobs data
+            [$jobs, $meta] = $this->jobService->getJobs( $parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
 
-        //     // Generate pagination component
-        //     $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
+            // Generate pagination component
+            $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
 
-        //     // Add data to pass to the view
-        //     $data['jobs'] = $jobs;
-        //     $data['meta'] = $meta;
-        //     $data['filters'] = $queryParams;
-        //     $data['paginationComponent'] = $paginationComponent;
-        // } catch (BaseHttpException $e) {
-        //     // TODO: Render error view
-        //     echo $e->getMessage();
-        // } catch (Exception $e) {
-        //     // TODO: Render Internal server error
-        //     echo $e->getMessage();
-        // }
+            // Add data to pass to the view
+            $data['jobs'] = $jobs;
+            $data['meta'] = $meta;
+            $data['filters'] = $queryParams;
+            $data['paginationComponent'] = $paginationComponent;
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+            echo $e->getMessage();
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+            echo $e->getMessage();
+        }
 
         $this->renderPage($viewPathFromPages, $data);
     }
 
     /**
-     * Parse company job page query params
+     * Parse job page query params
      */
-    private function parseCompanyJobQueryParams(
+    private function parseJobQueryParams(
         ?array $rawIsOpens,
         ?array $rawJobTypes,
         ?array $rawLocationTypes,
@@ -112,7 +112,7 @@ class JobController extends Controller {
         $isCreatedAtAsc = false; // Default sort
         $isOpens = $jobTypes = $locationTypes = $createdAtFrom = $createdAtTo = $search = $page = null;
 
-        // Is opem
+        // Is open
         if ($rawIsOpens !== null) {
             foreach ($rawIsOpens as $isOpenValue) {
                 if ($isOpenValue === "true") {
