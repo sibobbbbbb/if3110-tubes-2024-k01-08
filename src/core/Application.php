@@ -206,6 +206,22 @@ class Application
         };
 
         /**
+         * Get company's jobs
+         */
+        $router->get(
+            '/jobs',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderJobs';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
+
+        /**
          * Get job seeeker's application history
          */
         $router->get(
@@ -518,7 +534,8 @@ class Application
         $this->container->bind(
             JobService::class,
             function ($c) {
-                return new JobService();
+                $jobRepository = $c->get(JobRepository::class);
+                return new JobService($jobRepository);
             }
         );
 
@@ -604,7 +621,8 @@ class Application
         $this->container->bind(
             JobController::class,
             function ($c) {
-                return new JobController();
+                $jobService = $c->get(JobService::class);
+                return new JobController($jobService);
             }
         );
 

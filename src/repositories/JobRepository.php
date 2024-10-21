@@ -52,6 +52,93 @@ class JobRepository extends Repository
     }
 
     /**
+     * Get job from all company
+     * @param ?array isOpens - The job is open or not
+     * @param ?array jobTypes - The job types
+     * @param ?array locationTypes - The location types
+     * @param ?DateTime createdAtFrom - The start date
+     * @param ?DateTime createdAtTo - The end date
+     * @param ?string search - The search string
+     * @param bool isCreatedAtAsc - The order of created at
+     * @param ?int page - The page
+     * @param ?int limit - The limit
+     * @returns [array of JobDao, meta dao] - The jobs
+     */
+    public function getJobsWithFilter(?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
+    {
+        $totalItemsQuery = "SELECT COUNT(*) FROM jobs";
+        $query = "SELECT * FROM jobs";
+
+        $params = [];
+        $conditions = [];
+
+        if ($isOpens !== null) {
+            $conditions[] = "is_open = ANY(:is_opens)";
+            $params[":is_opens"] = '{' . implode(',', array_map(function ($isOpen) {
+                return $isOpen ? 't' : 'f';
+            }, $isOpens)) . '}';
+        }
+
+        if ($jobTypes !== null) {
+            $conditions[] = "job_type = ANY(:job_types)";
+            $params[":job_types"] = '{' . implode(',', array_map(function ($jobType) {
+                return $jobType->value;
+            }, $jobTypes)) . '}';
+        }
+
+        if ($locationTypes !== null) {
+            $conditions[] = "location_type = ANY(:location_types)";
+            $params[":location_types"] = '{' . implode(',', array_map(function ($locationType) {
+                return $locationType->value;
+            }, $locationTypes)) . '}';
+        }
+
+        if ($createdAtFrom !== null) {
+            $conditions[] = "created_at >= :created_at_from";
+            $createdAtFrom->setTime(0, 0, 0);
+            $params[':created_at_from'] = $createdAtFrom->format('Y-m-d H:i:s');
+        }
+
+        if ($createdAtTo !== null) {
+            $conditions[] = "created_at <= :created_at_to";
+            $createdAtTo->setTime(23, 59, 59);
+            $params[':created_at_to'] = $createdAtTo->format('Y-m-d H:i:s');
+        }
+
+        if ($search !== null) {
+            $conditions[] = "(position ILIKE :search OR description ILIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+            $totalItemsQuery .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        // Get the total count  
+        $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
+
+        // Get data
+        $query .= " ORDER BY created_at " . ($isCreatedAtAsc ? "ASC" : "DESC");
+        $query .= " LIMIT :limit OFFSET :offset";
+        $params[':limit'] = $limit;
+        $params[':offset'] = ($page - 1) * $limit;
+
+        $results = $this->db->queryMany($query, $params);
+
+        // Parse data to dao
+        $jobs = [];
+        foreach ($results as $result) {
+            $jobs[] = JobDao::fromRaw($result);
+        }
+
+        // Parse to meta dao
+        $meta = new PaginationMetaDao($page, $limit, $totalItems);
+
+        return [$jobs, $meta];
+    }
+
+    /**
      * Get company's job
      * @param int $companyId - The company id
      * @param ?array isOpens - The job is open or not
@@ -166,7 +253,7 @@ class JobRepository extends Repository
 
             $this->editJob($job);
 
-            $jobAttachments =  $this->createJobAttachments($job->getJobId(), $attachmentPaths);
+            $jobAttachments = $this->createJobAttachments($job->getJobId(), $attachmentPaths);
 
             $this->db->commit();
         } catch (Exception $e) {
@@ -217,7 +304,7 @@ class JobRepository extends Repository
     /**
      * Get a job by id
      */
-    public function getJobById(int $jobId): JobDao | null
+    public function getJobById(int $jobId): JobDao|null
     {
         $query = "SELECT * FROM jobs WHERE job_id = :job_id;";
         $params = [':job_id' => $jobId];
@@ -233,7 +320,7 @@ class JobRepository extends Repository
     /**
      * Get job by id with attachments also (denormliazed into jobDao)
      */
-    public function getJobByIdWithAttachments(int $jobId): JobDao | null
+    public function getJobByIdWithAttachments(int $jobId): JobDao|null
     {
         $job = $this->getJobById($jobId);
         if ($job === null) {
@@ -337,7 +424,7 @@ class JobRepository extends Repository
     /**
      * Get job attachment
      */
-    public function getJobAttachmentById(int $attachmentId): JobAttachmentDao | null
+    public function getJobAttachmentById(int $attachmentId): JobAttachmentDao|null
     {
         $query = "SELECT * FROM job_attachments WHERE attachment_id = :attachment_id;";
         $params = [':attachment_id' => $attachmentId];
