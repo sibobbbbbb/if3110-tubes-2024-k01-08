@@ -253,19 +253,34 @@ use src\dao\LocationType;
                                         </div>
                                     <?php endif; ?>
 
-                                    <div class="badge badge--outline">
+                                    <div class="badge badge--secondary">
                                         <?= htmlspecialchars(JobType::renderText($job->getJobType())) ?>
                                     </div>
 
-                                    <div class="badge badge--secondary">
+                                    <div class="badge badge--outline">
                                         <?= htmlspecialchars(LocationType::renderText($job->getLocationType())) ?>
                                     </div>
                                 </div>
 
                                 <!-- Created at -->
-                                <p class="job-article__description">
-                                    Created at <?= htmlspecialchars($job->getCreatedAt()->format('m/d/Y')) ?>
-                                </p>
+                                <div class="job-article__information">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days icon--sm--margin">
+                                        <path d="M8 2v4" />
+                                        <path d="M16 2v4" />
+                                        <rect width="18" height="18" x="3" y="4" rx="2" />
+                                        <path d="M3 10h18" />
+                                        <path d="M8 14h.01" />
+                                        <path d="M12 14h.01" />
+                                        <path d="M16 14h.01" />
+                                        <path d="M8 18h.01" />
+                                        <path d="M12 18h.01" />
+                                        <path d="M16 18h.01" />
+                                    </svg>
+
+                                    <span>
+                                        <?= htmlspecialchars($job->getCreatedAt()->format('m/d/Y')) ?>
+                                    </span>
+                                </div>
                             </header>
 
                             <!-- Actions -->

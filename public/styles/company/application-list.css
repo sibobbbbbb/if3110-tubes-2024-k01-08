@@ -54,7 +54,7 @@
 .header__group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.675rem;
 }
 
 .header__title {
@@ -68,6 +68,16 @@
   flex-wrap: wrap;
   flex-direction: row;
   gap: 0.5rem;
+}
+
+.header__information {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 0.875rem; /* 14px */
+  line-height: normal;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
 }
 
 .application-list--empty {
