@@ -196,23 +196,9 @@ use src\dao\LocationType;
                 </h1>
 
                 <p class="header__description">
-                    Manage your company's jobs in this page.
+                Discover new opportunities daily and take control of your career path
                 </p>
             </div>
-
-            <!-- Create new -->
-            <a href="/company/jobs/create" class="header__create-anchor">
-                <button class="button button--default-color button--sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus icon--sm--margin">
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-
-                    <span>
-                        Create New
-                    </span>
-                </button>
-            </a>
         </header>
 
         <!-- Job lists -->
