@@ -230,7 +230,7 @@ class Application
             '/history',
             function () {
                 $controller = $this->container->get(JobController::class);
-                $method = 'renderandHandleHistory';
+                $method = 'renderApplicationsHistory';
                 return [
                     'controller' => $controller,
                     'method' => $method
@@ -380,7 +380,7 @@ class Application
 
         /**
          * Update company's 
-        */
+         */
 
         /**
          * Delete a company's job
@@ -541,7 +541,8 @@ class Application
             JobService::class,
             function ($c) {
                 $jobRepository = $c->get(JobRepository::class);
-                return new JobService($jobRepository);
+                $applicationRepository = $c->get(ApplicationRepository::class);
+                return new JobService($jobRepository, $applicationRepository);
             }
         );
 

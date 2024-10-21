@@ -102,6 +102,14 @@ use src\dao\LocationType;
                                     <?= htmlspecialchars($app->getUser()->getEmail()) ?>
                                 </h3>
 
+                                <!-- Applied at -->
+                                <p class="application-article__description">
+                                    Applied at <?= htmlspecialchars($app->getCreatedAt()->format('m/d/Y')) ?>
+                                </p>
+                            </header>
+
+                            <!-- Actions -->
+                            <div class="application-article__actions">
                                 <!-- Tags -->
                                 <div>
                                     <?php if ($app->getStatus() == ApplicationStatus::ACCEPTED): ?>
@@ -119,14 +127,6 @@ use src\dao\LocationType;
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Applied at -->
-                                <p class="application-article__description">
-                                    Applied at <?= htmlspecialchars($app->getCreatedAt()->format('m/d/Y')) ?>
-                                </p>
-                            </header>
-
-                            <!-- Actions -->
-                            <div class="application-article__actions">
                                 <!-- View -->
                                 <a href="/company/jobs/<?= htmlspecialchars($app->getJobId(), ENT_QUOTES, 'utf-8') ?>/applications/<?= htmlspecialchars($app->getApplicationId(), ENT_QUOTES, 'utf-8') ?>">
                                     <button class="button button--outline button--sm">

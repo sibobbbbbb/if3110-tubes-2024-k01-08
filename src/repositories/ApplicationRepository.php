@@ -14,11 +14,64 @@ class ApplicationRepository extends Repository
     }
 
     /**
+     * Get user's job application history (paginated)
+     * @param int user_id
+     * @param int page
+     * @return [ApplicationDao, PaginationMetaDao] array
+     */
+    public function getUserApplications(int $user_id, int $page, int $limit): array
+    {
+        $queryMeta = "SELECT COUNT(*) FROM applications WHERE user_id = :user_id";
+        $params = [
+            ':user_id' => $user_id,
+        ];
+
+        // Get meta
+        $totalItems = $this->db->queryOne($queryMeta, $params)[0];
+
+        // Get data
+        $offset = ($page - 1) * $limit;
+        $params[':limit'] = $limit;
+        $params[':offset'] = $offset;
+        $queryData = "
+            SELECT * 
+            FROM 
+                applications 
+                INNER JOIN jobs ON applications.job_id = jobs.job_id
+                INNER JOIN users ON jobs.company_id = users.id
+            WHERE user_id = :user_id 
+            ORDER BY applications.created_at DESC 
+            LIMIT :limit 
+            OFFSET :offset";
+
+        $result = $this->db->queryMany($queryData, $params);
+
+        // Parse data
+        $applications = [];
+        foreach ($result as $raw) {
+            $company = UserDao::fromRaw($raw);
+
+            $job = JobDao::fromRaw($raw);
+            $job->setCompany($company);
+
+            $application = ApplicationDao::fromRaw($raw);
+            $application->setJob($job);
+
+            $applications[] = $application;
+        }
+
+        // Parse meta
+        $meta = new PaginationMetaDao($page, $limit, $totalItems);
+
+        return [$applications, $meta];
+    }
+
+    /**
      * Get a company's job applications (paginated)
      * @param int job_id
      * @param int page
      * @param int limit
-     * @return ApplicationDao array
+     * @return [ApplicationDao, PaginationMetaDao] array
      */
     public function getJobApplications(int $job_id, int $page, int $limit): array
     {
@@ -67,7 +120,7 @@ class ApplicationRepository extends Repository
     /**
      * Get an application by id including the user and job
      * @param int application_id
-     * @return ApplicationDao
+     * @return ApplicationDao | null
      */
     public function getOneJobApplication(int $application_id): ApplicationDao | null
     {

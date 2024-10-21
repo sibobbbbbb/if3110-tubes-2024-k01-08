@@ -5,7 +5,7 @@ namespace src\controllers;
 use DateTime;
 use Exception;
 use src\core\{Response, Request};
-use src\dao\{LocationType, JobType};
+use src\dao\{LocationType, JobType, UserRole};
 use src\dto\DtoFactory;
 use src\exceptions\BadRequestHttpException;
 use src\exceptions\BaseHttpException;
@@ -40,6 +40,12 @@ class JobController extends Controller
     public function renderJobs(Request $req, Response $res): void
     {
         $viewPathFromPages = 'jobs/index.php';
+
+        // this is a public route, but should only be accessible by non auth or jobseeker
+        // If user has session and is company, redirect to company dashboard
+        if (UserSession::isLoggedIn() && UserSession::getUserRole() == UserRole::COMPANY) {
+            $res->redirect('/company/dashboard');
+        }
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Jobs';
@@ -86,10 +92,12 @@ class JobController extends Controller
             $data['paginationComponent'] = $paginationComponent;
         } catch (BaseHttpException $e) {
             // TODO: Render error view
-            echo $e->getMessage();
+            error_log($e->getMessage());
+            // echo $e->getMessage();
         } catch (Exception $e) {
             // TODO: Render Internal server error
-            echo $e->getMessage();
+            error_log($e->getMessage());
+            // echo $e->getMessage();
         }
 
         $this->renderPage($viewPathFromPages, $data);
@@ -185,20 +193,16 @@ class JobController extends Controller
         ];
     }
 
-    public function renderandHandleHistory(Request $req, Response $res): void
+    public function renderApplicationsHistory(Request $req, Response $res): void
     {
-        // // Redirect if user is authenticated
-        // $this->redirectIfAuthenticated($req, $res);
-
-        // Render the view
         $viewPathFromPages = 'history/index.php';
+        $currentUserId = UserSession::getUserId();
 
         // Data to pass to the view (SSR)
-        $title = 'LinkInPurry | Sign In';
-        $description = 'Sign in to your LinkInPurry account';
+        $title = 'LinkInPurry | History';
+        $description = 'Your job applications history';
         $additionalTags = <<<HTML
-                <link rel="stylesheet" href="/styles/history/history.css" />
-                <script src="/scripts/auth/sign-up/job-seeker.js" defer></script>
+                <link rel="stylesheet" href="/styles/jobs/history.css" />
             HTML;
         $data = [
             'title' => $title,
@@ -206,10 +210,51 @@ class JobController extends Controller
             'additionalTags' => $additionalTags
         ];
 
-        if ($req->getMethod() == "GET") {
-            // Get
-            $this->renderPage($viewPathFromPages, $data);
-        } else {
+        // Get query parameters
+        $rawPage = $req->getQueryParams('page');
+
+        // Parse query parameters
+        $queryParams = $this->parseHistoryQueryParams($rawPage);
+        $parsedPage = $queryParams['page'];
+
+        try {
+            // Call service to get applications history
+            [$applications, $meta] = $this->jobService->getApplicationsHistory($currentUserId, $parsedPage);
+
+            // Generate pagination component
+            $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
+
+            // Add data to pass to the view
+            $data['applications'] = $applications;
+            $data['meta'] = $meta;
+            $data['paginationComponent'] = $paginationComponent;
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+            error_log($e->getMessage());
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+            error_log($e->getMessage());
         }
+
+        // Render the page
+        $this->renderPage($viewPathFromPages, $data);
+    }
+
+    private function parseHistoryQueryParams(?string $rawPage)
+    {
+        $page = 1;
+        if ($rawPage !== null) {
+            // Parse to integer
+            $pageResult = filter_var($rawPage, FILTER_VALIDATE_INT);
+            if ($pageResult == false || $pageResult < 1) {
+                $page = 1;
+            } else {
+                $page = $pageResult;
+            }
+        }
+
+        return [
+            'page' => $page
+        ];
     }
 }
