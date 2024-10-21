@@ -53,7 +53,7 @@ CREATE TYPE application_status_enum AS ENUM ('accepted', 'rejected', 'waiting');
 CREATE TABLE applications (
     application_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    job_id INTEGER, -- NULL if the job is deleted
+    job_id INTEGER NOT NULL,
     cv_path VARCHAR(255) NOT NULL,
     video_path VARCHAR(255),
     status application_status_enum DEFAULT 'waiting',
@@ -63,8 +63,7 @@ CREATE TABLE applications (
     UNIQUE (user_id, job_id), -- One user can only apply once for a job
 
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE SET NULL
-    -- ON DELETE SET NULL agar saat job dihapus, tampilkan job tersebut telah dihapus;
+    FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE
 );
 
 

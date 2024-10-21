@@ -41,8 +41,8 @@ class ApplicationRepository extends Repository
             SELECT * 
             FROM 
                 applications 
-                LEFT JOIN jobs ON applications.job_id = jobs.job_id
-                LEFT JOIN users ON applications.user_id = users.id 
+                INNER JOIN jobs ON applications.job_id = jobs.job_id
+                INNER JOIN users ON applications.user_id = users.id 
             WHERE jobs.job_id = :job_id 
             ORDER BY applications.created_at DESC 
             LIMIT :limit 
