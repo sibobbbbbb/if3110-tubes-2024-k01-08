@@ -972,6 +972,16 @@ body {
   background-color: rgba(34, 197, 94, 0.8);
 }
 
+.badge--yellow {
+  border: 1px solid transparent;
+  background-color: rgb(234 179 8);
+  color: hsl(var(--primary-foreground));
+}
+
+.badge--yellow:hover {
+  background-color: rgba(234 179 8, 0.8);
+}
+
 .badge--secondary {
   border: 1px solid transparent;
   background-color: hsl(var(--secondary));

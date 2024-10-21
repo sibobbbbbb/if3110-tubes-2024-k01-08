@@ -175,6 +175,9 @@ class CompanyController extends Controller
         $this->renderPage($viewPathFromPages, $data);
     }
 
+    /**
+     * Parse company job page query params
+     */
     private function parseCompanyJobQueryParams(
         ?array $rawIsOpens,
         ?array $rawJobTypes,
@@ -279,6 +282,91 @@ class CompanyController extends Controller
             'is-created-at-asc' => $isCreatedAtAsc,
             'page' => $page
         ];
+    }
+
+    /**
+     * Render company job detail (list of applications of the job)  
+     */
+    public function renderCompanyJobApplications(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/[jobId]/applications/index.php';
+        $currentJobId = $req->getPathParams('jobId');
+        $currentUserId = UserSession::getUserId();
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Job Applications';
+        $description = 'List of applications for this job';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/company/application-list.css" />
+                <script src="/scripts/company/application-list.js" defer></script>
+            HTML;
+
+        // Parse page query
+        $rawPage = $req->getQueryParams('page');
+        $queryParams = $this->parseCompanyJobApplicationQueryParams($rawPage);
+        $parsedPage = $queryParams['page'];
+
+        // Render page
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags,
+        ];
+
+        try {
+            // Get job applications
+            [$job, $applications, $meta] = $this->companyService->getCompanyJobApplications($currentUserId, $currentJobId, $parsedPage);
+
+            // Generate pagination component
+            $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
+
+            // Add data to pass to the view
+            // echo var_dump($applications);
+            $data['job'] = $job;
+            $data['applications'] = $applications;
+            $data['meta'] = $meta;
+            $data['paginationComponent'] = $paginationComponent;
+
+            $this->renderPage($viewPathFromPages, $data);
+        } catch (BaseHttpException $e) {
+            // Http error
+        } catch (Exception $e) {
+            // Treat as internal server error
+        }
+    }
+
+    /**
+     * Parse company job application query params
+     */
+    private function parseCompanyJobApplicationQueryParams(
+        ?string $rawPage
+    ): array {
+        $page = 1;
+
+        // Page number (default to 1)
+        if ($rawPage !== null) {
+            // Parse to integer
+            $pageResult = filter_var($rawPage, FILTER_VALIDATE_INT);
+            if ($pageResult == false || $pageResult < 1) {
+                $page = 1;
+            } else {
+                $page = $pageResult;
+            }
+        }
+
+        return [
+            'page' => $page
+        ];
+    }
+
+
+    /**
+     * Render and handle company job application detail
+     */
+    public function renderAndHandleCompanyJobApplicationDetail(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/[jobId]/applications/[applicationId]/index.php';
+        $currentUserId = UserSession::getUserId();
     }
 
     /**

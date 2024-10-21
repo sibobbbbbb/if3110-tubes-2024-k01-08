@@ -15,6 +15,10 @@ class ApplicationDao
     private ?string $status_reason;
     private DateTime $created_at;
 
+    // Foreign columns
+    private JobDao $job;
+    private UserDao $user;
+
     public function __construct(int $application_id, int $user_id, int $job_id, string $cv_path, ?string $video_path, ApplicationStatus $status, ?string $status_reason, DateTime $created_at)
     {
         $this->application_id = $application_id;
@@ -25,6 +29,20 @@ class ApplicationDao
         $this->status = $status;
         $this->status_reason = $status_reason;
         $this->created_at = $created_at;
+    }
+
+    public static function fromRaw(array $raw): ApplicationDao
+    {
+        return new ApplicationDao(
+            $raw['application_id'],
+            $raw['user_id'],
+            $raw['job_id'],
+            $raw['cv_path'],
+            $raw['video_path'],
+            ApplicationStatus::fromString($raw['status']),
+            $raw['status_reason'],
+            new DateTime($raw['created_at'])
+        );
     }
 
     public function getApplicationId(): int
@@ -59,6 +77,14 @@ class ApplicationDao
     {
         return $this->created_at;
     }
+    public function getUser(): UserDao
+    {
+        return $this->user;
+    }
+    public function getJob(): JobDao
+    {
+        return $this->job;
+    }
 
     public function setCvPath(string $cv_path): void
     {
@@ -75,5 +101,13 @@ class ApplicationDao
     public function setStatusReason(?string $status_reason): void
     {
         $this->status_reason = $status_reason;
+    }
+    public function setUser(UserDao $user): void
+    {
+        $this->user = $user;
+    }
+    public function setJob(JobDao $job): void
+    {
+        $this->job = $job;
     }
 }

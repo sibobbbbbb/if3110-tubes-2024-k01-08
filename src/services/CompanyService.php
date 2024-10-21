@@ -6,20 +6,22 @@ use DateTime;
 use Exception;
 use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
-use src\exceptions\NotFoundHttpException;
-use src\repositories\{JobRepository, UserRepository};
+use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
 
 class CompanyService extends Service
 {
     // Dependency injection
     private UserRepository $userRepository;
     private JobRepository $jobRepository;
+    private ApplicationRepository $applicationRepository;
     private UploadService $uploadService;
 
-    public function __construct(UserRepository $userRepository, JobRepository $jobRepository, UploadService $uploadService)
+
+    public function __construct(UserRepository $userRepository, JobRepository $jobRepository, ApplicationRepository $applicationRepository, UploadService $uploadService)
     {
         $this->userRepository = $userRepository;
         $this->jobRepository = $jobRepository;
+        $this->applicationRepository = $applicationRepository;
         $this->uploadService = $uploadService;
     }
 
@@ -139,7 +141,8 @@ class CompanyService extends Service
     }
 
     /**
-     * Get many company's jobs with filter (job type, location type, is open) 
+     * Get many company's jobs with filter (job type, location type, is open)
+     * Company id is validated through middleware
      */
     public function getCompanyJobs(int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, ?int $page): array
     {
@@ -156,6 +159,48 @@ class CompanyService extends Service
 
         return [$jobs, $meta];
     }
+
+    /**
+     * G
+     */
+    /**
+     * Get a company's job applications (paginated)
+     * @param int job_id
+     * @param int page
+     */
+    public function getCompanyJobApplications(int $companyId, int $job_id, int $page): array
+    {
+        // base limit
+        $limit = 10;
+
+        // Validate if company is authorized to view applications
+        try {
+            $job = $this->jobRepository->getJobById($job_id);
+        } catch (Exception $e) {
+            HttpExceptionFactory::createInternalServerError("Failed to get job");
+        }
+
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Check if authorized
+        if ($job->getCompanyId() != $companyId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to view this job's applications");
+        }
+
+        // Get applications of the job id
+        try {
+            [$applications, $meta] = $this->applicationRepository->getJobApplications($job_id, $page, $limit);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            HttpExceptionFactory::createInternalServerError("Failed to get job applications");
+        }
+
+        return [$job, $applications, $meta];
+    }
+
 
 
     /**
