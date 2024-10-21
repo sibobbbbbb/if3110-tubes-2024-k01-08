@@ -53,7 +53,7 @@ CREATE TYPE application_status_enum AS ENUM ('accepted', 'rejected', 'waiting');
 CREATE TABLE applications (
     application_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    job_id INTEGER NOT NULL,
+    job_id INTEGER, -- NULL if the job is deleted
     cv_path VARCHAR(255) NOT NULL,
     video_path VARCHAR(255),
     status application_status_enum DEFAULT 'waiting',
