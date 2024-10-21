@@ -58,7 +58,7 @@
         <p class="signin__register-prompt">
             Don't have an account?
             <a href="/auth/sign-up" class="anchor-link">
-                Register
+                Sign up
             </a>
         </p>
     </section>

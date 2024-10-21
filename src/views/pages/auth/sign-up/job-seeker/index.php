@@ -76,13 +76,13 @@
 
             <!-- submit button -->
             <button type="submit" class="button button--default-size button--default-color">
-                Register Your Account
+                Sign Up
             </button>
         </form>
 
         <!-- Sign up -->
         <p class="signup__register-prompt">
-            Already register your account?
+            Already sign up your account?
             <a href="/auth/sign-in" class="anchor-link">
                 Sign in
             </a>
