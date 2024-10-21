@@ -5,9 +5,10 @@ use src\utils\UserSession;
 
 // Determine search form action
 $searchForJobsAction = "/jobs";
-if (UserSession::isLoggedIn() || UserSession::getUserRole() === UserRole::COMPANY) {
+if (UserSession::isLoggedIn() && UserSession::getUserRole() === UserRole::COMPANY) {
     $searchForJobsAction = "/company/jobs";
 }
+// echo var_dump($searchForJobsAction);
 ?>
 
 <!-- Content -->
