@@ -216,9 +216,10 @@
   font-weight: 700;
 }
 
-.job-article__company {
+.job-article__information {
   display: flex;
   flex-direction: row;
+  align-items: center;
   font-size: 0.875rem; /* 14px */
   line-height: normal;
   font-weight: 500;
@@ -230,13 +231,6 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.job-article__description {
-  font-size: 0.875rem; /* 14px */
-  line-height: normal;
-  font-weight: 400;
-  color: hsl(var(--muted-foreground));
 }
 
 .job-article__actions {

@@ -54,7 +54,6 @@ class JobController extends Controller
         ];
 
         // Get query parameters
-        $rawIsOpens = $req->getQueryParams('is-opens');
         $rawJobTypes = $req->getQueryParams('job-types');
         $rawLocationTypes = $req->getQueryParams('location-types');
         $rawCreatedAtFrom = $req->getQueryParams('created-at-from');
@@ -64,8 +63,7 @@ class JobController extends Controller
         $rawPage = $req->getQueryParams('page');
 
         // Parse query parameters
-        $queryParams = $this->parseJobQueryParams($rawIsOpens, $rawJobTypes, $rawLocationTypes, $rawCreatedAtFrom, $rawCreatedAtTo, $rawSearch, $rawSortCreatedAt, $rawPage);
-        $parsedIsOpens = $queryParams['is-opens'];
+        $queryParams = $this->parseJobQueryParams($rawJobTypes, $rawLocationTypes, $rawCreatedAtFrom, $rawCreatedAtTo, $rawSearch, $rawSortCreatedAt, $rawPage);
         $parsedJobTypes = $queryParams['job-types'];
         $parsedLocationTypes = $queryParams['location-types'];
         $parsedCreatedAtFrom = $queryParams['created-at-from'];
@@ -76,7 +74,7 @@ class JobController extends Controller
 
         try {
             // Get jobs data
-            [$jobs, $meta] = $this->jobService->getJobs($parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
+            [$jobs, $meta] = $this->jobService->getJobs($parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
 
             // Generate pagination component
             $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
@@ -101,7 +99,6 @@ class JobController extends Controller
      * Parse job page query params
      */
     private function parseJobQueryParams(
-        ?array $rawIsOpens,
         ?array $rawJobTypes,
         ?array $rawLocationTypes,
         ?string $rawCreatedAtFrom,
@@ -111,24 +108,7 @@ class JobController extends Controller
         ?string $rawPage
     ): array {
         $isCreatedAtAsc = false; // Default sort
-        $isOpens = $jobTypes = $locationTypes = $createdAtFrom = $createdAtTo = $search = $page = null;
-
-        // Is open
-        if ($rawIsOpens !== null) {
-            foreach ($rawIsOpens as $isOpenValue) {
-                if ($isOpenValue === "true") {
-                    if ($isOpens === null) {
-                        $isOpens = [];
-                    }
-                    $isOpens[] = true;
-                } else if ($isOpenValue === "false") {
-                    if ($isOpens === null) {
-                        $isOpens = [];
-                    }
-                    $isOpens[] = false;
-                }
-            }
-        }
+        $jobTypes = $locationTypes = $createdAtFrom = $createdAtTo = $search = $page = null;
 
         // Job types
         if ($rawJobTypes !== null) {
@@ -195,7 +175,6 @@ class JobController extends Controller
         }
 
         return [
-            'is-opens' => $isOpens,
             'job-types' => $jobTypes,
             'location-types' => $locationTypes,
             'created-at-from' => $createdAtFrom,

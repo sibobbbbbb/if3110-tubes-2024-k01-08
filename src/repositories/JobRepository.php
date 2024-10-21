@@ -54,6 +54,8 @@ class JobRepository extends Repository
 
     /**
      * Get job from all company
+     * 1. Job must be open
+     * 2. search filter searchs for the posititon nanme, company name, and description of the job.
      * @param ?array isOpens - The job is open or not
      * @param ?array jobTypes - The job types
      * @param ?array locationTypes - The location types
@@ -65,20 +67,16 @@ class JobRepository extends Repository
      * @param ?int limit - The limit
      * @returns [array of JobDao, meta dao] - The jobs
      */
-    public function getJobsWithFilter(?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
+    public function getJobsWithFilter(?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
     {
         $totalItemsQuery = "SELECT COUNT(*) FROM jobs INNER JOIN users ON jobs.company_id = users.id";
         $query = "SELECT * FROM jobs INNER JOIN users ON jobs.company_id = users.id";
 
-        $params = [];
-        $conditions = [];
-
-        if ($isOpens !== null) {
-            $conditions[] = "is_open = ANY(:is_opens)";
-            $params[":is_opens"] = '{' . implode(',', array_map(function ($isOpen) {
-                return $isOpen ? 't' : 'f';
-            }, $isOpens)) . '}';
-        }
+        // Initial condition: job is open
+        $conditions = ["is_open = :is_open"];
+        $params = [
+            ':is_open' => true,
+        ];
 
         if ($jobTypes !== null) {
             $conditions[] = "job_type = ANY(:job_types)";
