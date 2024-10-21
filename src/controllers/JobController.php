@@ -13,10 +13,13 @@ use src\exceptions\HttpExceptionFactory;
 use src\services\{JobService, UserService};
 use src\utils\{UserSession, Validator};
 use src\views\components\PaginationComponent;
-class JobController extends Controller {
+
+class JobController extends Controller
+{
     private JobService $jobService;
 
-    public function __construct(JobService $jobService) {
+    public function __construct(JobService $jobService)
+    {
         $this->jobService = $jobService;
     }
 
@@ -37,14 +40,12 @@ class JobController extends Controller {
     public function renderJobs(Request $req, Response $res): void
     {
         $viewPathFromPages = 'jobs/index.php';
-        $currentUserId = UserSession::getUserId();
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Jobs';
         $description = 'List of jobs available for you';
         $additionalTags = <<<HTML
                 <link rel="stylesheet" href="/styles/jobs/job-list.css" />
-                <script src="/scripts/job-list.js" defer></script>
             HTML;
         $data = [
             'title' => $title,
@@ -75,7 +76,7 @@ class JobController extends Controller {
 
         try {
             // Get jobs data
-            [$jobs, $meta] = $this->jobService->getJobs( $parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
+            [$jobs, $meta] = $this->jobService->getJobs($parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
 
             // Generate pagination component
             $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
@@ -229,8 +230,7 @@ class JobController extends Controller {
         if ($req->getMethod() == "GET") {
             // Get
             $this->renderPage($viewPathFromPages, $data);
-        } else{
-
+        } else {
         }
     }
 }

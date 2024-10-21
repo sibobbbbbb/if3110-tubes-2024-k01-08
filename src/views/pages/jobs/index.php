@@ -160,7 +160,7 @@ use src\dao\LocationType;
 
             <div class="filter-form__actions">
                 <!-- Reset Filter -->
-                <a href="/company/jobs">
+                <a href="/jobs">
                     <button type="button" class="button button--secondary button--icon--sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter-x icon--sm">
                             <path d="M13.013 3H2l8 9.46V19l4 2v-8.54l.9-1.055" />
@@ -196,7 +196,7 @@ use src\dao\LocationType;
                 </h1>
 
                 <p class="header__description">
-                Discover new opportunities daily and take control of your career path
+                    Discover new opportunities daily and take control of your career path
                 </p>
             </div>
         </header>
@@ -226,6 +226,22 @@ use src\dao\LocationType;
                                 <h3 class="job-article__title">
                                     <?= htmlspecialchars($job->getPosition()) ?>
                                 </h3>
+
+                                <div class="job-article__company">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2 icon--sm--margin">
+                                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                                        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                                        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                                        <path d="M10 6h4" />
+                                        <path d="M10 10h4" />
+                                        <path d="M10 14h4" />
+                                        <path d="M10 18h4" />
+                                    </svg>
+
+                                    <span>
+                                        <?= htmlspecialchars($job->getCompany()->getName()) ?>
+                                    </span>
+                                </div>
 
                                 <!-- Tags -->
                                 <div class="job-article__tags">
@@ -257,7 +273,7 @@ use src\dao\LocationType;
                             <!-- Actions -->
                             <div class="job-article__actions">
                                 <!-- View -->
-                                <a href="/company/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>/applications">
+                                <a href="/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>">
                                     <button class="button button--outline button--sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye icon--sm--margin">
                                             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
@@ -268,32 +284,6 @@ use src\dao\LocationType;
                                         </span>
                                     </button>
                                 </a>
-
-                                <!-- Edit -->
-                                <a href="/company/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>/edit">
-                                    <button class="button button--secondary button--sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil-line icon--sm--margin">
-                                            <path d="M12 20h9" />
-                                            <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
-                                            <path d="m15 5 3 3" />
-                                        </svg>
-
-                                        <span>
-                                            Edit
-                                        </span>
-                                    </button>
-                                </a>
-
-                                <!-- Delete (Ajax) -->
-                                <button data-job-id="<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>" aria-label="delete job button" type="button" class="button button--destructive button--icon button--icon--sm job-list__delete-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 icon--sm">
-                                        <path d="M3 6h18" />
-                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                                        <line x1="10" x2="10" y1="11" y2="17" />
-                                        <line x1="14" x2="14" y1="11" y2="17" />
-                                    </svg>
-                                </button>
                             </div>
                         </article>
                     </li>

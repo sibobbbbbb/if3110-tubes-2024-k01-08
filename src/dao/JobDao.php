@@ -20,6 +20,9 @@ class JobDao
     // array of JobAttachmentDao
     private array $attachments;
 
+    // UserDao (companyId)
+    private UserDao $company;
+
     public function __construct(int $job_id, int $company_id, string $position, string $description, string $job_type, string $location_type, bool $is_open, DateTime $created_at, DateTime $updated_at)
     {
         $this->job_id = $job_id;
@@ -79,6 +82,10 @@ class JobDao
     {
         return $this->attachments;
     }
+    public function getCompany(): UserDao
+    {
+        return $this->company;
+    }
 
     public function setJobId(int $job_id): void
     {
@@ -115,5 +122,9 @@ class JobDao
     public function setAttachments(array $attachments): void
     {
         $this->attachments = $attachments;
+    }
+    public function setCompany(UserDao $company): void
+    {
+        $this->company = $company;
     }
 }

@@ -34,7 +34,7 @@ class JobService extends Service
         try {
             [$jobs, $meta] = $this->jobRepository->getJobsWithFilter($isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
         } catch (Exception $e) {
-            echo $e->getMessage();
+            error_log($e->getMessage());
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
         }
 

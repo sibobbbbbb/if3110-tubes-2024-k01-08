@@ -9,6 +9,7 @@ use src\dao\JobDao;
 use src\dao\JobType;
 use src\dao\LocationType;
 use src\dao\PaginationMetaDao;
+use src\dao\UserDao;
 use src\database\Database;
 
 class JobRepository extends Repository
@@ -66,8 +67,8 @@ class JobRepository extends Repository
      */
     public function getJobsWithFilter(?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
     {
-        $totalItemsQuery = "SELECT COUNT(*) FROM jobs";
-        $query = "SELECT * FROM jobs";
+        $totalItemsQuery = "SELECT COUNT(*) FROM jobs INNER JOIN users ON jobs.company_id = users.id";
+        $query = "SELECT * FROM jobs INNER JOIN users ON jobs.company_id = users.id";
 
         $params = [];
         $conditions = [];
@@ -106,7 +107,8 @@ class JobRepository extends Repository
         }
 
         if ($search !== null) {
-            $conditions[] = "(position ILIKE :search OR description ILIKE :search)";
+            // position, description, company name
+            $conditions[] = "(position ILIKE :search OR description ILIKE :search OR users.name ILIKE :search)";
             $params[':search'] = "%$search%";
         }
 
@@ -129,7 +131,11 @@ class JobRepository extends Repository
         // Parse data to dao
         $jobs = [];
         foreach ($results as $result) {
-            $jobs[] = JobDao::fromRaw($result);
+            $newCompany = UserDao::fromRaw($result);
+            $newJob = JobDao::fromRaw($result);
+            $newJob->setCompany($newCompany);
+
+            $jobs[] = $newJob;
         }
 
         // Parse to meta dao
