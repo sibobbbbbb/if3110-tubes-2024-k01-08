@@ -177,6 +177,59 @@ class Application
         );
 
         /**
+         * Job Routes (Job-Seeker)
+         */
+        // Create job
+        // $createJobFactoryFunction = function () {
+        //     $controller = $this->container->get(CompanyController::class);
+        //     $method = 'renderAndHandleCreateJob';
+        //     return [
+        //         'controller' => $controller,
+        //         'method' => $method
+        //     ];
+        // };
+        // Render
+        // $router->get(
+        //     '/company/jobs/create',
+        //     $createJobFactoryFunction,
+        //     [$companyAuthMiddlewareFactoryFunction]
+        // );
+        // Handle
+        // $router->post(
+        //     '/company/jobs/create',
+        //     $createJobFactoryFunction,
+        //     [$companyAuthMiddlewareFactoryFunction]
+        // );
+
+        // Get jobs
+        $router->get(
+            '/jobs',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderJobs';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$jobSeekerAuthMiddleware]
+        );
+
+        // Get company detail jobs
+        $router->get(
+            '/company/jobs/[jobId]/applications',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'renderCompanyJobApplications';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        /**
          * Company Routes
          */
         // Create job
@@ -304,6 +357,7 @@ class Application
             [$companyAuthMiddlewareFactoryFunction]
         );
 
+        // Job History
         $router->get(
             '/history',
             function () {
@@ -526,7 +580,8 @@ class Application
         $this->container->bind(
             JobController::class,
             function ($c) {
-                return new JobController();
+                $jobService = $c->get(JobService::class);
+                return new JobController($jobService);
             }
         );
 
