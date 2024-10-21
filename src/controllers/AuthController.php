@@ -303,7 +303,7 @@ class AuthController extends Controller
     {
         if (strpos($errormess, 'email') == true) {
             $data['errorFields'] = [
-                'email' => ["Email Already Exist"]
+                'email' => ["Email already exist"]
             ];
             return $data['errorFields'];
         }
