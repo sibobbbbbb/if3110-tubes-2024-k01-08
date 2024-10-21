@@ -26,4 +26,14 @@ enum JobType: string
             default => throw new \InvalidArgumentException("Invalid job type: $jobType")
         };
     }
+
+    public static function renderText(JobType $jobType): string
+    {
+        return match ($jobType) {
+            JobType::FULL_TIME => 'Full-time',
+            JobType::PART_TIME => 'Part-time',
+            JobType::INTERNSHIP => 'Internship',
+            default => throw new \InvalidArgumentException("Invalid job type: $jobType")
+        };
+    }
 }

@@ -15,6 +15,6 @@ stop:
 
 reset:
 	docker compose down
-	sudo rm -rf ./db-data
-
+	docker volume rm linkinpurry-db-data
+	docker volume rm linkinpurry-upload-data
 

@@ -215,6 +215,20 @@ class Application
             [$companyAuthMiddlewareFactoryFunction]
         );
 
+        // Get company detail jobs
+        $router->get(
+            '/company/jobs/[jobId]/applications',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'renderCompanyJobApplications';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
         // Update company profile
         $companyProfileFactoryFunction = function () {
             $controller = $this->container->get(CompanyController::class);
@@ -290,7 +304,17 @@ class Application
             [$companyAuthMiddlewareFactoryFunction]
         );
 
-        // $this->renderError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
+        $router->get(
+            '/history',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderandHandleHistory';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
     }
 
     /**
@@ -426,8 +450,9 @@ class Application
             function ($c) {
                 $userRepository = $c->get(UserRepository::class);
                 $jobRepository = $c->get(JobRepository::class);
+                $applicationRepository = $c->get(ApplicationRepository::class);
                 $uploadService = $c->get(UploadService::class);
-                return new CompanyService($userRepository, $jobRepository, $uploadService);
+                return new CompanyService($userRepository, $jobRepository, $applicationRepository, $uploadService);
             }
         );
 

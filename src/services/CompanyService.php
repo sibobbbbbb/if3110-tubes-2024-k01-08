@@ -6,20 +6,22 @@ use DateTime;
 use Exception;
 use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
-use src\exceptions\NotFoundHttpException;
-use src\repositories\{JobRepository, UserRepository};
+use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
 
 class CompanyService extends Service
 {
     // Dependency injection
     private UserRepository $userRepository;
     private JobRepository $jobRepository;
+    private ApplicationRepository $applicationRepository;
     private UploadService $uploadService;
 
-    public function __construct(UserRepository $userRepository, JobRepository $jobRepository, UploadService $uploadService)
+
+    public function __construct(UserRepository $userRepository, JobRepository $jobRepository, ApplicationRepository $applicationRepository, UploadService $uploadService)
     {
         $this->userRepository = $userRepository;
         $this->jobRepository = $jobRepository;
+        $this->applicationRepository = $applicationRepository;
         $this->uploadService = $uploadService;
     }
 
@@ -138,6 +140,68 @@ class CompanyService extends Service
         return $job;
     }
 
+    /**
+     * Get many company's jobs with filter (job type, location type, is open)
+     * Company id is validated through middleware
+     */
+    public function getCompanyJobs(int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, ?int $page): array
+    {
+        // Set limit to only 10
+        $limit = 10;
+
+        // Get company's jobs with filter
+        try {
+            [$jobs, $meta] = $this->jobRepository->getCompanyJobsWithFilter($companyId, $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
+        }
+
+        return [$jobs, $meta];
+    }
+
+    /**
+     * G
+     */
+    /**
+     * Get a company's job applications (paginated)
+     * @param int job_id
+     * @param int page
+     */
+    public function getCompanyJobApplications(int $companyId, int $job_id, int $page): array
+    {
+        // base limit
+        $limit = 10;
+
+        // Validate if company is authorized to view applications
+        try {
+            $job = $this->jobRepository->getJobById($job_id);
+        } catch (Exception $e) {
+            HttpExceptionFactory::createInternalServerError("Failed to get job");
+        }
+
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Check if authorized
+        if ($job->getCompanyId() != $companyId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to view this job's applications");
+        }
+
+        // Get applications of the job id
+        try {
+            [$applications, $meta] = $this->applicationRepository->getJobApplications($job_id, $page, $limit);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            HttpExceptionFactory::createInternalServerError("Failed to get job applications");
+        }
+
+        return [$job, $applications, $meta];
+    }
+
+
 
     /**
      * Edit a job posting for current logged in company
@@ -211,7 +275,47 @@ class CompanyService extends Service
 
     /**
      * Delete a job posting for current logged in company
+     * Deletes the job and its attachments (database & server). Sets the user's application to be null.
+     * @param string $currentUserId - The user id
+     * @param string $jobId - The job id
      */
+    public function deleteJob(string $currentUserId, string $jobId): void
+    {
+        // Validate job
+        try {
+            $job = $this->jobRepository->getJobByIdWithAttachments($jobId);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job posting");
+        }
+
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Check if authorized
+        if ($job->getCompanyId() != $currentUserId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to delete this job posting");
+        }
+
+        // Delete job
+        try {
+            $this->jobRepository->deleteJob($job);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job posting");
+        }
+
+        // Delete files from server
+        // NOTE: DUMMY DATA DOESN'T ACTUALLY STORE FILE PATHS
+        // try {
+        //     $fileDirectories = array_map(fn($attachment) => $attachment->getFilePath(), $job->getAttachments());
+        //     if (count($fileDirectories) > 0) {
+        //         $this->uploadService->deleteMultipleFiles($fileDirectories);
+        //     }
+        // } catch (Exception $e) {
+        //     throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job attachments");
+        // }
+    }
 
 
     /**

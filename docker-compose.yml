@@ -55,7 +55,9 @@ services:
 
 volumes:
   db-data:
+    name: linkinpurry-db-data
   upload-data:
+    name: linkinpurry-upload-data
 
 networks:
   linkinpurry-network:

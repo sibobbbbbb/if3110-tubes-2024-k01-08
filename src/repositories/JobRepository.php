@@ -8,6 +8,7 @@ use src\dao\JobAttachmentDao;
 use src\dao\JobDao;
 use src\dao\JobType;
 use src\dao\LocationType;
+use src\dao\PaginationMetaDao;
 use src\database\Database;
 
 class JobRepository extends Repository
@@ -51,6 +52,106 @@ class JobRepository extends Repository
     }
 
     /**
+     * Get company's job
+     * @param int $companyId - The company id
+     * @param ?array isOpens - The job is open or not
+     * @param ?array jobTypes - The job types
+     * @param ?array locationTypes - The location types
+     * @param ?DateTime createdAtFrom - The start date
+     * @param ?DateTime createdAtTo - The end date
+     * @param ?string search - The search string
+     * @param bool isCreatedAtAsc - The order of created at
+     * @param ?int page - The page
+     * @param ?int limit - The limit
+     * @returns [array of JobDao, meta dao] - The jobs
+     */
+    public function getCompanyJobsWithFilter(int $companyId, ?array $isOpens, ?array $jobTypes, ?array $locationTypes, ?DateTime $createdAtFrom, ?DateTime $createdAtTo, ?string $search, bool $isCreatedAtAsc, int $page, int $limit): array
+    {
+        $totalItemsQuery = "SELECT COUNT(*) FROM jobs WHERE company_id = :company_id";
+        $query = "SELECT * FROM jobs WHERE company_id = :company_id";
+        $params = [':company_id' => $companyId];
+
+        if ($isOpens !== null) {
+            $commonQuery = " AND is_open = ANY(:is_opens)";
+
+            $query .= $commonQuery;
+            $totalItemsQuery .= $commonQuery;
+
+            $params[":is_opens"] = '{' . implode(',', array_map(function ($isOpen) {
+                return $isOpen ? 't' : 'f';
+            }, $isOpens)) . '}';
+        }
+
+        if ($jobTypes !== null) {
+            $commonQuery = " AND job_type = ANY(:job_types)";
+
+            $query .= $commonQuery;
+            $totalItemsQuery .= $commonQuery;
+
+            $params[":job_types"] = '{' . implode(',', array_map(function ($jobType) {
+                return $jobType->value;
+            }, $jobTypes)) . '}';
+        }
+
+        if ($locationTypes !== null) {
+            $commonQuery = " AND location_type = ANY(:location_types)";
+
+            $query .= $commonQuery;
+            $totalItemsQuery .= $commonQuery;
+
+            $params[":location_types"] = '{' . implode(',', array_map(function ($locationType) {
+                return $locationType->value;
+            }, $locationTypes)) . '}';
+        }
+
+        if ($createdAtFrom !== null) {
+            $query .= " AND created_at >= :created_at_from";
+            $totalItemsQuery .= " AND created_at >= :created_at_from";
+
+            // from the date at 00:00:00
+            $createdAtFrom->setTime(0, 0, 0);
+            $params[':created_at_from'] = $createdAtFrom->format('Y-m-d H:i:s');
+        }
+
+        if ($createdAtTo !== null) {
+            $query .= " AND created_at <= :created_at_to";
+            $totalItemsQuery .= " AND created_at <= :created_at_to";
+
+            // to the date at 23:59:59
+            $createdAtTo->setTime(23, 59, 59);
+            $params[':created_at_to'] = $createdAtTo->format('Y-m-d H:i:s');
+        }
+
+        if ($search !== null) {
+            $query .= " AND (position ILIKE :search OR description ILIKE :search)";
+            $totalItemsQuery .= " AND (position ILIKE :search OR description ILIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+
+        // Get the total count  
+        $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
+
+        // Get data
+        $query .= " ORDER BY created_at " . ($isCreatedAtAsc ? "ASC" : "DESC");
+        $query .= " LIMIT :limit OFFSET :offset";
+        $params[':limit'] = $limit;
+        $params[':offset'] = ($page - 1) * $limit;
+
+        $results = $this->db->queryMany($query, $params);
+
+        // Parse data to dao
+        $jobs = [];
+        foreach ($results as $result) {
+            $jobs[] = JobDao::fromRaw($result);
+        }
+
+        // Parse to meta dao
+        $meta = new PaginationMetaDao($page, $limit, $totalItems);
+
+        return [$jobs, $meta];
+    }
+
+    /**
      *  Edit a job posting with attachments
      * @param JobDao $job - The job object to be edited
      * @param array $attachmentPaths - Array of file paths for attachments
@@ -75,6 +176,18 @@ class JobRepository extends Repository
 
         return $jobAttachments;
     }
+
+    /**
+     * Delete a job posting with attachments (cascade delete job attachments)
+     */
+    public function deleteJobAndAttachments(JobDao $job): void
+    {
+        $query = "DELETE FROM jobs WHERE job_id = :job_id;";
+        $params = [':job_id' => $job->getJobId()];
+
+        $this->db->executeDelete($query, $params);
+    }
+
 
     /**
      * Create a new job posting

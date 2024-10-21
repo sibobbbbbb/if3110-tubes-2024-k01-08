@@ -17,12 +17,22 @@ enum LocationType: string
         ];
     }
 
-    public static function fromString($location): LocationType
+    public static function fromString(string $location): LocationType
     {
         return match ($location) {
             'on-site' => LocationType::ON_SITE,
             'hybrid' => LocationType::HYBRID,
             'remote' => LocationType::REMOTE,
+            default => throw new \InvalidArgumentException("Invalid location: $location")
+        };
+    }
+
+    public static function renderText(LocationType $location): string
+    {
+        return match ($location) {
+            LocationType::ON_SITE => 'On-site',
+            LocationType::HYBRID => 'Hybrid',
+            LocationType::REMOTE => 'Remote',
             default => throw new \InvalidArgumentException("Invalid location: $location")
         };
     }

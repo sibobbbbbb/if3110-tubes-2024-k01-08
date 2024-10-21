@@ -2,6 +2,7 @@
 
 namespace src\controllers;
 
+use DateTime;
 use Exception;
 use src\core\{Response, Request};
 use src\dao\{LocationType, JobType};
@@ -11,6 +12,7 @@ use src\exceptions\BaseHttpException;
 use src\exceptions\HttpExceptionFactory;
 use src\services\{CompanyService, UserService};
 use src\utils\{UserSession, Validator};
+use src\views\components\PaginationComponent;
 
 class CompanyController extends Controller
 {
@@ -130,22 +132,241 @@ class CompanyController extends Controller
         ];
 
         // Get query parameters
-        $rawQueryParams = [
-            'is-open' => $req->getQueryParams('is-open'),
-            'job-types' => $req->getQueryParams('job-types'),
-            'location-types' => $req->getQueryParams('location-types'),
-            'created-at-from' => $req->getQueryParams('created-at-from'),
-            'created-at-to' => $req->getQueryParams('created-at-to'),
-            'search' => $req->getQueryParams('search'),
-            'page' => $req->getQueryParams('page')
-        ];
-
-        // echo var_dump($rawQueryParams);
+        $rawIsOpens = $req->getQueryParams('is-opens');
+        $rawJobTypes = $req->getQueryParams('job-types');
+        $rawLocationTypes = $req->getQueryParams('location-types');
+        $rawCreatedAtFrom = $req->getQueryParams('created-at-from');
+        $rawCreatedAtTo = $req->getQueryParams('created-at-to');
+        $rawSearch = $req->getQueryParams('search');
+        $rawSortCreatedAt = $req->getQueryParams('sort-created-at');
+        $rawPage = $req->getQueryParams('page');
 
         // Parse query parameters
-        // echo var_dump($rawQueryParams);
+        $queryParams = $this->parseCompanyJobQueryParams($rawIsOpens, $rawJobTypes, $rawLocationTypes, $rawCreatedAtFrom, $rawCreatedAtTo, $rawSearch, $rawSortCreatedAt, $rawPage);
+        $parsedIsOpens = $queryParams['is-opens'];
+        $parsedJobTypes = $queryParams['job-types'];
+        $parsedLocationTypes = $queryParams['location-types'];
+        $parsedCreatedAtFrom = $queryParams['created-at-from'];
+        $parsedCreatedAtTo = $queryParams['created-at-to'];
+        $parsedSearch = $queryParams['search'];
+        $parsedSortCreatedAt = $queryParams['is-created-at-asc'];
+        $parsedPage = $queryParams['page'];
+
+        try {
+            // Get jobs data
+            [$jobs, $meta] = $this->companyService->getCompanyJobs($currentUserId, $parsedIsOpens, $parsedJobTypes, $parsedLocationTypes, $parsedCreatedAtFrom, $parsedCreatedAtTo, $parsedSearch, $parsedSortCreatedAt, $parsedPage);
+
+            // Generate pagination component
+            $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
+
+            // Add data to pass to the view
+            $data['jobs'] = $jobs;
+            $data['meta'] = $meta;
+            $data['filters'] = $queryParams;
+            $data['paginationComponent'] = $paginationComponent;
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+            echo $e->getMessage();
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+            echo $e->getMessage();
+        }
 
         $this->renderPage($viewPathFromPages, $data);
+    }
+
+    /**
+     * Parse company job page query params
+     */
+    private function parseCompanyJobQueryParams(
+        ?array $rawIsOpens,
+        ?array $rawJobTypes,
+        ?array $rawLocationTypes,
+        ?string $rawCreatedAtFrom,
+        ?string $rawCreatedAtTo,
+        ?string $rawSearch,
+        ?string $rawSortCreatedAt,
+        ?string $rawPage
+    ): array {
+        $isCreatedAtAsc = false; // Default sort
+        $isOpens = $jobTypes = $locationTypes = $createdAtFrom = $createdAtTo = $search = $page = null;
+
+        // Is opem
+        if ($rawIsOpens !== null) {
+            foreach ($rawIsOpens as $isOpenValue) {
+                if ($isOpenValue === "true") {
+                    if ($isOpens === null) {
+                        $isOpens = [];
+                    }
+                    $isOpens[] = true;
+                } else if ($isOpenValue === "false") {
+                    if ($isOpens === null) {
+                        $isOpens = [];
+                    }
+                    $isOpens[] = false;
+                }
+            }
+        }
+
+        // Job types
+        if ($rawJobTypes !== null) {
+            foreach ($rawJobTypes as $jobTypeValue) {
+                if (in_array($jobTypeValue, JobType::getValues())) {
+                    if ($jobTypes === null) {
+                        $jobTypes = [];
+                    }
+                    $jobTypes[] = JobType::fromString($jobTypeValue);
+                }
+            }
+        }
+
+        // Location types
+        if ($rawLocationTypes !== null) {
+            foreach ($rawLocationTypes as $locationTypeValue) {
+                if (in_array($locationTypeValue, LocationType::getValues())) {
+                    if ($locationTypes === null) {
+                        $locationTypes = [];
+                    }
+                    $locationTypes[] = LocationType::fromString($locationTypeValue);
+                }
+            }
+        }
+
+        // Date formatiing:
+        // yyyy-mm-dd => date
+        // Created at from
+        if ($rawCreatedAtFrom !== null) {
+            $createdAtFromDateTime = DateTime::createFromFormat('Y-m-d', $rawCreatedAtFrom);
+            if ($createdAtFromDateTime && $createdAtFromDateTime->format('Y-m-d') === $rawCreatedAtFrom) {
+                $createdAtFrom = $createdAtFromDateTime;
+            }
+        }
+
+        // Created at to
+        if ($rawCreatedAtTo !== null) {
+            $createdAtToDateTime = DateTime::createFromFormat('Y-m-d', $rawCreatedAtTo);
+            if ($createdAtToDateTime && $createdAtToDateTime->format('Y-m-d') === $rawCreatedAtTo) {
+                $createdAtTo = $createdAtToDateTime;
+            }
+        }
+
+        // Search
+        if ($rawSearch !== null && strlen($rawSearch) > 0) {
+            $search = $rawSearch;
+        }
+
+        // Created at sort
+        if ($rawSortCreatedAt !== null && $rawSortCreatedAt === "oldest-first") {
+            $isCreatedAtAsc = true;
+        }
+
+        // Page number (default to 1)
+        $page = 1;
+        if ($rawPage !== null) {
+            // Parse to integer
+            $pageResult = filter_var($rawPage, FILTER_VALIDATE_INT);
+            if ($pageResult == false || $pageResult < 1) {
+                $page = 1;
+            } else {
+                $page = $pageResult;
+            }
+        }
+
+        return [
+            'is-opens' => $isOpens,
+            'job-types' => $jobTypes,
+            'location-types' => $locationTypes,
+            'created-at-from' => $createdAtFrom,
+            'created-at-to' => $createdAtTo,
+            'search' => $search,
+            'is-created-at-asc' => $isCreatedAtAsc,
+            'page' => $page
+        ];
+    }
+
+    /**
+     * Render company job detail (list of applications of the job)  
+     */
+    public function renderCompanyJobApplications(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/[jobId]/applications/index.php';
+        $currentJobId = $req->getPathParams('jobId');
+        $currentUserId = UserSession::getUserId();
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Job Applications';
+        $description = 'List of applications for this job';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/company/application-list.css" />
+                <script src="/scripts/company/application-list.js" defer></script>
+            HTML;
+
+        // Parse page query
+        $rawPage = $req->getQueryParams('page');
+        $queryParams = $this->parseCompanyJobApplicationQueryParams($rawPage);
+        $parsedPage = $queryParams['page'];
+
+        // Render page
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags,
+        ];
+
+        try {
+            // Get job applications
+            [$job, $applications, $meta] = $this->companyService->getCompanyJobApplications($currentUserId, $currentJobId, $parsedPage);
+
+            // Generate pagination component
+            $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
+
+            // Add data to pass to the view
+            // echo var_dump($applications);
+            $data['job'] = $job;
+            $data['applications'] = $applications;
+            $data['meta'] = $meta;
+            $data['paginationComponent'] = $paginationComponent;
+
+            $this->renderPage($viewPathFromPages, $data);
+        } catch (BaseHttpException $e) {
+            // Http error
+        } catch (Exception $e) {
+            // Treat as internal server error
+        }
+    }
+
+    /**
+     * Parse company job application query params
+     */
+    private function parseCompanyJobApplicationQueryParams(
+        ?string $rawPage
+    ): array {
+        $page = 1;
+
+        // Page number (default to 1)
+        if ($rawPage !== null) {
+            // Parse to integer
+            $pageResult = filter_var($rawPage, FILTER_VALIDATE_INT);
+            if ($pageResult == false || $pageResult < 1) {
+                $page = 1;
+            } else {
+                $page = $pageResult;
+            }
+        }
+
+        return [
+            'page' => $page
+        ];
+    }
+
+
+    /**
+     * Render and handle company job application detail
+     */
+    public function renderAndHandleCompanyJobApplicationDetail(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'company/jobs/[jobId]/applications/[applicationId]/index.php';
+        $currentUserId = UserSession::getUserId();
     }
 
     /**
@@ -246,7 +467,27 @@ class CompanyController extends Controller
     /**
      * Delete a job
      */
-    public function handleDeleteJob(Request $req, Response $res): void {}
+    public function handleDeleteJob(Request $req, Response $res): void
+    {
+        $currentUserId = UserSession::getUserId();
+        $currentJobId = $req->getPathParams('jobId');
+
+        try {
+            $this->companyService->deleteJob($currentUserId, $currentJobId);
+        } catch (BaseHttpException $e) {
+            // Http exception
+            $responseDto = DtoFactory::createErrorDto($e->getMessage());
+            $res->json($e->getCode(), $responseDto);
+        } catch (Exception $e) {
+            // Treat as internal server error
+            $responseDto = DtoFactory::createErrorDto("An error occurred while deleting job");
+            $res->json(500, $responseDto);
+        }
+
+        // Success
+        $responseDto = DtoFactory::createSuccessDto("Job deleted successfully");
+        $res->json(200, $responseDto);
+    }
 
 
     /**

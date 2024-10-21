@@ -10,6 +10,9 @@ class Request
     // GET, POST, PUT, DELETE, PATCH, etc
     private string $method;
 
+    // Full request url (path + query params)
+    private string $uri;
+
     // Path of the request (for example: /users/123/)
     private string $reqPath;
 
@@ -31,6 +34,9 @@ class Request
     {
         // Method (uppercase)
         $this->method = $_SERVER['REQUEST_METHOD'];
+
+        // Full request URI
+        $this->uri = $_SERVER['REQUEST_URI'];
 
         // Request path
         $this->reqPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -57,6 +63,14 @@ class Request
     }
 
     /**
+     * Get full URI of the request
+     */
+    public function getUri(): string
+    {
+        return $this->uri;
+    }
+
+    /**
      * Get path of the request
      */
     public function getPath(): string
@@ -78,6 +92,14 @@ class Request
     public function getQueryParams(string $id): string | array | null
     {
         return $this->queryParams[$id] ?? null;
+    }
+
+    /**
+     * Get all query parameters
+     */
+    public function getAllQueryParams(): array
+    {
+        return $this->queryParams;
     }
 
     /**
