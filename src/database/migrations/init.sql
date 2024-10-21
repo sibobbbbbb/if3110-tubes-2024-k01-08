@@ -60,6 +60,8 @@ CREATE TABLE applications (
     status_reason TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 
+    UNIQUE (user_id, job_id), -- One user can only apply once for a job
+
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE SET NULL
     -- ON DELETE SET NULL agar saat job dihapus, tampilkan job tersebut telah dihapus;
@@ -193,14 +195,25 @@ SELECT
     '/uploads/jobs/attachment_' || generate_series || '.jpg'
 FROM generate_series(1, 900);
 
--- Applications (50 applications per job seeker, 150 total)
+
+-- Applications (50 unique applications per job seeker, 150 total)
+WITH job_seeker_applications AS (
+    SELECT 
+        user_id,
+        job_id,
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY random()) AS row_num
+    FROM 
+        (SELECT generate_series(1, 3) AS user_id) u
+    CROSS JOIN 
+        (SELECT job_id FROM jobs ORDER BY random()) j
+)
 INSERT INTO applications (application_id, user_id, job_id, cv_path, video_path, status, status_reason, created_at)
 SELECT 
-    generate_series,
-    ceil(generate_series / 50.0),
-    (SELECT job_id FROM jobs ORDER BY random() LIMIT 1),
-    '/uploads/applications/cv_' || generate_series || '.pdf',
-    CASE WHEN random() > 0.5 THEN '/uploads/applications/video_' || generate_series || '.mp4' ELSE NULL END,
+    ROW_NUMBER() OVER () AS application_id,
+    user_id,
+    job_id,
+    '/uploads/applications/cv_' || (ROW_NUMBER() OVER ()) || '.pdf',
+    CASE WHEN random() > 0.5 THEN '/uploads/applications/video_' || (ROW_NUMBER() OVER ()) || '.mp4' ELSE NULL END,
     (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)],
     CASE 
         WHEN (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)] = 'rejected' 
@@ -208,7 +221,8 @@ SELECT
         ELSE NULL
     END,
     now() - (random() * (interval '60 days'))
-FROM generate_series(1, 150);
+FROM job_seeker_applications
+WHERE row_num <= 50;
 
 -- Update users sequence
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
