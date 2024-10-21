@@ -221,7 +221,6 @@ class Application
                     'method' => $method
                 ];
             },
-            [$jobSeekerAuthMiddlewareFactoryFunction]
         );
 
         /**
@@ -378,6 +377,10 @@ class Application
             $editJobFactoryFunction,
             [$companyAuthMiddlewareFactoryFunction]
         );
+
+        /**
+         * Update company's 
+        */
 
         /**
          * Delete a company's job

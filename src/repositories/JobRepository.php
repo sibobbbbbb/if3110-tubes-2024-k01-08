@@ -310,9 +310,7 @@ class JobRepository extends Repository
         $params = [':job_id' => $jobId];
         $result = $this->db->queryOne($query, $params);
 
-        if ($result === null) {
-            return null;
-        }
+        if ($result == false) return null;
 
         return JobDao::fromRaw($result);
     }
@@ -430,9 +428,8 @@ class JobRepository extends Repository
         $params = [':attachment_id' => $attachmentId];
         $result = $this->db->queryOne($query, $params);
 
-        if ($result === null) {
-            return null;
-        }
+        if ($result == false) return null;
+
 
         return JobAttachmentDao::fromRaw($result);
     }

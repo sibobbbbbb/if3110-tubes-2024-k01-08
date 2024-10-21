@@ -46,9 +46,7 @@ class UserRepository extends Repository
         $result = $this->db->queryOne($query, $params);
 
         // If not found
-        if ($result == false) {
-            return null;
-        }
+        if ($result == false) return null;
 
         $user = UserDao::fromRaw($result);
 
@@ -76,9 +74,7 @@ class UserRepository extends Repository
         $result = $this->db->queryOne($query, $params);
 
         // If not found
-        if ($result == false) {
-            return null;
-        }
+        if ($result == false) return null;
 
         $company = CompanyDetailDao::fromRaw($result);
 
@@ -126,7 +122,7 @@ class UserRepository extends Repository
         // Insert into users table
         $query = "INSERT INTO users (name, email, password, role) 
               VALUES (:name, :email, :password, :role)";
-    
+
         $params = [
             ':name' => $user->getName(),
             ':email' => $user->getEmail(),
@@ -149,7 +145,7 @@ class UserRepository extends Repository
             // Insert into users table
             $queryUser = "INSERT INTO users (name, email, password, role) 
                         VALUES (:name, :email, :password, :role)";
-  
+
             $paramsUser = [
                 ':name' => $user->getName(),
                 ':email' => $user->getEmail(),

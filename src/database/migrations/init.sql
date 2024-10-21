@@ -164,13 +164,15 @@ INSERT INTO users (name, email, password, role) VALUES
 ('company2', 'company2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('company3', 'company3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('Dewo', 'dewo@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
-('Travis', 'travis@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker');
+('Bas', 'bas@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker');
 
 -- Company Details
 INSERT INTO company_details (user_id, location, about) VALUES
 (4, 'New York, USA', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
 (5, 'London, UK', 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-(6, 'Tokyo, Japan', 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.');
+(6, 'Tokyo, Japan', 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'),
+(7, 'Jakarta, Indonesia', 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');
+
 
 -- Jobs (300 jobs, 100 for each company)
 INSERT INTO jobs (job_id, company_id, position, description, job_type, location_type, is_open, created_at, updated_at)

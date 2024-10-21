@@ -4,7 +4,7 @@ namespace src\services;
 
 use DateTime;
 use Exception;
-use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
+use src\dao\{ApplicationStatus, LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
 
@@ -283,6 +283,47 @@ class CompanyService extends Service
             }
 
             return [$job, []];
+        }
+    }
+
+    /**
+     * Update a job application status
+     * @param string $currentUserId - The user id
+     * @param string $applicationId - The application id
+     * @param ApplicationStatus $status - The application status
+     * @param string $message - The application message
+     */
+    public function updateJobApplicationStatus(string $currentUserId, string $applicationId, ApplicationStatus $status, string $message): void
+    {
+        // Validate application
+        try {
+            $application = $this->applicationRepository->getOneJobApplication($applicationId);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job application");
+        }
+
+        // If application not found
+        if ($application == null) {
+            throw HttpExceptionFactory::createNotFound("Job application not found");
+        }
+
+        // Validate if user is authorized to update application status
+        if ($application->getJob()->getCompanyId() != $currentUserId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to update this job application status");
+        }
+
+        // Validate initial status
+        if ($application->getStatus() != ApplicationStatus::WAITING) {
+            throw HttpExceptionFactory::createBadRequest("Application status is not pending");
+        }
+
+        // Update application status
+        $application->setStatus($status);
+        $application->setStatusReason($message);
+        try {
+            $this->applicationRepository->updateApplicationStatus($application);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while updating job application status");
         }
     }
 

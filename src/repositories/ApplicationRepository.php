@@ -2,10 +2,7 @@
 
 namespace src\repositories;
 
-use src\dao\ApplicationDao;
-use src\dao\JobDao;
-use src\dao\PaginationMetaDao;
-use src\dao\UserDao;
+use src\dao\{ApplicationDao, ApplicationStatus, JobDao, PaginationMetaDao, UserDao};
 use src\database\Database;
 
 class ApplicationRepository extends Repository
@@ -65,5 +62,55 @@ class ApplicationRepository extends Repository
         $meta = new PaginationMetaDao($page, $limit, $totalItems);
 
         return [$applications, $meta];
+    }
+
+    /**
+     * Get an application by id including the user and job
+     * @param int application_id
+     * @return ApplicationDao
+     */
+    public function getOneJobApplication(int $application_id): ApplicationDao | null
+    {
+        $query = "
+            SELECT * 
+            FROM 
+                applications 
+                INNER JOIN jobs ON applications.job_id = jobs.job_id
+                INNER JOIN users ON applications.user_id = users.id 
+            WHERE application_id = :application_id";
+        $params = [
+            ':application_id' => $application_id,
+        ];
+
+        $result = $this->db->queryOne($query, $params);
+
+        if ($result === false) return null;
+
+        $application = ApplicationDao::fromRaw($result);
+        $user = UserDao::fromRaw($result);
+        $job = JobDao::fromRaw($result);
+        $application->setUser($user);
+        $application->setJob($job);
+
+        return $application;
+    }
+
+    /**
+     * Update an application's status
+     * @param ApplicationDao application
+     * @return void
+     */
+    public function updateApplicationStatus(ApplicationDao $application): void
+    {
+        $query = "UPDATE applications SET status = :status, status_reason = :status_reason WHERE application_id = :application_id";
+        $params = [
+            ':application_id' => $application->getApplicationId(),
+            ':status' => $application->getStatus()->value,
+            ':status_reason' => $application->getStatusReason(),
+        ];
+
+        $this->db->executeUpdate($query, $params);
+
+        return;
     }
 }

@@ -8,7 +8,10 @@ use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
 
-class JobService extends Service {
+/* Job seeker */
+
+class JobService extends Service
+{
 
     // Dependency injection
     private JobRepository $jobRepository;
@@ -29,7 +32,7 @@ class JobService extends Service {
 
         // Get company's jobs with filter
         try {
-            [$jobs, $meta] = $this->jobRepository->getJobsWithFilter( $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
+            [$jobs, $meta] = $this->jobRepository->getJobsWithFilter($isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
         } catch (Exception $e) {
             echo $e->getMessage();
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
