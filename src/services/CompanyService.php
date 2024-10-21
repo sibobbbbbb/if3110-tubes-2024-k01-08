@@ -88,7 +88,7 @@ class CompanyService extends Service
 
     /**
      * Create a new job posting for current logged in company
-     * @param string $userId - The user id
+     * @param string $userId - The user id (validated through middleware)
      * @param string $position - The job position
      * @param string $description - The job description
      * @param JobType $jobType - The job type
@@ -99,22 +99,35 @@ class CompanyService extends Service
      */
     public function createJob(string $userId, string $position, string $description, JobType $jobType, LocationType $locationType, array $rawAttachments): array
     {
-        // Upload files to server
-        try {
-            $directoryFromPublic = '/uploads/job-attachments/';
-            $uploadedFilePaths = $this->uploadService->uploadMultipleFiles($directoryFromPublic, $rawAttachments);
-        } catch (Exception $e) {
-            throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading job attachments");
-        }
+        $isAttachmentEmpty = $rawAttachments['error'][0] == 4;
 
-        // Create job and its attachments
-        try {
-            [$job, $jobAttachments] = $this->jobRepository->createJobAndAttachments($userId, $position, $description, $jobType, $locationType, $uploadedFilePaths);
-        } catch (Exception $e) {
-            throw HttpExceptionFactory::createInternalServerError("An error occurred while creating job posting");
-        }
+        if ($isAttachmentEmpty) {
+            // Create a job without attachments
+            try {
+                $job = $this->jobRepository->createJob($userId, $position, $description, $jobType, $locationType);
+            } catch (Exception $e) {
+                throw HttpExceptionFactory::createInternalServerError("An error occurred while creating job posting");
+            }
 
-        return [$job, $jobAttachments];
+            return [$job, []];
+        } else {
+            // Upload files to server
+            try {
+                $directoryFromPublic = '/uploads/job-attachments/';
+                $uploadedFilePaths = $this->uploadService->uploadMultipleFiles($directoryFromPublic, $rawAttachments);
+            } catch (Exception $e) {
+                throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading job attachments");
+            }
+
+            // Create job and its attachments
+            try {
+                [$job, $jobAttachments] = $this->jobRepository->createJobAndAttachments($userId, $position, $description, $jobType, $locationType, $uploadedFilePaths);
+            } catch (Exception $e) {
+                throw HttpExceptionFactory::createInternalServerError("An error occurred while creating job posting");
+            }
+
+            return [$job, $jobAttachments];
+        }
     }
 
     /**
@@ -352,10 +365,11 @@ class CompanyService extends Service
             throw HttpExceptionFactory::createForbidden("You are not authorized to delete this job attachment");
         }
 
-        // If attachment is the only one
-        if (count($job->getAttachments()) == 1) {
-            throw HttpExceptionFactory::createBadRequest("Job posting must have at least one attachment");
-        }
+        // Attachment is optional (QnA No. 30)
+        // // If attachment is the only one
+        // if (count($job->getAttachments()) == 1) {
+        //     throw HttpExceptionFactory::createBadRequest("Job posting must have at least one attachment");
+        // }
 
         // Delete job attachment
         try {

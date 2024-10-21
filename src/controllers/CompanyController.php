@@ -58,13 +58,14 @@ class CompanyController extends Controller
         } else if ($req->getMethod() == "POST") {
             // POST
 
-            // Validate request body
+            // Validate request 
+            // attachment is optional (QnA No. 30)
             $rules = [
                 'position' => ['required', "max" => 128],
                 'description' => ['required', "max" => 2048],
                 'job-type' => ['required', "enum" => JobType::getValues()],
                 'location-type' => ['required', "enum" => LocationType::getValues()],
-                'attachments' => ['requiredFile', "files" => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
+                'attachments' => ['optional', "files" => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['image/jpeg', 'image/png']]]
             ];
 
             $validator = new Validator();
@@ -418,6 +419,7 @@ class CompanyController extends Controller
         } else if ($req->getMethod() == "POST") {
             // POST
             // Validate request body
+            // attachment is optional (QnA No. 30)
             $rules = [
                 'position' => ['required', "max" => 128],
                 'description' => ['required', "max" => 2048],
