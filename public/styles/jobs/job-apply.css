@@ -34,6 +34,42 @@
     width: 1.125rem;
     height: 1.125rem;
   }
+
+  .header__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.675rem;
+  }
+  
+  .header__title {
+    font-size: 1.5rem; /* 24px */
+    line-height: 2rem; /* 32px */
+    font-weight: 700;
+  }
+  
+  .header__tags {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .header__informations {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+  
+  .header__information {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 0.875rem; /* 14px */
+    line-height: normal;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+  }
   
   .card__title {
     margin-bottom: 1.25rem;
