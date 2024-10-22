@@ -94,20 +94,6 @@ class Application
             }
         );
 
-        /**
-         * Error
-         */
-        $router->get(
-            '/',
-            function () {
-                $controller = $this->container->get(ErrorController::class);
-                $method = 'renderHome';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            }
-        );
     }
 
     /**
@@ -262,6 +248,22 @@ class Application
             function () {
                 $controller = $this->container->get(JobController::class);
                 $method = 'renderApplicationsHistory';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
+
+        /**
+         * Get job Recommendation
+         */
+        $router->get(
+            '/recommendation',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderJobRecommendation';
                 return [
                     'controller' => $controller,
                     'method' => $method
