@@ -6,7 +6,7 @@ use Exception;
 use src\core\{Request, Response};
 use src\dao\UserRole;
 use src\dto\DtoFactory;
-use src\exceptions\{BadRequestHttpException, InternalServerErrorHttpException};
+use src\exceptions\{BadRequestHttpException, InternalServerErrorHttpException, HttpExceptionFactory};
 use src\services\AuthService;
 use src\utils\{UserSession, Validator};
 
@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         if ($req->getMethod() == "GET") {
             // Get
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else {
             // Post
             // Validate the request body
@@ -64,8 +64,7 @@ class AuthController extends Controller
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
-                exit();
+                $res->renderPage($viewPathFromPages, $data);
             }
 
             // Authenticate the user
@@ -81,12 +80,16 @@ class AuthController extends Controller
                     'password' => [$message],
                 ];
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
-                exit();
+                $res->renderPage($viewPathFromPages, $data);
             } catch (Exception $e) {
                 // Internal server error
                 // TODO: render error view
-                exit();
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+        
+                $res->renderError($dataError);
             }
 
             // Success
@@ -139,7 +142,7 @@ class AuthController extends Controller
             'additionalTags' => $additionalTags
         ];
 
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
     /**
@@ -168,7 +171,7 @@ class AuthController extends Controller
 
         if ($req->getMethod() == "GET") {
             // Get
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else {
             // Post
             $name = $req->getBody()['name'];
@@ -187,7 +190,7 @@ class AuthController extends Controller
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
             }
 
             // Authenticate the transaction
@@ -196,11 +199,14 @@ class AuthController extends Controller
             } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
-            } catch (InternalServerErrorHttpException $e) {
-                $Errorcontrol = new ErrorController();
-                $Errorcontrol->handleError(500, "Internal Server Error", "Oops! Something went wrong on our end. Please try again later.");
-                exit();
+                $res->renderPage($viewPathFromPages, $data);
+            } catch (Exception $e) {
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+        
+                $res->renderError($dataError);
             }
 
             $res->redirect('/auth/sign-in');
@@ -233,7 +239,7 @@ class AuthController extends Controller
 
         if ($req->getMethod() == "GET") {
             // Get
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else {
             // Post
             $name = $req->getBody()['name'];
@@ -256,7 +262,7 @@ class AuthController extends Controller
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
             }
 
 
@@ -266,9 +272,16 @@ class AuthController extends Controller
             } catch (BadRequestHttpException $e) {
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
+            } catch(Exception $e){
+                //Internal Server Errpr
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+        
+                $res->renderError($dataError);
             }
-
             $res->redirect('/auth/sign-in');
         }
     }
