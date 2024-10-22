@@ -16,8 +16,12 @@ class ErrorController extends Controller
      */
     public function handleError(int $statusCode, string $subheading, string $message): void
     {
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/global.css" />
+                <link rel="stylesheet" href="/styles/error/error.css" />
+            HTML;
         $data = [
-            'additionalTags' => '<link rel="stylesheet" href="/styles/error/error.css" />',
+            'additionalTags' => $additionalTags,
             'statusCode' => $statusCode,
             'subHeading' => $subheading,
             'message' => $message,

@@ -1,28 +1,25 @@
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
-}
 .main {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: hsl(var(--destructive-foreground));
 }
 .error-container {
     text-align: center;
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
     max-width: 400px;
-    width: 90%;
+    background-color: hsl(var(--background));
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 32px;
 }
 .error-icon {
     width: 80px;
     height: 80px;
-    background-color: #e6f3ff;
+    background-color: hsl(var(--destructive));
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -32,27 +29,34 @@ body, html {
 .error-icon::before {
     content: "!";
     font-size: 40px;
-    color: #1e90ff;
+    color: hsl(var(--destructive-foreground));
 }
 h1 {
-    font-size: 48px;
+    font-size: 64px;
     margin: 0 0 10px;
-    color: #1e90ff;
+    color: hsl(var(--destructive));
 }
 p {
-    color: #666;
+    color: hsl(var(--card-foreground));
     margin-bottom: 20px;
 }
 .go-back-btn {
-    background-color: #1e90ff;
-    color: white;
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--background));
     border: none;
-    padding: 10px 20px;
+    padding: 12px 30px;
     font-size: 16px;
-    border-radius: 4px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
 }
 .go-back-btn:hover {
-    background-color: #4169e1;
+    background-color: #ff6666;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 68, 68, 0.3);
 }
+
+
+
