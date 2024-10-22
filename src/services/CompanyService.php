@@ -4,7 +4,7 @@ namespace src\services;
 
 use DateTime;
 use Exception;
-use src\dao\{ApplicationStatus, LocationType, JobType, JobDao, CompanyDetailDao};
+use src\dao\{ApplicationDao, ApplicationStatus, LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
 
@@ -174,8 +174,31 @@ class CompanyService extends Service
     }
 
     /**
-     * G
+     * Get application detial
      */
+    public function getCompanyJobApplication(int $currentUserId, int $applicationId): ApplicationDao
+    {
+        // Get application by id
+        try {
+            $application = $this->applicationRepository->getOneJobApplication($applicationId);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job application");
+        }
+
+        // If application not found
+        if ($application == null) {
+            throw HttpExceptionFactory::createNotFound("Job application not found");
+        }
+
+        // Check if company is authorized to view application
+        if ($application->getJob()->getCompanyId() != $currentUserId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to view this job application");
+        }
+
+        return $application;
+    }
+
+
     /**
      * Get a company's job applications (paginated)
      * @param int job_id

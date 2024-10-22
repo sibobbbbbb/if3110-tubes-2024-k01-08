@@ -96,6 +96,7 @@ class Router
         }
 
         // If not found, default redirect to 404 page
+        
         $this->controller->handleError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
         // throw HttpExceptionFactory::createNotFound('Route not found');
     }
