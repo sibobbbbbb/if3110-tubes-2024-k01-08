@@ -2,8 +2,6 @@
 
 namespace src\core;
 
-use src\exceptions\HttpExceptionFactory;
-use src\controllers\ErrorController;
 
 class Router
 {
