@@ -89,17 +89,17 @@ class JobController extends Controller
             $data['meta'] = $meta;
             $data['filters'] = $queryParams;
             $data['paginationComponent'] = $paginationComponent;
-        } catch (BaseHttpException $e) {
-            // TODO: Render error view
-            error_log($e->getMessage());
-            // echo $e->getMessage();
-        } catch (Exception $e) {
+        }  catch (Exception $e) {
             // TODO: Render Internal server error
-            error_log($e->getMessage());
-            // echo $e->getMessage();
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+    
+            $res->renderError($dataError);
         }
 
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
     /**
@@ -145,13 +145,17 @@ class JobController extends Controller
             // Add data to pass to the view
             $data['job'] = $job;
             $data['application'] = $application;
-        } catch (BaseHttpException $e) {
-            // TODO: Render error view
-        } catch (Exception $e) {
-            // TODO: Render Internal server error
+        }  catch (Exception $e) {
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+    
+            $res->renderError($dataError);
         }
 
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
 
@@ -280,16 +284,18 @@ class JobController extends Controller
             $data['applications'] = $applications;
             $data['meta'] = $meta;
             $data['paginationComponent'] = $paginationComponent;
-        } catch (BaseHttpException $e) {
-            // TODO: Render error view
-            error_log($e->getMessage());
         } catch (Exception $e) {
             // TODO: Render Internal server error
-            error_log($e->getMessage());
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+    
+            $res->renderError($dataError);
         }
 
         // Render the page
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
     private function parseHistoryQueryParams(?string $rawPage)

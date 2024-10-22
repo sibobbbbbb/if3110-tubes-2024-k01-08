@@ -23,6 +23,6 @@ class HomeController extends Controller
             'additionalTags' => $additionalTags
         ];
 
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 }

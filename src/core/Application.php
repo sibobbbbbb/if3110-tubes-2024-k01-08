@@ -3,6 +3,7 @@
 namespace src\core;
 
 use Exception;
+use src\controllers\ErrorController;
 use src\exceptions\BaseHttpException;
 use src\core\{Config, Router, Container};
 use src\database\Database;
@@ -85,6 +86,21 @@ class Application
             '/',
             function () {
                 $controller = $this->container->get(HomeController::class);
+                $method = 'renderHome';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
+
+        /**
+         * Error
+         */
+        $router->get(
+            '/',
+            function () {
+                $controller = $this->container->get(ErrorController::class);
                 $method = 'renderHome';
                 return [
                     'controller' => $controller,

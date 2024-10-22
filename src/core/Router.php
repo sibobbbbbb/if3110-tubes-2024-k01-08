@@ -9,11 +9,9 @@ class Router
 {
     // Store registered routes for the app
     private $routes;
-    private $controller;
     public function __construct()
     {
         $this->routes = [];
-        $this->controller = new ErrorController();
     }
 
     /**
@@ -96,7 +94,13 @@ class Router
         }
 
         // If not found, default redirect to 404 page
-        $this->controller->handleError(404, "Page Not Found", "Sorry, the page you are looking for doesn't exist.");
+        $data = [
+            'statusCode' => 404,
+            'subHeading' => "Page Not Found",
+            'message' => "Sorry, the page you are looking for doesnt exist",
+        ];
+
+        $res->renderError($data);
         // throw HttpExceptionFactory::createNotFound('Route not found');
     }
 

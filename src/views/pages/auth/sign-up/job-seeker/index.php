@@ -76,7 +76,7 @@
 
             <!-- submit button -->
             <button type="submit" class="button button--default-size button--default-color">
-                Sign Up
+                Register Your Account
             </button>
         </form>
 

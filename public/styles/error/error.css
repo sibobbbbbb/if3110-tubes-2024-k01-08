@@ -14,7 +14,8 @@
     background-color: hsl(var(--background));
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 32px;
+    padding: 24px;
+    margin: 40px auto;
 }
 .error-icon {
     width: 80px;
@@ -32,13 +33,14 @@
     color: hsl(var(--destructive-foreground));
 }
 h1 {
-    font-size: 64px;
+    font-size: 2.25rem;
     margin: 0 0 10px;
     color: hsl(var(--destructive));
 }
 p {
-    color: hsl(var(--card-foreground));
-    margin-bottom: 20px;
+    color: hsl(var(--foreground));
+    margin-bottom: 25px;
+    font-size: 1rem;
 }
 .go-back-btn {
     background-color: hsl(var(--destructive));
@@ -59,4 +61,45 @@ p {
 }
 
 
+@media screen and (max-width: 480px) {
+    .error-container {
+        max-width: 90%;
+        padding: 20px;
+    }
 
+    .error-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .error-icon::before {
+        font-size: 30px;
+    }
+
+    h1 {
+        font-size: 48px;
+    }
+
+    p {
+        font-size: 16px;
+    }
+
+    .go-back-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .error-container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+}
