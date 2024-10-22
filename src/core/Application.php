@@ -241,16 +241,24 @@ class Application
         /**
          * Apply for a job & handle the form submission
          */
+        $applyJobFactoryFunction = function () {
+            $controller = $this->container->get(JobController::class);
+            $method = 'renderAndHandleApplyJob';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render
         $router->get(
             '/jobs/[jobId]/apply',
-            function () {
-                $controller = $this->container->get(JobController::class);
-                $method = 'renderAndHandleApplyJob';
-                return [
-                    'controller' => $controller,
-                    'method' => $method
-                ];
-            },
+            $applyJobFactoryFunction,
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
+        // Handle
+        $router->post(
+            '/jobs/[jobId]/apply',
+            $applyJobFactoryFunction,
             [$jobSeekerAuthMiddlewareFactoryFunction]
         );
 
