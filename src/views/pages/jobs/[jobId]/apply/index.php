@@ -133,7 +133,7 @@ use src\dao\LocationType;
 
             <!-- Submit -->
             <button type="submit" class="button button--default-size button--default-color">
-                Apply
+                Apply Now
             </button>
         </form>
     </section>
