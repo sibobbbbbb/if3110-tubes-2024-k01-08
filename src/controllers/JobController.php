@@ -154,6 +154,44 @@ class JobController extends Controller
         $this->renderPage($viewPathFromPages, $data);
     }
 
+    /**
+     * Render job application page for job-seeker
+     * 
+     * Contain job information,
+     * Input CV file in pdf format,
+     * Upload video (optional)
+     */
+    public function renderAndHandleApplyJob(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'jobs/[jobId]/apply/index.php';
+        $jobId = $req->getPathParams('jobId');
+        $currentUserId = UserSession::getUserId();
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Apply Job';
+        $description = 'Apply for a job';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/jobs/job-apply.css" />
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags
+        ];
+
+        try {
+            // Get job data
+            $job = $this->jobService->getJobDetail($currentUserId, $jobId)[0];
+
+            // Add data to pass to the view
+            $data['job'] = $job;
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+        }
+        $this->renderPage($viewPathFromPages, $data);
+    }
 
     /**
      * Parse job page query params

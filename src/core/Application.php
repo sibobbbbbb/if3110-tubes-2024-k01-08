@@ -237,6 +237,22 @@ class Application
                 ];
             },
         );
+                
+        /**
+         * Apply for a job & handle the form submission
+         */
+        $router->get(
+            '/jobs/[jobId]/apply',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderAndHandleApplyJob';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
 
         /**
          * Get job seeeker's application history
