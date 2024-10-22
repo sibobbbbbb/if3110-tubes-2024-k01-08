@@ -23,6 +23,9 @@ class JobDao
     // UserDao (companyId)
     private UserDao $company;
 
+    // Company detail
+    private CompanyDetailDao $companyDetail;
+
     public function __construct(int $job_id, int $company_id, string $position, string $description, string $job_type, string $location_type, bool $is_open, DateTime $created_at, DateTime $updated_at)
     {
         $this->job_id = $job_id;
@@ -86,6 +89,10 @@ class JobDao
     {
         return $this->company;
     }
+    public function getCompanyDetail(): CompanyDetailDao
+    {
+        return $this->companyDetail;
+    }
 
     public function setJobId(int $job_id): void
     {
@@ -126,5 +133,9 @@ class JobDao
     public function setCompany(UserDao $company): void
     {
         $this->company = $company;
+    }
+    public function setCompanyDetail(CompanyDetailDao $companyDetail): void
+    {
+        $this->companyDetail = $companyDetail;
     }
 }

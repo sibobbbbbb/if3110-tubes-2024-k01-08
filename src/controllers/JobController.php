@@ -25,11 +25,11 @@ class JobController extends Controller
 
     /**
      * Render and handle the jobs list page for job-seeker
+     * If user is authenticated and is company, redirect to company dashboard
      * I.S. user authenticated & authorized as JOBSEEKER (from middleware)
      * F.S. render the jobs list page
      * sorts (ony one at a time): sortCreatedAtAsc (default false)
      * filters: (no filter => all jobs)
-     *  - open/closed (key=is-open, value=true/false)
      *  - job type (key=job-types, value=enum)
      *  - location type (key=location-types, value=enum)
      *  - daterange (key=created-at-from, value=date) & (key=created-at-to, value=timestamp)
@@ -41,7 +41,6 @@ class JobController extends Controller
     {
         $viewPathFromPages = 'jobs/index.php';
 
-        // this is a public route, but should only be accessible by non auth or jobseeker
         // If user has session and is company, redirect to company dashboard
         if (UserSession::isLoggedIn() && UserSession::getUserRole() == UserRole::COMPANY) {
             $res->redirect('/company/dashboard');
@@ -102,6 +101,59 @@ class JobController extends Controller
 
         $this->renderPage($viewPathFromPages, $data);
     }
+
+    /**
+     * Render job detail page for job-seeker
+     * 
+     * Case 1: Unauthenticated user, in header render login button
+     * Case 2: Authenticated user, company -> redirect to company dashboard
+     * Case 3: Authenticated user, jobseeker:
+     * Case 3a: Haven't applied -> render apply button
+     * Case 3b: Already applied -> render path to CV & Video
+     * Case 3c: Job closed -> render not found page
+     */
+    public function renderJobDetail(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'jobs/[jobId]/index.php';
+        $jobId = $req->getPathParams('jobId');
+        $currentUserId = UserSession::getUserId();
+
+        // this is a public route, but should only be accessible by non auth or jobseeker
+        // If user has session and is company, redirect to company dashboard
+        if (UserSession::isLoggedIn() && UserSession::getUserRole() == UserRole::COMPANY) {
+            $res->redirect('/company/dashboard');
+        }
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Job Detail';
+        $description = 'Job detail';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/jobs/job-detail.css" />
+                <link rel="stylesheet" href="/styles/carousel.css" />
+                <script src="/scripts/carousel.js" defer></script>
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags
+        ];
+
+        try {
+            // Get data needed
+            [$job, $application] = $this->jobService->getJobDetail($currentUserId, $jobId);
+
+            // Add data to pass to the view
+            $data['job'] = $job;
+            $data['application'] = $application;
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+        }
+
+        $this->renderPage($viewPathFromPages, $data);
+    }
+
 
     /**
      * Parse job page query params

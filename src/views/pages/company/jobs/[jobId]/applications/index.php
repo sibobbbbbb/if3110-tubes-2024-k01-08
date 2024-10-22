@@ -41,14 +41,13 @@ use src\dao\LocationType;
                         </div>
                     <?php endif; ?>
 
-
                     <!-- Job type -->
-                    <div class="badge badge--outline">
+                    <div class="badge badge--secondary">
                         <?= htmlspecialchars(JobType::renderText($job->getJobType())) ?>
                     </div>
 
                     <!-- Location Type -->
-                    <div class="badge badge--secondary">
+                    <div class="badge badge--outline">
                         <?= htmlspecialchars(LocationType::renderText($job->getLocationType())) ?>
                     </div>
                 </div>

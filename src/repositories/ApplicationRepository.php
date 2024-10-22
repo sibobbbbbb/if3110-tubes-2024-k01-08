@@ -149,6 +149,24 @@ class ApplicationRepository extends Repository
     }
 
     /**
+     * Get job application by job id and user id (not candidate key but guarteed unique)
+     */
+    public function getJobAplicationByUserIdJobId(int $userId, int $jobId): ApplicationDao | null
+    {
+        $query = "SELECT * FROM applications WHERE user_id = :user_id AND job_id = :job_id";
+        $params = [
+            ':user_id' => $userId,
+            ':job_id' => $jobId,
+        ];
+
+        $result = $this->db->queryOne($query, $params);
+        if ($result == false) return null;
+
+        $application = ApplicationDao::fromRaw($result);
+        return $application;
+    }
+
+    /**
      * Update an application's status
      * @param ApplicationDao application
      * @return void

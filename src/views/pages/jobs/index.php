@@ -214,41 +214,44 @@ use src\dao\LocationType;
                                     </div>
                                 </div>
 
-                                <div class="job-article__information">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2 icon--sm--margin">
-                                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
-                                        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
-                                        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-                                        <path d="M10 6h4" />
-                                        <path d="M10 10h4" />
-                                        <path d="M10 14h4" />
-                                        <path d="M10 18h4" />
-                                    </svg>
+                                <div class="job-article__informations">
+                                    <!-- Company -->
+                                    <div class="job-article__information">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2 icon--sm--margin">
+                                            <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                                            <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                                            <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                                            <path d="M10 6h4" />
+                                            <path d="M10 10h4" />
+                                            <path d="M10 14h4" />
+                                            <path d="M10 18h4" />
+                                        </svg>
 
-                                    <span>
-                                        <?= htmlspecialchars($job->getCompany()->getName()) ?>
-                                    </span>
-                                </div>
+                                        <span>
+                                            <?= htmlspecialchars($job->getCompany()->getName()) ?>
+                                        </span>
+                                    </div>
 
 
-                                <!-- Created at -->
-                                <div class="job-article__information">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days icon--sm--margin">
-                                        <path d="M8 2v4" />
-                                        <path d="M16 2v4" />
-                                        <rect width="18" height="18" x="3" y="4" rx="2" />
-                                        <path d="M3 10h18" />
-                                        <path d="M8 14h.01" />
-                                        <path d="M12 14h.01" />
-                                        <path d="M16 14h.01" />
-                                        <path d="M8 18h.01" />
-                                        <path d="M12 18h.01" />
-                                        <path d="M16 18h.01" />
-                                    </svg>
+                                    <!-- Created at -->
+                                    <div class="job-article__information">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days icon--sm--margin">
+                                            <path d="M8 2v4" />
+                                            <path d="M16 2v4" />
+                                            <rect width="18" height="18" x="3" y="4" rx="2" />
+                                            <path d="M3 10h18" />
+                                            <path d="M8 14h.01" />
+                                            <path d="M12 14h.01" />
+                                            <path d="M16 14h.01" />
+                                            <path d="M8 18h.01" />
+                                            <path d="M12 18h.01" />
+                                            <path d="M16 18h.01" />
+                                        </svg>
 
-                                    <span>
-                                        <?= htmlspecialchars($job->getCreatedAt()->format('m/d/Y')) ?>
-                                    </span>
+                                        <span>
+                                            <?= htmlspecialchars($job->getCreatedAt()->format('m/d/Y')) ?>
+                                        </span>
+                                    </div>
                                 </div>
                             </header>
 

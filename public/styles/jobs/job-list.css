@@ -213,6 +213,13 @@
   font-weight: 700;
 }
 
+.job-article__informations {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 0.75rem;
+}
+
 .job-article__information {
   display: flex;
   flex-direction: row;

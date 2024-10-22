@@ -6,7 +6,7 @@ use Exception;
 use src\exceptions\BaseHttpException;
 use src\core\{Config, Router, Container};
 use src\database\Database;
-use src\services\{ApplicationService, UserService, AuthService, CompanyService, JobService, UploadService};
+use src\services\{UserService, AuthService, CompanyService, JobService, UploadService};
 use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware};
 use src\controllers\{AuthController, CompanyController, HomeController, JobController};
 use src\repositories\{ApplicationRepository, UserRepository, JobRepository};
@@ -216,6 +216,21 @@ class Application
             function () {
                 $controller = $this->container->get(JobController::class);
                 $method = 'renderJobs';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+        );
+
+        /**
+         * Get a job detail
+         */
+        $router->get(
+            '/jobs/[jobId]',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderJobDetail';
                 return [
                     'controller' => $controller,
                     'method' => $method
@@ -542,7 +557,8 @@ class Application
             function ($c) {
                 $jobRepository = $c->get(JobRepository::class);
                 $applicationRepository = $c->get(ApplicationRepository::class);
-                return new JobService($jobRepository, $applicationRepository);
+                $userRepository = $c->get(UserRepository::class);
+                return new JobService($jobRepository, $applicationRepository, $userRepository);
             }
         );
 
@@ -555,14 +571,6 @@ class Application
                 $applicationRepository = $c->get(ApplicationRepository::class);
                 $uploadService = $c->get(UploadService::class);
                 return new CompanyService($userRepository, $jobRepository, $applicationRepository, $uploadService);
-            }
-        );
-
-        // Application Service
-        $this->container->bind(
-            ApplicationService::class,
-            function ($c) {
-                return new ApplicationService();
             }
         );
 

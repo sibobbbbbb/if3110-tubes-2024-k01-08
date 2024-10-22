@@ -16,11 +16,13 @@ class JobService extends Service
     // Dependency injection
     private JobRepository $jobRepository;
     private ApplicationRepository $applicationRepository;
+    private UserRepository $userRepository;
 
-    public function __construct(JobRepository $jobRepository, ApplicationRepository $applicationRepository)
+    public function __construct(JobRepository $jobRepository, ApplicationRepository $applicationRepository, UserRepository $userRepository)
     {
         $this->jobRepository = $jobRepository;
         $this->applicationRepository = $applicationRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -42,6 +44,48 @@ class JobService extends Service
 
         return [$jobs, $meta];
     }
+
+    /**
+     * Get a job by id (includes the company detail & attachments)
+     */
+    public function getJobDetail(?string $currentUserId, int $jobId)
+    {
+        // Get job detail with attachments
+        try {
+            $job = $this->jobRepository->getJobByIdWithAttachments($jobId);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job detail");
+        }
+
+        // If job is closed
+        if (!$job->getIsOpen()) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Get comapny detail
+        try {
+            $companyDetail = $this->userRepository->findCompanyDetailByUserId($job->getCompanyId());
+            $job->setCompanyDetail($companyDetail);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company detail");
+        }
+
+        // If current user is not null, get application if any
+        if ($currentUserId != null) {
+            try {
+                $application = $this->applicationRepository->getJobAplicationByUserIdJobId($currentUserId, $jobId);
+            } catch (Exception $e) {
+                throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
+            }
+
+            return [$job, $application];
+        }
+
+        return [$job, null];
+    }
+
 
     /**
      * Get user's job application history (paginated)
