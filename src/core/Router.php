@@ -2,8 +2,6 @@
 
 namespace src\core;
 
-use src\exceptions\HttpExceptionFactory;
-use src\controllers\ErrorController;
 
 class Router
 {
@@ -93,7 +91,7 @@ class Router
             }
         }
 
-        // If not found, default redirect to 404 page
+        // If not found render to 404 page
         $data = [
             'statusCode' => 404,
             'subHeading' => "Page Not Found",
@@ -101,7 +99,6 @@ class Router
         ];
 
         $res->renderError($data);
-        // throw HttpExceptionFactory::createNotFound('Route not found');
     }
 
     private function matchPath(string $router, string $uri): bool

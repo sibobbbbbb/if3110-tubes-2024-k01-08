@@ -6,7 +6,7 @@ use Exception;
 use src\core\{Request, Response};
 use src\dao\UserRole;
 use src\dto\DtoFactory;
-use src\exceptions\{BadRequestHttpException, InternalServerErrorHttpException, HttpExceptionFactory};
+use src\exceptions\{BadRequestHttpException, BaseHttpException, InternalServerErrorHttpException, HttpExceptionFactory};
 use src\services\AuthService;
 use src\utils\{UserSession, Validator};
 
@@ -81,14 +81,21 @@ class AuthController extends Controller
                 ];
                 $data['fields'] = $req->getBody();
                 $res->renderPage($viewPathFromPages, $data);
-            } catch (Exception $e) {
-                // Internal server error
-                // TODO: render error view
+            } catch (BaseHttpException $e) {
+                // Render error page
                 $dataError = [
                     'statusCode' => $e->getCode(),
                     'message' => $e->getMessage(),
                 ];
-        
+
+                $res->renderError($dataError);
+            } catch (Exception $e) {
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "Internal server error",
+                ];
+
                 $res->renderError($dataError);
             }
 
@@ -200,12 +207,21 @@ class AuthController extends Controller
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $res->renderPage($viewPathFromPages, $data);
-            } catch (Exception $e) {
+            } catch (BaseHttpException $e) {
+                // Render error page
                 $dataError = [
                     'statusCode' => $e->getCode(),
                     'message' => $e->getMessage(),
                 ];
-        
+
+                $res->renderError($dataError);
+            } catch (Exception $e) {
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "Internal server error",
+                ];
+
                 $res->renderError($dataError);
             }
 
@@ -273,13 +289,21 @@ class AuthController extends Controller
                 $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
                 $data['fields'] = $req->getBody();
                 $res->renderPage($viewPathFromPages, $data);
-            } catch(Exception $e){
-                //Internal Server Errpr
+            } catch (BaseHttpException $e) {
+                // Render error page
                 $dataError = [
                     'statusCode' => $e->getCode(),
                     'message' => $e->getMessage(),
                 ];
-        
+
+                $res->renderError($dataError);
+            } catch (Exception $e) {
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "Internal server error",
+                ];
+
                 $res->renderError($dataError);
             }
             $res->redirect('/auth/sign-in');

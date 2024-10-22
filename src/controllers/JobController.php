@@ -89,13 +89,21 @@ class JobController extends Controller
             $data['meta'] = $meta;
             $data['filters'] = $queryParams;
             $data['paginationComponent'] = $paginationComponent;
-        }  catch (Exception $e) {
-            // TODO: Render Internal server error
+        } catch (BaseHttpException $e) {
+            // Render error page
             $dataError = [
                 'statusCode' => $e->getCode(),
                 'message' => $e->getMessage(),
             ];
-    
+
+            $res->renderError($dataError);
+        } catch (Exception $e) {
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching jobs",
+            ];
+
             $res->renderError($dataError);
         }
 
@@ -145,13 +153,21 @@ class JobController extends Controller
             // Add data to pass to the view
             $data['job'] = $job;
             $data['application'] = $application;
-        }  catch (Exception $e) {
-            // Render Internal server error
+        } catch (BaseHttpException $e) {
+            // Render error page
             $dataError = [
                 'statusCode' => $e->getCode(),
                 'message' => $e->getMessage(),
             ];
-    
+
+            $res->renderError($dataError);
+        } catch (Exception $e) {
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching job detail",
+            ];
+
             $res->renderError($dataError);
         }
 
@@ -284,13 +300,21 @@ class JobController extends Controller
             $data['applications'] = $applications;
             $data['meta'] = $meta;
             $data['paginationComponent'] = $paginationComponent;
-        } catch (Exception $e) {
-            // TODO: Render Internal server error
+        } catch (BaseHttpException $e) {
+            // Render error page
             $dataError = [
                 'statusCode' => $e->getCode(),
                 'message' => $e->getMessage(),
             ];
-    
+
+            $res->renderError($dataError);
+        } catch (Exception $e) {
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching your job applications history",
+            ];
+
             $res->renderError($dataError);
         }
 
