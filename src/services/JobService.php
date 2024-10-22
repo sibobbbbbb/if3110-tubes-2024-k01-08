@@ -7,6 +7,7 @@ use Exception;
 use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
+use src\utils\UserSession;
 
 /* Job seeker */
 
@@ -105,5 +106,25 @@ class JobService extends Service
         }
 
         return [$applications, $meta];
+    }
+
+    /**
+     * Get many jobs Recommendation
+     */
+    public function getJobsRecommendation(): array
+    {   
+        // Find the user by email
+        $user = $this->userRepository->findUserByEmail(UserSession::getUserEmail());
+
+        try {
+            $jobs = $this->jobRepository->selectJobRecommendation($user->getId());
+        } catch (\PDOException $e) {
+            if ($e->getCode() == "23505") {
+                throw HttpExceptionFactory::createBadRequest($e->getMessage());
+            }
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while creating account");
+        }
+
+        return $jobs ?? [];
     }
 }

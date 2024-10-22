@@ -253,6 +253,22 @@ class Application
             },
             [$jobSeekerAuthMiddlewareFactoryFunction]
         );
+
+        /**
+         * Get job Recommendation
+         */
+        $router->get(
+            '/recommendation',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'renderJobRecommendation';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
     }
 
     /**

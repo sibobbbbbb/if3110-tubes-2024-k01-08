@@ -1356,6 +1356,11 @@ main {
 
 /* Rich text content */
 .content__rich-text {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  
   h1 {
     font-size: 1.25rem; /* 20px */
     line-height: 1.75rem; /* 28px */
@@ -1382,6 +1387,7 @@ main {
     line-height: 1.25rem; /* 20px */
     font-weight: 400;
     margin-bottom: 0.25rem;
+    word-break: break-word;
   }
 
   a {

@@ -171,7 +171,7 @@ class JobController extends Controller
             $res->renderError($dataError);
         }
 
-        $res->renderPage($viewPathFromPages, $data);
+        // $res->renderPage($viewPathFromPages, $data);
     }
 
 
@@ -338,5 +338,42 @@ class JobController extends Controller
         return [
             'page' => $page
         ];
+    }
+
+    public function renderJobRecommendation(Request $req, Response $res): void
+    {
+        // Render the view
+        $viewPathFromPages = 'recommendation/index.php';
+
+        // Data to pass to the view
+        $title = 'LinkInPurry | Job Recommendation';
+        $description = 'Get Your Jobs Recommendation';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/jobs/recommendation.css" />
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags,
+        ];
+
+        try {
+            // Get jobs data
+            $jobs = $this->jobService->getJobsRecommendation();
+
+
+            // Add data to pass to the view
+            $data['jobs'] = $jobs;
+        }  catch (Exception $e) {
+            // TODO: Render Internal server error
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+    
+            $res->renderError($dataError);
+        }
+
+        $res->renderPage($viewPathFromPages, $data);
     }
 }

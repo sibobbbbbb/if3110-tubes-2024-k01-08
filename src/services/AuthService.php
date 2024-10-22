@@ -54,7 +54,7 @@ class AuthService extends Service
             if ($e->getCode() == "23505") {
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
             }
-            HttpExceptionFactory::createInternalServerError("An error occurred while creating your account");
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while creating your account");
         }
     }
     /**
@@ -71,7 +71,7 @@ class AuthService extends Service
             if ($e->getCode() == "23505") {
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
             }
-            HttpExceptionFactory::createInternalServerError("An error occurred while creating account");
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while creating account");
         }
     }
 }
