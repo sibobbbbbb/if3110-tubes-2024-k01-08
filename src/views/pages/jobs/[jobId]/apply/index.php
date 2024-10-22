@@ -98,14 +98,14 @@ use src\dao\LocationType;
             <div class="form__group">
                 <!-- Upload CV -->
                 <label for="attachments" class="form__label 
-                        <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                            <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
-                        <?php endif; ?>
-                    ">
+                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
+                        <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
+                    <?php endif; ?>
+                ">
                     Upload Your CV
                 </label>
 
-                <input class="input" name="attachments[]" type="file" accept="image/*" multiple />
+                <input class="input" name="attachments[]" type="file" accept=".pdf" />
 
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
@@ -115,14 +115,14 @@ use src\dao\LocationType;
 
                 <!-- Upload Video -->
                 <label for="attachments" class="form__label 
-                        <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                            <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
-                        <?php endif; ?>
-                    ">
+                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
+                        <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
+                    <?php endif; ?>
+                ">
                     Upload Video (Optional)
                 </label>
 
-                <input class="input" name="attachments[]" type="file" accept="image/*" multiple />
+                <input class="input" name="attachments[]" type="file" accept="video/*" multiple />
 
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
