@@ -235,7 +235,7 @@ class AuthController extends Controller
     public function renderandhandleSignUpCompany(Request $req, Response $res): void
     {
         // Redirect if user is authenticated
-        // $this->redirectIfAuthenticated($req, $res);
+        $this->redirectIfAuthenticated($req, $res);
 
         // Render the view
         $viewPathFromPages = 'auth/sign-up/company/index.php';

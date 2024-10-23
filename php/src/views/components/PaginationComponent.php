@@ -51,8 +51,8 @@ class PaginationComponent
         <nav aria-label="Page navigation">
             <ul class="pagination">
                 <li class="page-item">
-                    <a class="page-link {$prevAnchorClass}" href="{$prevAnchorHref}" aria-label="Previous">
-                        <button class="button button--icon button--outline" {$prevButtonAttribute}>
+                    <a class="page-link {$prevAnchorClass}" href="{$prevAnchorHref}" aria-label="Previous Anchor">
+                        <button class="button button--icon button--outline" {$prevButtonAttribute} aria-label="Previous Button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left icon--sm"><path d="m15 18-6-6 6-6"/></svg>                        
                         </button>
                     </a>
@@ -62,8 +62,8 @@ class PaginationComponent
 
 
                 <li class="page-item">
-                    <a class="page-link {$nextAnchorClass}" href="{$nextAnchorHref}" aria-label="Next">
-                        <button class="button button--icon button--outline" {$nextButtonAttribute}>
+                    <a class="page-link {$nextAnchorClass}" href="{$nextAnchorHref}" aria-label="Next Anchor">
+                        <button class="button button--icon button--outline" {$nextButtonAttribute} aria-label="Next Button">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right icon--sm"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
                     </a>

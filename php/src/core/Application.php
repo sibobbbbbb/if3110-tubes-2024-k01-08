@@ -77,6 +77,9 @@ class Application
     private function registerMiscRoutes()
     {
         $router = $this->container->get(Router::class);
+        $anyAuthMiddlewareFactoryFunction = function () {
+            return $this->container->get(AnyAuthMiddleware::class);
+        };
 
         /**
          * Home
@@ -103,7 +106,8 @@ class Application
                     'controller' => $controller,
                     'method' => $method
                 ];
-            }
+            },
+            [$anyAuthMiddlewareFactoryFunction]
         );
     }
 

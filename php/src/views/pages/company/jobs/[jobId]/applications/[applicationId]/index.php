@@ -109,6 +109,7 @@ use src\dao\LocationType;
 
             <iframe
                 class="cv"
+                title="Curriculum Vitae"
                 src='<?= htmlspecialchars($application->getCvPath(), ENT_QUOTES, 'utf-8'); ?>'
                 width='100%'
                 height='600px'>

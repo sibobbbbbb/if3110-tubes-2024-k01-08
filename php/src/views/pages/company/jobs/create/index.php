@@ -148,7 +148,7 @@
                     Attachments
                 </label>
 
-                <input class="input" name="attachments[]" type="file" accept="image/*" multiple />
+                <input id="attachments" class="input" name="attachments[]" type="file" accept="image/*" multiple />
 
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['attachments'])):  ?>

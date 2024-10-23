@@ -204,12 +204,12 @@ use src\utils\UserSession;
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <button class="carousel-control prev">
+                        <button class="carousel-control prev" aria-label="Previous Carousel Slide">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left carousel-control__icon">
                                 <path d="m15 18-6-6 6-6" />
                             </svg>
                         </button>
-                        <button class="carousel-control next">
+                        <button class="carousel-control next" aria-label="Next Carousel Slide">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right carousel-control__icon">
                                 <path d="m9 18 6-6-6-6" />
                             </svg>

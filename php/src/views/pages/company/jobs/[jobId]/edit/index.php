@@ -97,6 +97,7 @@
                         <input type="hidden" name="is-open" value="0">
                         <!-- True -->
                         <input
+                            id="is-open"
                             type="checkbox"
                             name="is-open"
                             value="1"
@@ -191,7 +192,7 @@
                     <?php foreach ($fields['attachments'] as $attachment): ?>
                         <div class="attachment">
                             <img class="attachment__image" src="<?= htmlspecialchars($attachment->getFilePath(), ENT_QUOTES, 'UTF-8'); ?>" alt="Attachment" class="attachment">
-                            <button data-attachment-id="<?= htmlspecialchars($attachment->getAttachmentId(), ENT_QUOTES, 'UTF-8'); ?>" type="button" class="button--destructive button attachment__delete-button">
+                            <button data-attachment-id="<?= htmlspecialchars($attachment->getAttachmentId(), ENT_QUOTES, 'UTF-8'); ?>" type="button" class="button--destructive button attachment__delete-button" aria-label="Delete Image Button">
                                 <svg class="attachment__delete-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2">
                                     <path d="M3 6h18" />
                                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
@@ -204,7 +205,7 @@
                     <?php endforeach; ?>
                 </div>
 
-                <input class="input" name="attachments[]" type="file" accept="image/*" multiple />
+                <input id="attachments" class="input" name="attachments[]" type="file" accept="image/*" multiple />
 
                 <p class="form__error-message">
                     <?php if (isset($errorFields) && isset($errorFields['attachments'])):  ?>

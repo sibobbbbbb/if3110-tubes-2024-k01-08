@@ -50,7 +50,7 @@ use src\dao\LocationType;
                     <!-- Date range -->
                     <div class="filter-form__group">
                         <label for="created-at-from" class="filter-form__label">Date From</label>
-                        <input type="date" name="created-at-from" class="input filter-form__input--date"
+                        <input id="created-at-from" type="date" name="created-at-from" class="input filter-form__input--date"
                             <?php if (isset($filters['created-at-from'])): ?>
                             <?= 'value="' . htmlspecialchars($filters['created-at-from']->format('Y-m-d'), ENT_QUOTES, "utf-8") . '"' ?>
                             <?php else: ?>
@@ -60,7 +60,7 @@ use src\dao\LocationType;
 
                     <div class="filter-form__group">
                         <label for="created-at-to" class="filter-form__label">Date To</label>
-                        <input type="date" name="created-at-to" class="input filter-form__input--date"
+                        <input id="created-at-to" type="date" name="created-at-to" class="input filter-form__input--date"
                             <?php if (isset($filters['created-at-to'])): ?>
                             <?= 'value="' . htmlspecialchars($filters['created-at-to']->format('Y-m-d'), ENT_QUOTES, "utf-8") . '"' ?>
                             <?php else: ?>
@@ -136,8 +136,8 @@ use src\dao\LocationType;
 
             <div class="filter-form__actions">
                 <!-- Reset Filter -->
-                <a href="/jobs">
-                    <button type="button" class="button button--secondary button--icon--sm">
+                <a href="/jobs" aria-label="Reset Filter">
+                    <button type="button" class="button button--secondary button--icon--sm" aria-label="Reset Filter">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter-x icon--sm">
                             <path d="M13.013 3H2l8 9.46V19l4 2v-8.54l.9-1.055" />
                             <path d="m22 3-5 5" />
