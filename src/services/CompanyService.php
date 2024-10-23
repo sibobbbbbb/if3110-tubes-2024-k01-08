@@ -7,6 +7,7 @@ use Exception;
 use src\dao\{ApplicationDao, ApplicationStatus, LocationType, JobType, JobDao, CompanyDetailDao};
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
+use src\utils\PathResolver;
 
 class CompanyService extends Service
 {
@@ -94,11 +95,11 @@ class CompanyService extends Service
             throw HttpExceptionFactory::createInternalServerError("Failed to get job applications");
         }
 
-        $host = $_SERVER['HTTP_HOST'];
+        $baseURL = PathResolver::getBaseUrl();
 
         foreach ($applications as $application) {
-            $cvURL = $host . $application->getCVPath();
-            $videoURL = $application->getVideoPath() ? $host . $application->getVideoPath() : 'N/A';
+            $cvURL = $baseURL . $application->getCVPath();
+            $videoURL = $application->getVideoPath() ? $baseURL . $application->getVideoPath() : 'N/A';
 
             $result[] = [
                 $application->getApplicationId(),

@@ -15,4 +15,14 @@ class PathResolver
         $path = preg_replace('/\/+/', '/', $path);
         return $path;
     }
+
+    /**
+     * Get base url of the application.
+     */
+    public static function getBaseUrl(): string
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'];
+        return $protocol . "://" . $host;
+    }
 }
