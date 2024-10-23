@@ -9,6 +9,7 @@ use src\dao\{LocationType, JobType, UserRole};
 use src\dto\DtoFactory;
 use src\exceptions\BadRequestHttpException;
 use src\exceptions\BaseHttpException;
+use src\exceptions\ConflictHttpException;
 use src\exceptions\HttpExceptionFactory;
 use src\services\{JobService, UserService};
 use src\utils\{UserSession, Validator};
@@ -204,6 +205,93 @@ class JobController extends Controller
         // $res->renderPage($viewPathFromPages, $data);
     }
 
+    /**
+     * Render job application page for job-seeker
+     * 
+     * Contain job information,
+     * Input CV file in pdf format,
+     * Upload video (optional)
+     */
+    public function renderAndHandleApplyJob(Request $req, Response $res): void
+    {
+        $viewPathFromPages = 'jobs/[jobId]/apply/index.php';
+        $jobId = $req->getPathParams('jobId');
+        $currentUserId = UserSession::getUserId();
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Apply Job';
+        $description = 'Apply for a job';
+        $additionalTags = <<<HTML
+                <link rel="stylesheet" href="/styles/jobs/job-apply.css" />
+            HTML;
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags
+        ];
+
+        try {
+            // Get job data
+            $job = $this->jobService->getJobDetail($currentUserId, $jobId)[0];
+            $isAlreadyApplied = $this->jobService->isApplied($currentUserId, $jobId);
+
+            // Add data to pass to the view
+            $data['job'] = $job;
+            $data['jobId'] = $jobId;
+
+            if ($req->getMethod() == "GET") {
+                if ($isAlreadyApplied) {
+                    $res->redirect("/jobs/$jobId");
+                } else {
+                    // Render the page
+                    $this->renderPage($viewPathFromPages, $data);
+                }
+            } else if ($req->getMethod() == "POST") {
+                // Handle form submission
+
+                // Validate request
+                $rules = [
+                    'cv' => ['requiredFile', 'file' => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['application/pdf']]],
+                    'video' => ['optional', 'file' => ['maxSize' => 50 * 1024 * 1024, 'allowedTypes' => ['video/mp4', 'video/x-msvideo', 'video/quicktime', 'video/x-matroska']]]
+                ];
+
+                $validator = new Validator();
+                $isValid = $validator->validate($req->getBody(), $rules);
+                if (!$isValid) {
+                    $data['errorFields'] = $validator->getErrorFields();
+                    $data['fields'] = $req->getBody();
+                    $data['fields']['cv'] = $req->getBody()['cv'];
+                    $this->renderPage($viewPathFromPages, $data);
+                }
+
+                // Upload CV and video
+                $cv = $req->getBody()['cv'];
+                $video = $req->getBody()['video'];
+
+                try {
+                    // Apply for job
+                    $this->jobService->applyJob($currentUserId, $jobId, $cv, $video);
+                }
+                // Catch exceptions
+                catch (ConflictHttpException $e) {
+                    $res->redirect("/jobs/$jobId");
+                } catch (BaseHttpException $e) {
+                    // TODO: Render error view
+                } catch (Exception $e) {
+                    // TODO: Render Internal server error
+                }
+
+                // Redirect to job detail page
+                $res->redirect("/history");
+            }
+        } catch (BaseHttpException $e) {
+            // TODO: Render error view
+            echo $e->getMessage();
+        } catch (Exception $e) {
+            // TODO: Render Internal server error
+            echo $e->getMessage();
+        }
+    }
 
     /**
      * Parse job page query params

@@ -194,4 +194,29 @@ class ApplicationRepository extends Repository
 
         return;
     }
+
+    /**
+     * Apply for a job
+     * @param int user_id
+     * @param int job_id
+     * @param string cv
+     * @param string video
+     * @return void
+     */
+    public function createApplication(int $user_id, int $job_id, string $cvPath, string $videoPath): ApplicationDao
+    {
+        $query = "INSERT INTO applications (user_id, job_id, cv_path, video_path) VALUES (:user_id, :job_id, :cv, :video)";
+        $params = [
+            ':user_id' => $user_id,
+            ':job_id' => $job_id,
+            ':cv' => $cvPath,
+            ':video' => $videoPath,
+        ];
+
+        // echo var_dump($params);
+
+        $newApplicationId = $this->db->executeInsert($query, $params);
+
+        return new ApplicationDao($newApplicationId, $user_id, $job_id, $cvPath,  $videoPath, ApplicationStatus::WAITING, null, new \DateTime());
+    }
 }
