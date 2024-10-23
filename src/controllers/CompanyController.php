@@ -11,7 +11,7 @@ use src\exceptions\BadRequestHttpException;
 use src\exceptions\BaseHttpException;
 use src\exceptions\HttpExceptionFactory;
 use src\services\{CompanyService, UserService};
-use src\utils\{UserSession, Validator};
+use src\utils\{UserSession, Utils, Validator};
 use src\views\components\PaginationComponent;
 
 class CompanyController extends Controller
@@ -30,9 +30,18 @@ class CompanyController extends Controller
      */
     public function handleGetJobApplicationData(Request $req, Response $res)
     {
-        // Get current company id and job id
+        // Get current company id
         $currentUserId = UserSession::getUserId();
+
+        // Get & validate path param
         $jobId = $req->getPathParams('jobId');
+        if (!Utils::isInteger($jobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         // Get job applications data
         try {
@@ -346,8 +355,18 @@ class CompanyController extends Controller
     public function renderCompanyJobApplications(Request $req, Response $res): void
     {
         $viewPathFromPages = 'company/jobs/[jobId]/applications/index.php';
-        $currentJobId = $req->getPathParams('jobId');
         $currentUserId = UserSession::getUserId();
+
+        // Validate path params
+        $currentJobId = $req->getPathParams('jobId');
+        if (!Utils::isInteger($currentJobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
+
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Job Applications';
@@ -435,9 +454,17 @@ class CompanyController extends Controller
         $viewPathFromPages = 'company/jobs/[jobId]/applications/[applicationId]/index.php';
         $currentUserId = UserSession::getUserId();
 
-        // Get path params
+        // Get & validate path params
         $currentJobId = $req->getPathParams('jobId');
         $currentApplicationId = $req->getPathParams('applicationId');
+        if (!Utils::isInteger($currentJobId) || !Utils::isInteger($currentApplicationId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
+
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Application Detail';
@@ -536,7 +563,16 @@ class CompanyController extends Controller
     {
         $viewPathFromPages = 'company/jobs/[jobId]/edit/index.php';
         $currentUserId = UserSession::getUserId();
+
+        // Validate path params
         $currentJobId = $req->getPathParams("jobId");
+        if (!Utils::isInteger($currentJobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Edit Job';
@@ -636,7 +672,16 @@ class CompanyController extends Controller
     public function handleDeleteJob(Request $req, Response $res): void
     {
         $currentUserId = UserSession::getUserId();
+
+        // Validate path params
         $currentJobId = $req->getPathParams('jobId');
+        if (!Utils::isInteger($currentJobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         try {
             $this->companyService->deleteJob($currentUserId, $currentJobId);
@@ -671,8 +716,17 @@ class CompanyController extends Controller
     public function handleDeleteJobAttachment(Request $req, Response $res): void
     {
         error_log("Delete job attachment");
-        $attachmentId = $req->getPathParams('attachmentId');
         $currentUserId = UserSession::getUserId();
+
+        // Validate path params
+        $attachmentId = $req->getPathParams('attachmentId');
+        if (!Utils::isInteger($attachmentId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         // Delete attachment
         try {

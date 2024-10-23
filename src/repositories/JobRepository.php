@@ -118,7 +118,7 @@ class JobRepository extends Repository
         // Get the total count  
         $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
         $totalPage = ceil($totalItems / $limit);
-        if ($page > $totalPage) {
+        if ($page > $totalPage && $totalPage > 0) {
             $page = $totalPage;
         }
 
@@ -226,7 +226,7 @@ class JobRepository extends Repository
         // Get the total count  
         $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
         $totalPage = ceil($totalItems / $limit);
-        if ($page > $totalPage) {
+        if ($page > $totalPage && $totalPage > 0) {
             $page = $totalPage;
         }
 

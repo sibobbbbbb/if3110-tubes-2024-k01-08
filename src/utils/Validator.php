@@ -41,6 +41,13 @@ class Validator
                             continue 2;
                         }
                         break;
+                    case 'integer':
+                        if (!is_int($value)) {
+                            // echo "in integer";
+                            $message = ucfirst("$fieldInMessage must be an integer");
+                            $this->addError($field, $message);
+                        }
+                        break;
                     case 'min':
                         if (strlen($value) < $param) {
                             // echo "in min";

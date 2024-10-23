@@ -63,6 +63,11 @@ class JobService extends Service
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job detail");
         }
 
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
         // If job is closed
         if (!$job->getIsOpen()) {
             throw HttpExceptionFactory::createNotFound("Job posting not found");

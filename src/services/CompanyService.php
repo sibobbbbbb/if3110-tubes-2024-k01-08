@@ -59,7 +59,7 @@ class CompanyService extends Service
         try {
             $job = $this->jobRepository->getJobById($jobId);
         } catch (Exception $e) {
-            HttpExceptionFactory::createInternalServerError("Failed to get job");
+            throw HttpExceptionFactory::createInternalServerError("Failed to get job");
         }
 
         // If job not found
@@ -91,7 +91,7 @@ class CompanyService extends Service
             $applications = $this->applicationRepository->getAllJobApplicationsUnpaginated($companyId, $jobId);
         } catch (Exception $e) {
             // echo $e->getMessage();
-            HttpExceptionFactory::createInternalServerError("Failed to get job applications");
+            throw HttpExceptionFactory::createInternalServerError("Failed to get job applications");
         }
 
         $host = $_SERVER['HTTP_HOST'];
@@ -283,7 +283,7 @@ class CompanyService extends Service
         try {
             $job = $this->jobRepository->getJobById($job_id);
         } catch (Exception $e) {
-            HttpExceptionFactory::createInternalServerError("Failed to get job");
+            throw HttpExceptionFactory::createInternalServerError("Failed to get job");
         }
 
         // If job not found
@@ -301,7 +301,7 @@ class CompanyService extends Service
             [$applications, $meta] = $this->applicationRepository->getJobApplications($job_id, $page, $limit);
         } catch (Exception $e) {
             // echo $e->getMessage();
-            HttpExceptionFactory::createInternalServerError("Failed to get job applications");
+            throw HttpExceptionFactory::createInternalServerError("Failed to get job applications");
         }
 
         return [$job, $applications, $meta];

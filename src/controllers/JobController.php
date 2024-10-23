@@ -12,7 +12,7 @@ use src\exceptions\BaseHttpException;
 use src\exceptions\ConflictHttpException;
 use src\exceptions\HttpExceptionFactory;
 use src\services\{JobService, UserService};
-use src\utils\{UserSession, Validator};
+use src\utils\{UserSession, Utils, Validator};
 use src\views\components\PaginationComponent;
 
 class JobController extends Controller
@@ -29,18 +29,27 @@ class JobController extends Controller
      */
     public function handleAccessApplicationAttachment(Request $req, Response $res): void
     {
-        $jobId = $req->getPathParams('jobId');
-        $userId = $req->getPathParams('userId');
-        $type = $req->getPathParams('type');
         $currentUserId = UserSession::getUserId();
 
+        // Validate id path param
+        $jobId = $req->getPathParams('jobId');
+        $userId = $req->getPathParams('userId');
+        if (!Utils::isInteger($jobId) || !Utils::isInteger($userId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
+
+        $type = $req->getPathParams('type');
         // Validate tpye
         if ($type !== 'cv' && $type !== 'video') {
-            $data = [
-                'statusCode' => 400,
-                'message' => "Invalid attachment type",
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
             ];
-            $res->renderError($data);
+            $res->renderError($dataError);
         }
 
         // Validate request
@@ -166,8 +175,17 @@ class JobController extends Controller
     public function renderJobDetail(Request $req, Response $res): void
     {
         $viewPathFromPages = 'jobs/[jobId]/index.php';
-        $jobId = $req->getPathParams('jobId');
         $currentUserId = UserSession::getUserId();
+
+        $jobId = $req->getPathParams('jobId');
+        // Validate job id
+        if (!Utils::isInteger($jobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         // this is a public route, but should only be accessible by non auth or jobseeker
         // If user has session and is company, redirect to company dashboard
@@ -227,8 +245,17 @@ class JobController extends Controller
     public function renderAndHandleApplyJob(Request $req, Response $res): void
     {
         $viewPathFromPages = 'jobs/[jobId]/apply/index.php';
-        $jobId = $req->getPathParams('jobId');
         $currentUserId = UserSession::getUserId();
+
+        // Validate path param
+        $jobId = $req->getPathParams('jobId');
+        if (!Utils::isInteger($jobId)) {
+            $dataError = [
+                'statusCode' => 404,
+                'message' => "Page not found",
+            ];
+            $res->renderError($dataError);
+        }
 
         // Base data to pass to the view
         $title = 'LinkInPurry | Apply Job';
