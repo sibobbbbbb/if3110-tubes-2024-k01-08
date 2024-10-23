@@ -340,7 +340,6 @@ class CompanyController extends Controller
             $paginationComponent = PaginationComponent::renderPagination($meta, $req->getUri());
 
             // Add data to pass to the view
-            // echo var_dump($applications);
             $data['job'] = $job;
             $data['applications'] = $applications;
             $data['meta'] = $meta;

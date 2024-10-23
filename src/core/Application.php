@@ -95,7 +95,7 @@ class Application
 
         // Validate who can access application attachment
         $router->get(
-            '/uploads/applications/jobs/[jobId]/users/[userId]/[fileName]',
+            '/uploads/applications/jobs/[jobId]/users/[userId]/[type]/[fileName]',
             function () {
                 $controller = $this->container->get(JobController::class);
                 $method = 'handleAccessApplicationAttachment';
@@ -250,7 +250,7 @@ class Application
                 ];
             },
         );
-                
+
         /**
          * Apply for a job & handle the form submission
          */

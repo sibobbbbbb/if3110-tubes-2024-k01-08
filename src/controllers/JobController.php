@@ -31,10 +31,21 @@ class JobController extends Controller
     {
         $jobId = $req->getPathParams('jobId');
         $userId = $req->getPathParams('userId');
+        $type = $req->getPathParams('type');
         $currentUserId = UserSession::getUserId();
 
+        // Validate tpye
+        if ($type !== 'cv' && $type !== 'video') {
+            $data = [
+                'statusCode' => 400,
+                'message' => "Invalid attachment type",
+            ];
+            $res->renderError($data);
+        }
+
+        // Validate request
         try {
-            $this->jobService->validateCvVideoRequest($currentUserId, $userId, $jobId);
+            $application = $this->jobService->validateCvVideoRequest($currentUserId, $userId, $jobId);
         } catch (BaseHttpException $e) {
             $data = [
                 'statusCode' => $e->getCode(),
@@ -51,7 +62,8 @@ class JobController extends Controller
         }
 
         // If no exception, redirect to the attachment
-        $res->redirect($req->getUri());
+        $path = $type === 'cv' ? $application->getCvPath() : $application->getVideoPath();
+        $res->blob($path);
     }
 
     /**
@@ -202,7 +214,7 @@ class JobController extends Controller
             $res->renderError($dataError);
         }
 
-        // $res->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
     /**
@@ -244,7 +256,7 @@ class JobController extends Controller
                     $res->redirect("/jobs/$jobId");
                 } else {
                     // Render the page
-                    $this->renderPage($viewPathFromPages, $data);
+                    $res->renderPage($viewPathFromPages, $data);
                 }
             } else if ($req->getMethod() == "POST") {
                 // Handle form submission
@@ -257,11 +269,12 @@ class JobController extends Controller
 
                 $validator = new Validator();
                 $isValid = $validator->validate($req->getBody(), $rules);
+
                 if (!$isValid) {
                     $data['errorFields'] = $validator->getErrorFields();
                     $data['fields'] = $req->getBody();
                     $data['fields']['cv'] = $req->getBody()['cv'];
-                    $this->renderPage($viewPathFromPages, $data);
+                    $res->renderPage($viewPathFromPages, $data);
                 }
 
                 // Upload CV and video
@@ -276,20 +289,40 @@ class JobController extends Controller
                 catch (ConflictHttpException $e) {
                     $res->redirect("/jobs/$jobId");
                 } catch (BaseHttpException $e) {
-                    // TODO: Render error view
+                    // Render error view
+                    $dataError = [
+                        'statusCode' => $e->getCode(),
+                        'message' => $e->getMessage(),
+                    ];
+
+                    $res->renderError($dataError);
                 } catch (Exception $e) {
                     // TODO: Render Internal server error
+                    $dataError = [
+                        'statusCode' => 500,
+                        'message' => "An error occurred while applying for the job",
+                    ];
+
+                    $res->renderError($dataError);
                 }
 
                 // Redirect to job detail page
                 $res->redirect("/history");
             }
         } catch (BaseHttpException $e) {
-            // TODO: Render error view
-            echo $e->getMessage();
+            // Render error view
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+            $res->renderError($dataError);
         } catch (Exception $e) {
-            // TODO: Render Internal server error
-            echo $e->getMessage();
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching job detail",
+            ];
+            $res->renderError($dataError);
         }
     }
 

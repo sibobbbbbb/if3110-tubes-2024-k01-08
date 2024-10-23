@@ -77,6 +77,12 @@ class Validator
                         }
                         break;
                     case 'requiredFile':
+                        if ($value['error'] == UPLOAD_ERR_NO_FILE) {
+                            $message = ucfirst("$fieldInMessage is required");
+                            $this->addError($field, $message);
+                        }
+                        break;
+                    case 'requiredFiles':
                         foreach ($value['error'] as $key => $error) {
                             if ($error == UPLOAD_ERR_NO_FILE) {
                                 $message = ucfirst("$fieldInMessage is required");

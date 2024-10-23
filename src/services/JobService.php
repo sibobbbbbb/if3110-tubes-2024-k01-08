@@ -82,6 +82,7 @@ class JobService extends Service
             try {
                 $application = $this->applicationRepository->getJobAplicationByUserIdJobId($currentUserId, $jobId);
             } catch (Exception $e) {
+                // echo $e->getMessage();
                 throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
             }
 
@@ -94,8 +95,12 @@ class JobService extends Service
     /**
      * Check if a request for cv/video is authorized to be proceeded 
      */
-    public function validateCvVideoRequest(int $currentUserId, int $jobId, int $userId)
+    public function validateCvVideoRequest(?int $currentUserId, int $userId, int $jobId): ApplicationDao
     {
+        if ($currentUserId == null) {
+            throw HttpExceptionFactory::createUnauthorized("You are not authorized to proceed this request");
+        }
+
         // Get application job id & user id
         try {
             $application = $this->applicationRepository->getJobAplicationByUserIdJobId($userId, $jobId);
@@ -113,9 +118,10 @@ class JobService extends Service
             throw HttpExceptionFactory::createForbidden("You are not authorized to proceed this request");
         }
 
-        return true;
+        return $application;
     }
 
+    /**
      * Check if user has already applied for the job
      */
     public function isApplied(int $user_id, int $job_id): bool
@@ -139,13 +145,12 @@ class JobService extends Service
      * @param string $video
      * @return string - file path of the uploaded
      */
-    public function applyJob(int $user_id, int $job_id, array $rawCv, array $rawVideo): ApplicationDao
+    public function applyJob(int $user_id, int $job_id, array $rawCv, array $rawVideo): void
     {
         // Check if user has already applied for the job
         try {
             $application = $this->applicationRepository->getJobAplicationByUserIdJobId($user_id, $job_id);
         } catch (Exception $e) {
-            error_log($e->getMessage());
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
         }
 
@@ -156,23 +161,23 @@ class JobService extends Service
 
         // Upload CV to server
         try {
-            $directoryCvFromPublic = '/uploads/applications/jobs/[jobId]/users/[userId]/';
+            $directoryCvFromPublic = "/uploads/applications/jobs/$job_id/users/$user_id/cv/";
             $uploadedCvPath = $this->uploadService->uploadOneFile($directoryCvFromPublic, $rawCv);
         } catch (Exception $e) {
             throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading CV");
         }
-        // echo var_dump($rawVideo);
+
+        $uploadedVideoPath = null;
         $isVideoEmpty = $rawVideo['error'] == UPLOAD_ERR_NO_FILE;
         if (!$isVideoEmpty) {
             // Upload video to server
             try {
-                $directoryVideoFromPublic = '/uploads/applications/video/';
+                $directoryVideoFromPublic = "/uploads/applications/jobs/$job_id/users/$user_id/video/";
                 $uploadedVideoPath = $this->uploadService->uploadOneFile($directoryVideoFromPublic, $rawVideo);
             } catch (Exception $e) {
-                echo $e->getMessage();
                 throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading video");
             }
-        }        
+        }
 
         // Create application
         try {
@@ -180,8 +185,6 @@ class JobService extends Service
         } catch (Exception $e) {
             throw HttpExceptionFactory::createInternalServerError("An error occurred while applying for job");
         }
-
-        return $application;
     }
 
     /**
@@ -208,7 +211,7 @@ class JobService extends Service
      * Get many jobs Recommendation
      */
     public function getJobsRecommendation(): array
-    {   
+    {
         // Find the user by email
         $user = $this->userRepository->findUserByEmail(UserSession::getUserEmail());
 

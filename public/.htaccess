@@ -1,6 +1,21 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . index.php
+
+  # Allow direct access to files in public folder except /uploads/applications
+  RewriteCond %{REQUEST_URI} !^/uploads/applications/
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # Redirect /uploads/applications to index.php
+  RewriteRule ^uploads/applications/ index.php [L]
+  
+  # Redirect everything else to index.php
+  RewriteRule ^ index.php [L]
 </IfModule>
+
+# Deny access to .htaccess
+<Files .htaccess>
+  Order allow,deny
+  Deny from all
+</Files>

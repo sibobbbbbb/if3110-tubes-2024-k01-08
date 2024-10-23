@@ -3,6 +3,8 @@
 namespace src\core;
 
 use src\exceptions\HttpExceptionFactory;
+use src\utils\PathResolver;
+
 class Response
 {
     public function json(int $statusCode, array $data)
@@ -17,6 +19,37 @@ class Response
     {
         header('Location: ' . $url);
         exit();
+    }
+
+    /**
+     * Get blob in public
+     */
+    public function blob(string $path)
+    {
+        $directoryFromPublic = PathResolver::resolve(__DIR__ .  '/../../public/' . $path);
+
+        // not found
+        if (!file_exists($directoryFromPublic) || !is_readable($directoryFromPublic)) {
+            $this->renderError([
+                'statusCode' => 404,
+                'message' => 'File not found'
+            ]);
+        }
+
+        // Get file info and content
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $directoryFromPublic);
+        finfo_close($finfo);
+
+        // Set headers
+        header('Content-Type: ' . $mimeType);
+        header('Content-Length: ' . filesize($directoryFromPublic));
+        header('Cache-Control: public, max-age=86400'); // Cache for 1 day
+
+        // Read and output file
+        readfile($directoryFromPublic);
+
+        exit;
     }
 
     /**
@@ -186,7 +219,7 @@ class Response
                     break;
             }
         }
-        
+
         $title = $data['subHeading'];
         $description = $data['message'];
         $additionalTags = <<<HTML
@@ -200,7 +233,7 @@ class Response
 
         // Set HTTP status code immediately
         // http_response_code($statusCode);
-        
+
 
         // Check if the content file exists
         if (!file_exists($contentPath)) {

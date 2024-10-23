@@ -166,7 +166,7 @@ class CompanyService extends Service
         try {
             [$jobs, $meta] = $this->jobRepository->getCompanyJobsWithFilter($companyId, $isOpens, $jobTypes, $locationTypes, $createdAtFrom, $createdAtTo, $search, $isCreatedAtAsc, $page, $limit);
         } catch (Exception $e) {
-            echo $e->getMessage();
+            // echo $e->getMessage();
             throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching company's job postings");
         }
 
@@ -230,7 +230,7 @@ class CompanyService extends Service
         try {
             [$applications, $meta] = $this->applicationRepository->getJobApplications($job_id, $page, $limit);
         } catch (Exception $e) {
-            echo $e->getMessage();
+            // echo $e->getMessage();
             HttpExceptionFactory::createInternalServerError("Failed to get job applications");
         }
 

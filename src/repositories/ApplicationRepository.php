@@ -159,7 +159,7 @@ class ApplicationRepository extends Repository
                 applications
                 INNER JOIN jobs ON applications.job_id = jobs.job_id 
             WHERE
-                user_id = :user_id AND job_id = :job_id";
+                applications.user_id = :user_id AND applications.job_id = :job_id";
 
         $params = [
             ':user_id' => $userId,
@@ -203,7 +203,7 @@ class ApplicationRepository extends Repository
      * @param string video
      * @return void
      */
-    public function createApplication(int $user_id, int $job_id, string $cvPath, string $videoPath): ApplicationDao
+    public function createApplication(int $user_id, int $job_id, string $cvPath, ?string $videoPath): ApplicationDao
     {
         $query = "INSERT INTO applications (user_id, job_id, cv_path, video_path) VALUES (:user_id, :job_id, :cv, :video)";
         $params = [
@@ -212,8 +212,6 @@ class ApplicationRepository extends Repository
             ':cv' => $cvPath,
             ':video' => $videoPath,
         ];
-
-        // echo var_dump($params);
 
         $newApplicationId = $this->db->executeInsert($query, $params);
 
