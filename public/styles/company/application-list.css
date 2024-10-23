@@ -54,6 +54,28 @@
 .header__group {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.export-form {
+  align-self: flex-end;
+}
+
+@media (min-width: 640px) {
+  .header__group {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* .export-form {
+    align-self: center;
+  } */
+}
+
+.header__sub-group {
+  display: flex;
+  flex-direction: column;
   gap: 0.675rem;
 }
 

@@ -319,6 +319,22 @@ class Application
         };
 
         /**
+         * Download csv data for a company's job applications
+         */
+        $router->get(
+            '/company/jobs/[jobId]/applications/data',
+            function () {
+                $controller = $this->container->get(CompanyController::class);
+                $method = 'handleGetJobApplicationData';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            },
+            [$companyAuthMiddlewareFactoryFunction]
+        );
+
+        /**
          * Create new job for a company & handle the form submission
          */
         $createJobFactoryFunction = function () {

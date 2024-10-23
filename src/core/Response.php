@@ -44,12 +44,33 @@ class Response
         // Set headers
         header('Content-Type: ' . $mimeType);
         header('Content-Length: ' . filesize($directoryFromPublic));
-        header('Cache-Control: public, max-age=86400'); // Cache for 1 day
+        // header('Cache-Control: public, max-age=86400'); // Cache for 1 day
 
         // Read and output file
         readfile($directoryFromPublic);
 
         exit;
+    }
+
+    public function csv(string $filename, array $data)
+    {
+        // Set headers
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: public, max-age=0'); // No cache
+
+        // Open output stream
+        $output = fopen('php://output', 'w');
+
+        // Write CSV rows (including headers)
+        foreach ($data as $row) {
+            fputcsv($output, $row);
+        }
+
+        // Close output stream
+        fclose($output);
+
+        exit();
     }
 
     /**

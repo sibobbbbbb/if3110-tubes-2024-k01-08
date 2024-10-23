@@ -25,6 +25,43 @@ class CompanyController extends Controller
     }
 
     /**
+     * Get job application CSV data for a certain job
+     * /company/jobs/[jobId]/applications/data
+     */
+    public function handleGetJobApplicationData(Request $req, Response $res)
+    {
+        // Get current company id and job id
+        $currentUserId = UserSession::getUserId();
+        $jobId = $req->getPathParams('jobId');
+
+        // Get job applications data
+        try {
+            $applications = $this->companyService->getCompanyJobApplicationCSVData($currentUserId, $jobId);
+        } catch (BaseHttpException $e) {
+            // Render error page
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($dataError);
+        } catch (Exception $e) {
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching job applications data",
+            ];
+
+            $res->renderError($dataError);
+        }
+
+        // Generate CSV file
+        $filename = "job-applications-$jobId.csv";
+        $res->csv($filename, $applications);
+    }
+
+
+    /**
      * Render and handle the create job page (GET & POST)
      * I.S. user authenticated & authorized as company (from middleware)
      * F.S. render the create lowongan page

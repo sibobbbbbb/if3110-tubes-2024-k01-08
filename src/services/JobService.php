@@ -53,7 +53,7 @@ class JobService extends Service
     /**
      * Get a job by id (includes the company detail & attachments)
      */
-    public function getJobDetail(?string $currentUserId, int $jobId)
+    public function getJobDetail(?int $currentUserId, int $jobId)
     {
         // Get job detail with attachments
         try {

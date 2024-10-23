@@ -67,6 +67,41 @@ class ApplicationRepository extends Repository
     }
 
     /**
+     * Get all applications for a company's jobs unpaginated
+     */
+    public function getAllJobApplicationsUnpaginated(int $companyId, int $jobId): array
+    {
+        $query = "
+            SELECT * 
+            FROM 
+                applications 
+                INNER JOIN jobs ON applications.job_id = jobs.job_id
+                INNER JOIN users ON applications.user_id = users.id 
+            WHERE jobs.job_id = :job_id AND jobs.company_id = :company_id
+            ORDER BY applications.created_at DESC";
+
+        $params = [
+            ':company_id' => $companyId,
+            ':job_id' => $jobId,
+        ];
+
+        $result = $this->db->queryMany($query, $params);
+
+        $applications = [];
+        foreach ($result as $raw) {
+            $user = UserDao::fromRaw($raw);
+            $job = JobDao::fromRaw($raw);
+            $application = ApplicationDao::fromRaw($raw);
+            $application->setUser($user);
+            $application->setJob($job);
+
+            $applications[] = $application;
+        }
+
+        return $applications;
+    }
+
+    /**
      * Get a company's job applications (paginated)
      * @param int job_id
      * @param int page

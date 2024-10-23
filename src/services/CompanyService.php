@@ -48,6 +48,76 @@ class CompanyService extends Service
     }
 
     /**
+     * Get current company's job applications with CSV
+     * Returns the csv values:
+     * the first row must be the header
+     * the next is the values in the CSVs
+     */
+    public function getCompanyJobApplicationCSVData(int $companyId, int $jobId)
+    {
+        // Validate if company is authorized to view applications
+        try {
+            $job = $this->jobRepository->getJobById($jobId);
+        } catch (Exception $e) {
+            HttpExceptionFactory::createInternalServerError("Failed to get job");
+        }
+
+        // If job not found
+        if ($job == null) {
+            throw HttpExceptionFactory::createNotFound("Job posting not found");
+        }
+
+        // Check if authorized
+        if ($job->getCompanyId() != $companyId) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to view this job's applications");
+        }
+
+        $result = [];
+        $result[] = [
+            'id_application',
+            'id_job',
+            'job_position',
+            'id_user',
+            'user_name',
+            'user_email',
+            'apply_date',
+            'cv_url',
+            'video_url',
+            'status',
+        ];
+
+        // Get applications of the job id
+        try {
+            $applications = $this->applicationRepository->getAllJobApplicationsUnpaginated($companyId, $jobId);
+        } catch (Exception $e) {
+            // echo $e->getMessage();
+            HttpExceptionFactory::createInternalServerError("Failed to get job applications");
+        }
+
+        $host = $_SERVER['HTTP_HOST'];
+
+        foreach ($applications as $application) {
+            $cvURL = $host . $application->getCVPath();
+            $videoURL = $application->getVideoPath() ? $host . $application->getVideoPath() : 'N/A';
+
+            $result[] = [
+                $application->getApplicationId(),
+                $application->getJob()->getJobId(),
+                $application->getJob()->getPosition(),
+                $application->getUser()->getId(),
+                $application->getUser()->getName(),
+                $application->getUser()->getEmail(),
+                $application->getCreatedAt()->format('Y-m-d H:i:s'),
+                $cvURL,
+                $videoURL,
+                $application->getStatus()->value,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * Update company profile
      * @param int $userId - The user id
      * @param string $name - The company name
@@ -97,7 +167,7 @@ class CompanyService extends Service
      * @throws HttpException
      * @return [job, attachments] - The new job and attachments
      */
-    public function createJob(string $userId, string $position, string $description, JobType $jobType, LocationType $locationType, array $rawAttachments): array
+    public function createJob(int $userId, string $position, string $description, JobType $jobType, LocationType $locationType, array $rawAttachments): array
     {
         $isAttachmentEmpty = $rawAttachments['error'][0] == 4;
 
@@ -136,7 +206,7 @@ class CompanyService extends Service
      * @throws HttpException
      * @return JobDao - The job posting (with attachments)
      */
-    public function getJobDetail(string $jobId): JobDao
+    public function getJobDetail(int $jobId): JobDao
     {
         // Get job by id
         try {
@@ -252,7 +322,7 @@ class CompanyService extends Service
      * @throws HttpException
      * @return [job, attachments] - The edited job and attachments
      */
-    public function editJob(string $currentUserId, string $jobId, string $position, string $description, bool $isOpen, JobType $jobType, LocationType $locationType, array $attachments): array
+    public function editJob(int $currentUserId, int $jobId, string $position, string $description, bool $isOpen, JobType $jobType, LocationType $locationType, array $attachments): array
     {
         // Validate job
         try {
@@ -316,7 +386,7 @@ class CompanyService extends Service
      * @param ApplicationStatus $status - The application status
      * @param string $message - The application message
      */
-    public function updateJobApplicationStatus(string $currentUserId, string $applicationId, ApplicationStatus $status, string $message): void
+    public function updateJobApplicationStatus(int $currentUserId, int $applicationId, ApplicationStatus $status, string $message): void
     {
         // Validate application
         try {
@@ -356,7 +426,7 @@ class CompanyService extends Service
      * @param string $currentUserId - The user id
      * @param string $jobId - The job id
      */
-    public function deleteJob(string $currentUserId, string $jobId): void
+    public function deleteJob(int $currentUserId, int $jobId): void
     {
         // Validate job
         try {
@@ -398,7 +468,7 @@ class CompanyService extends Service
     /**
      * Delete a job attachment
      */
-    public function deleteJobAttachment(string $currentUserId, string $jobAttachmentId): void
+    public function deleteJobAttachment(int $currentUserId, int $jobAttachmentId): void
     {
         // Validate job attachment
         try {
