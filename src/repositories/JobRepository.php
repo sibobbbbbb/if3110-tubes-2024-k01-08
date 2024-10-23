@@ -117,6 +117,10 @@ class JobRepository extends Repository
 
         // Get the total count  
         $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
+        $totalPage = ceil($totalItems / $limit);
+        if ($page > $totalPage) {
+            $page = $totalPage;
+        }
 
         // Get data
         $query .= " ORDER BY created_at " . ($isCreatedAtAsc ? "ASC" : "DESC");
@@ -221,6 +225,10 @@ class JobRepository extends Repository
 
         // Get the total count  
         $totalItems = $this->db->queryOne($totalItemsQuery, $params)[0];
+        $totalPage = ceil($totalItems / $limit);
+        if ($page > $totalPage) {
+            $page = $totalPage;
+        }
 
         // Get data
         $query .= " ORDER BY created_at " . ($isCreatedAtAsc ? "ASC" : "DESC");

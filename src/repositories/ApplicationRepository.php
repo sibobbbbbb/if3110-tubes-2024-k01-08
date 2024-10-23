@@ -28,6 +28,10 @@ class ApplicationRepository extends Repository
 
         // Get meta
         $totalItems = $this->db->queryOne($queryMeta, $params)[0];
+        $totalPage = ceil($totalItems / $limit);
+        if ($page > $totalPage) {
+            $page = $totalPage;
+        }
 
         // Get data
         $offset = ($page - 1) * $limit;
@@ -117,6 +121,10 @@ class ApplicationRepository extends Repository
 
         // Get meta
         $totalItems = $this->db->queryOne($queryMeta, $params)[0];
+        $totalPage = ceil($totalItems / $limit);
+        if ($page > $totalPage) {
+            $page = $totalPage;
+        }
 
         // Get data
         $offset = ($page - 1) * $limit;
