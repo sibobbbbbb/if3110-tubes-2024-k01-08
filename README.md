@@ -32,7 +32,7 @@ LinkinPurry is a sophisticated job market platform designed to connect talented 
 
 - Frontend: Pure JavaScript, HTML5, CSS3
 - Backend: PHP (vanilla) with the clean architecture pattern
-- Database: MySQL/PostgreSQL for reliable data management
+- Database: PostgreSQL for reliable data management
 - Security: Password hashing, input sanitization, and XSS protection
 - Rich Text: Quill.js integration for enhanced content editing
 - Docker: Containerized deployment for consistent environments
