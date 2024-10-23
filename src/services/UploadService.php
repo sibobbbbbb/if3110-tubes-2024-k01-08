@@ -36,8 +36,10 @@ class UploadService
             }
         }
 
+        $x = move_uploaded_file($normalizedFile['tmp_name'], $fileDirectoryToMove);
+        // echo var_dump($x);
         // Move the file to the target directory
-        if (!move_uploaded_file($normalizedFile['tmp_name'], $fileDirectoryToMove)) {
+        if (!$x) {
             throw new \Exception('Failed to upload file');
         }
 

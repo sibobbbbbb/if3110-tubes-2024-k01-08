@@ -582,7 +582,8 @@ class Application
                 $jobRepository = $c->get(JobRepository::class);
                 $applicationRepository = $c->get(ApplicationRepository::class);
                 $userRepository = $c->get(UserRepository::class);
-                return new JobService($jobRepository, $applicationRepository, $userRepository);
+                $uploadService = $c->get(UploadService::class);
+                return new JobService($jobRepository, $applicationRepository, $userRepository, $uploadService);
             }
         );
 

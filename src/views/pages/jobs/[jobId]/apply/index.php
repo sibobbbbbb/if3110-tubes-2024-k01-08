@@ -87,46 +87,50 @@ use src\dao\LocationType;
 
 
         <!-- Form -->
-        <form id="create-job-form" class="form" action="/company/jobs/create" method="POST"
+        <form 
+            id="create-job-form" 
+            class="form" 
+            action="/jobs/<?= htmlspecialchars($jobId, ENT_QUOTES, 'UTF-8')?>/apply" 
+            method="POST"
             enctype="multipart/form-data">
             <!-- Title -->
             <h1 class="card__title">
                 Apply For This Job
             </h1>
 
-            <!-- Attachments -->
+            <!-- Upload -->
             <div class="form__group">
                 <!-- Upload CV -->
-                <label for="attachments" class="form__label 
-                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                        <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
+                <label for="cv" class="form__label 
+                    <?php if (isset($errorFields) && isset($errorFields['cv'])): ?>
+                        <?= htmlspecialchars($errorFields['cv'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Upload Your CV
                 </label>
 
-                <input class="input" name="attachments[]" type="file" accept=".pdf" />
+                <input class="input" name="cv" type="file" accept=".pdf" />
 
                 <p class="form__error-message">
-                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                        <?= htmlspecialchars($errorFields['attachments'][0] ?? '') ?>
+                    <?php if (isset($errorFields) && isset($errorFields['cv'])): ?>
+                        <?= htmlspecialchars($errorFields['cv'][0] ?? '') ?>
                     <?php endif; ?>
                 </p>
 
                 <!-- Upload Video -->
-                <label for="attachments" class="form__label 
-                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                        <?= htmlspecialchars($errorFields['attachments'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
+                <label for="video" class="form__label 
+                    <?php if (isset($errorFields) && isset($errorFields['video'])): ?>
+                        <?= htmlspecialchars($errorFields['video'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 ">
                     Upload Video (Optional)
                 </label>
 
-                <input class="input" name="attachments[]" type="file" accept="video/*" multiple />
+                <input class="input" name="video" type="file" accept="video/*" multiple />
 
                 <p class="form__error-message">
-                    <?php if (isset($errorFields) && isset($errorFields['attachments'])): ?>
-                        <?= htmlspecialchars($errorFields['attachments'][0] ?? '') ?>
+                    <?php if (isset($errorFields) && isset($errorFields['video'])): ?>
+                        <?= htmlspecialchars($errorFields['video'][0] ?? '') ?>
                     <?php endif; ?>
                 </p>
             </div>
