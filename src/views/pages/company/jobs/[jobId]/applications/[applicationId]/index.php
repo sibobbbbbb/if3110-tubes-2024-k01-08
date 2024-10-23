@@ -119,26 +119,29 @@ use src\dao\LocationType;
             </iframe>
         </section>
 
-        <section class="card__content">
-            <h2 class="content__title">Introduction Video</h2>
 
-            <video
-                class="video"
-                controls
-                width='100%'
-                height='auto'
-                preload='metadata'
-                controlsList='nodownload'
-                class='video-player'>
-                <source src='<?= htmlspecialchars($application->getVideoPath(), ENT_QUOTES, 'utf-8')  ?>'>
-                Your browser doesn't support HTML5 video.
-                <a href='<?= htmlspecialchars($application->getVideoPath(), ENT_QUOTES, 'utf-8')  ?>'>Download the video instead.</a>
-            </video>
-        </section>
+        <?php if ($application->getVideoPath() != null): ?>
+            <section class="card__content">
+                <h2 class="content__title">Introduction Video</h2>
 
-        <!-- Accept / Reject -->
-        <section class="card__content">
-            <?php if ($application->getStatus() == ApplicationStatus::WAITING): ?>
+                <video
+                    class="video"
+                    controls
+                    width='100%'
+                    height='auto'
+                    preload='metadata'
+                    controlsList='nodownload'
+                    class='video-player'>
+                    <source src='<?= htmlspecialchars($application->getVideoPath(), ENT_QUOTES, 'utf-8')  ?>'>
+                    Your browser doesn't support HTML5 video.
+                    <a href='<?= htmlspecialchars($application->getVideoPath(), ENT_QUOTES, 'utf-8')  ?>'>Download the video instead.</a>
+                </video>
+            </section>
+        <?php endif; ?>
+
+        <?php if ($application->getStatus() == ApplicationStatus::WAITING): ?>
+            <!-- Accept / Reject -->
+            <section class="card__content">
                 <h2 class="content__title">
                     Application Verdict
                 </h2>
@@ -210,7 +213,7 @@ use src\dao\LocationType;
                     <!-- Submit button -->
                     <button class="button button--default-size button--default-color">Submit</button>
                 </form>
-            <?php endif; ?>
-        </section>
+            </section>
+        <?php endif; ?>
     </article>
 </main>

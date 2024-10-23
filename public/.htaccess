@@ -1,6 +1,9 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Disable directory listing
+  Options -Indexes
+
   # Allow direct access to files in public folder except /uploads/applications
   RewriteCond %{REQUEST_URI} !^/uploads/applications/
   RewriteCond %{REQUEST_FILENAME} -f [OR]
