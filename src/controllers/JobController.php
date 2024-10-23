@@ -24,6 +24,36 @@ class JobController extends Controller
     }
 
     /**
+     * Handle cv & video access request
+     */
+    public function handleAccessApplicationAttachment(Request $req, Response $res): void
+    {
+        $jobId = $req->getPathParams('jobId');
+        $userId = $req->getPathParams('userId');
+        $currentUserId = UserSession::getUserId();
+
+        try {
+            $this->jobService->validateCvVideoRequest($currentUserId, $userId, $jobId);
+        } catch (BaseHttpException $e) {
+            $data = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($data);
+        } catch (Exception $e) {
+            $data = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching job detail",
+            ];
+            $res->renderError($data);
+        }
+
+        // If no exception, redirect to the attachment
+        $res->redirect($req->getUri());
+    }
+
+    /**
      * Render and handle the jobs list page for job-seeker
      * If user is authenticated and is company, redirect to company dashboard
      * I.S. user authenticated & authorized as JOBSEEKER (from middleware)
@@ -364,13 +394,13 @@ class JobController extends Controller
 
             // Add data to pass to the view
             $data['jobs'] = $jobs;
-        }  catch (Exception $e) {
+        } catch (Exception $e) {
             // TODO: Render Internal server error
             $dataError = [
                 'statusCode' => $e->getCode(),
                 'message' => $e->getMessage(),
             ];
-    
+
             $res->renderError($dataError);
         }
 

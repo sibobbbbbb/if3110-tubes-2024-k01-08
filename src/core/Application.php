@@ -92,6 +92,19 @@ class Application
                 ];
             }
         );
+
+        // Validate who can access application attachment
+        $router->get(
+            '/uploads/applications/jobs/[jobId]/users/[userId]/[fileName]',
+            function () {
+                $controller = $this->container->get(JobController::class);
+                $method = 'handleAccessApplicationAttachment';
+                return [
+                    'controller' => $controller,
+                    'method' => $method
+                ];
+            }
+        );
     }
 
     /**
