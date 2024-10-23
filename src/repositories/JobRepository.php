@@ -451,7 +451,7 @@ class JobRepository extends Repository
         $this->db->executeDelete($query, $params);
     }
 
-    public function selectJobRecommendation(int $user_id): array
+    public function selectJobSuggestion(int $user_id): array
     {
         // Insert into users table
         $query = "SELECT j.*, u.*, COUNT(a.application_id) AS application_count

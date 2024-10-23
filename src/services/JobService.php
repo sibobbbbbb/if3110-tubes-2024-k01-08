@@ -208,15 +208,15 @@ class JobService extends Service
     }
 
     /**
-     * Get many jobs Recommendation
+     * Get many jobs Suggestion
      */
-    public function getJobsRecommendation(): array
+    public function getJobsSuggestion(): array
     {
         // Find the user by email
         $user = $this->userRepository->findUserByEmail(UserSession::getUserEmail());
 
         try {
-            $jobs = $this->jobRepository->selectJobRecommendation($user->getId());
+            $jobs = $this->jobRepository->selectJobSuggestion($user->getId());
         } catch (\PDOException $e) {
             if ($e->getCode() == "23505") {
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());

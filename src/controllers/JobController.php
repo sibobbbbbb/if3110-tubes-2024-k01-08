@@ -491,16 +491,16 @@ class JobController extends Controller
         ];
     }
 
-    public function renderJobRecommendation(Request $req, Response $res): void
+    public function renderJobSuggestion(Request $req, Response $res): void
     {
         // Render the view
-        $viewPathFromPages = 'recommendation/index.php';
+        $viewPathFromPages = 'suggestion/index.php';
 
         // Data to pass to the view
-        $title = 'LinkInPurry | Job Recommendation';
-        $description = 'Get Your Jobs Recommendation';
+        $title = 'LinkInPurry | Job Suggestion';
+        $description = 'Get Your Jobs Suggestion';
         $additionalTags = <<<HTML
-                <link rel="stylesheet" href="/styles/jobs/recommendation.css" />
+                <link rel="stylesheet" href="/styles/jobs/suggestion.css" />
             HTML;
         $data = [
             'title' => $title,
@@ -510,7 +510,7 @@ class JobController extends Controller
 
         try {
             // Get jobs data
-            $jobs = $this->jobService->getJobsRecommendation();
+            $jobs = $this->jobService->getJobsSuggestion();
 
 
             // Add data to pass to the view

@@ -292,13 +292,13 @@ class Application
         );
 
         /**
-         * Get job Recommendation
+         * Get job Suggestion
          */
         $router->get(
-            '/recommendation',
+            '/suggestion',
             function () {
                 $controller = $this->container->get(JobController::class);
-                $method = 'renderJobRecommendation';
+                $method = 'renderJobSuggestion';
                 return [
                     'controller' => $controller,
                     'method' => $method
