@@ -58,7 +58,7 @@ class Validator
                     case 'email':
                         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                             // echo "in email";
-                            $message = ucfirst("$fieldInMessage$ must be a valid email address");
+                            $message = ucfirst("$fieldInMessage must be a valid email address");
                             $this->addError($field, $message);
                         }
                         break;

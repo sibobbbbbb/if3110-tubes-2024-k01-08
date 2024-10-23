@@ -10,10 +10,10 @@
         <p><?= $message ?></p>
 
         <!-- Error Button -->
-        <?php if ($statusCode === 404): ?>
-            <button class="go-back-btn" onclick="window.location.href='/'">Go to Home</button>
+        <?php if ($statusCode === 500): ?>
+            <button class="go-back-btn" onclick="window.location.href=window.location.pathname">Refresh</button>
         <?php else: ?>
-            <button class="go-back-btn" onclick="location.reload()">Refresh</button>
+            <button class="go-back-btn" onclick="window.location.href='/'">Go to Home</button>
         <?php endif; ?>
     </div>
 </main>

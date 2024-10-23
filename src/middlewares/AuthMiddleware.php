@@ -38,7 +38,12 @@ abstract class AuthMiddleware extends Middleware
 
         // If user is logged in, but not in the specified roles, redirect to error page
         if (!in_array(UserSession::getUserRole(), $this->roles)) {
-            $res->redirect("/error/");
+            $data = [
+                'statusCode' => 403,
+                'message' => "You are not authorized to see this page.",
+            ];
+    
+            $res->renderError($data);
         }
 
         // continue

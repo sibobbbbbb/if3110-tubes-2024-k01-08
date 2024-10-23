@@ -450,4 +450,52 @@ class JobRepository extends Repository
         $params = [':attachment_id' => $attachment->getAttachmentId()];
         $this->db->executeDelete($query, $params);
     }
+
+    public function selectJobRecommendation(int $user_id): array
+    {
+        // Insert into users table
+        $query = "SELECT j.*, u.*, COUNT(a.application_id) AS application_count
+                  FROM jobs j
+                  LEFT JOIN applications a ON j.job_id = a.job_id
+                  LEFT JOIN users u ON u.id = j.company_id
+                  WHERE j.is_open = true
+                  AND j.job_id NOT IN (
+                    SELECT a1.job_id
+                    FROM applications a1
+                    WHERE a1.user_id = :user_id
+                  )
+                  GROUP BY j.job_id, u.id
+                  HAVING COUNT(a.application_id) > (
+                    SELECT AVG(application_count)
+                    FROM (
+                        SELECT COUNT(a2.application_id) AS application_count
+                        FROM jobs j2
+                        LEFT JOIN applications a2 ON j2.job_id = a2.job_id
+                        WHERE j2.is_open = true
+                        GROUP BY j2.job_id
+                    ) AS job_application_counts
+                  )
+                  ORDER BY j.created_at DESC, application_count DESC
+                  Limit 5
+                ";
+
+        $params = [
+            ':user_id' => $user_id
+        ];
+
+        $results = $this->db->queryMany($query, $params);
+        // error_log(var_dump($results));
+        // echo var_dump($results);
+
+        // Parse data to dao
+        $jobs = [];
+        foreach ($results as $result) {
+            $newUser = UserDao::fromRaw($result);
+            $newJob = JobDao::fromRaw($result);
+            $newJob->setCompany($newUser);
+
+            $jobs[] = $newJob;
+        }
+        return $jobs;
+    }
 }

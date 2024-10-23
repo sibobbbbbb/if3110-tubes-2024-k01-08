@@ -5,7 +5,7 @@ namespace src\controllers;
 use DateTime;
 use Exception;
 use src\core\{Response, Request};
-use src\dao\{LocationType, JobType};
+use src\dao\{ApplicationStatus, LocationType, JobType};
 use src\dto\DtoFactory;
 use src\exceptions\BadRequestHttpException;
 use src\exceptions\BaseHttpException;
@@ -54,7 +54,7 @@ class CompanyController extends Controller
         if ($req->getMethod() == "GET") {
             // GET
             // render
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
             // POST
 
@@ -73,7 +73,7 @@ class CompanyController extends Controller
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
             }
 
             // Create job
@@ -85,14 +85,22 @@ class CompanyController extends Controller
                 $attachments = $req->getBody()['attachments'];
 
                 $this->companyService->createJob($currentUserId, $position, $description, $jobType, $locationType, $attachments);
-            } catch (HttpExceptionFactory $e) {
-                // TODO: Render error view
-                throw $e;
-                return;
+            } catch (BaseHttpException $e) {
+                // Render error page
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+
+                $res->renderError($dataError);
             } catch (Exception $e) {
-                // TODO: Render Internal server error
-                throw $e;
-                return;
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "An error occurred while creating job",
+                ];
+
+                $res->renderError($dataError);
             }
 
             // Redirect to company jobs list page
@@ -166,14 +174,24 @@ class CompanyController extends Controller
             $data['filters'] = $queryParams;
             $data['paginationComponent'] = $paginationComponent;
         } catch (BaseHttpException $e) {
-            // TODO: Render error view
-            echo $e->getMessage();
+            // Render error page
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($dataError);
         } catch (Exception $e) {
-            // TODO: Render Internal server error
-            echo $e->getMessage();
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching company jobs",
+            ];
+
+            $res->renderError($dataError);
         }
 
-        $this->renderPage($viewPathFromPages, $data);
+        $res->renderPage($viewPathFromPages, $data);
     }
 
     /**
@@ -328,11 +346,23 @@ class CompanyController extends Controller
             $data['meta'] = $meta;
             $data['paginationComponent'] = $paginationComponent;
 
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } catch (BaseHttpException $e) {
-            // Http error
+            // Render error page
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($dataError);
         } catch (Exception $e) {
-            // Treat as internal server error
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching job applications",
+            ];
+
+            $res->renderError($dataError);
         }
     }
 
@@ -368,6 +398,96 @@ class CompanyController extends Controller
     {
         $viewPathFromPages = 'company/jobs/[jobId]/applications/[applicationId]/index.php';
         $currentUserId = UserSession::getUserId();
+
+        // Get path params
+        $currentJobId = $req->getPathParams('jobId');
+        $currentApplicationId = $req->getPathParams('applicationId');
+
+        // Base data to pass to the view
+        $title = 'LinkInPurry | Application Detail';
+        $description = 'Application detail';
+        $additionalTags = <<<HTML
+                <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js" defer></script>
+                <script src="/scripts/quill-editor.js" defer></script>
+                <script src="/scripts/company/application-detail.js" defer></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css">
+                <link rel="stylesheet" href="/styles/company/application-detail.css" />
+                <link rel="stylesheet" href="/styles/quill-editor.css">
+            HTML;
+
+        // Render page
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'additionalTags' => $additionalTags,
+        ];
+
+        // Get initial data for the view
+        try {
+            $application = $this->companyService->getCompanyJobApplication($currentUserId, $currentApplicationId);
+            $data['application'] = $application;
+        } catch (BaseHttpException $e) {
+            // Http exception
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+            $res->renderError($dataError);
+        } catch (Exception $e) {
+            // Render internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while fetching application detail",
+            ];
+            $res->renderError($dataError);
+        }
+
+        if ($req->getMethod() == "GET") {
+            // GET
+            $res->renderPage($viewPathFromPages, $data);
+        } else if ($req->getMethod() == "POST") {
+            // POST
+            // Validate request body
+            $rules = [
+                'status' => ['required', "enum" => ['accepted', 'rejected']],
+                'reason' => ['optional'] // rich text
+            ];
+
+            $validator = new Validator();
+            $isValid = $validator->validate($req->getBody(), $rules);
+            if (!$isValid) {
+                $data['errorFields'] = $validator->getErrorFields();
+                $data['fields'] = $req->getBody();
+                $res->renderPage($viewPathFromPages, $data);
+            }
+
+            // Update application status
+            try {
+                $status = ApplicationStatus::fromString($req->getBody()['status']);
+                $statusReason = $req->getBody()['status-reason'];
+
+                $this->companyService->updateJobApplicationStatus($currentUserId, $currentApplicationId, $status, $statusReason);
+            } catch (BaseHttpException $e) {
+                // Render error page
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+
+                $res->renderError($dataError);
+            } catch (Exception $e) {
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "An error occurred while updating application status",
+                ];
+
+                $res->renderError($dataError);
+            }
+
+            // Reset form state
+            $res->redirect("/company/jobs/$currentJobId/applications/$currentApplicationId");
+        }
     }
 
     /**
@@ -415,7 +535,7 @@ class CompanyController extends Controller
             ];
 
             // Render
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
             // POST
             // Validate request body
@@ -437,7 +557,7 @@ class CompanyController extends Controller
                 $data['fields'] = $req->getBody();
                 $data['fields']['attachments'] = $jobDetail->getAttachments();
 
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
             }
 
             // Edit job
@@ -450,14 +570,22 @@ class CompanyController extends Controller
                 $attachments = $req->getBody()['attachments'];
 
                 $this->companyService->editJob($currentUserId, $currentJobId, $position, $description, $isOpen, $jobType, $locationType, $attachments);
-            } catch (HttpExceptionFactory $e) {
-                // TODO: Render error view
-                throw $e;
-                return;
+            } catch (BaseHttpException $e) {
+                // Render error page
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+
+                $res->renderError($dataError);
             } catch (Exception $e) {
-                // TODO: Render Internal server error
-                throw $e;
-                return;
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "An error occurred while editing job",
+                ];
+
+                $res->renderError($dataError);
             }
 
             // Reset form state (redirect to the same page)
@@ -477,13 +605,21 @@ class CompanyController extends Controller
         try {
             $this->companyService->deleteJob($currentUserId, $currentJobId);
         } catch (BaseHttpException $e) {
-            // Http exception
-            $responseDto = DtoFactory::createErrorDto($e->getMessage());
-            $res->json($e->getCode(), $responseDto);
+            // Render error page
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($dataError);
         } catch (Exception $e) {
-            // Treat as internal server error
-            $responseDto = DtoFactory::createErrorDto("An error occurred while deleting job");
-            $res->json(500, $responseDto);
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while deleting job",
+            ];
+
+            $res->renderError($dataError);
         }
 
         // Success
@@ -506,13 +642,21 @@ class CompanyController extends Controller
         try {
             $this->companyService->deleteJobAttachment($currentUserId, $attachmentId);
         } catch (BaseHttpException $e) {
-            // Http exception
-            $responseDto = DtoFactory::createErrorDto($e->getMessage());
-            $res->json($e->getCode(), $responseDto);
+            // Render error page
+            $dataError = [
+                'statusCode' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ];
+
+            $res->renderError($dataError);
         } catch (Exception $e) {
-            // Treat as internal server error
-            $responseDto = DtoFactory::createErrorDto("An error occurred while deleting job attachment");
-            $res->json(500, $responseDto);
+            // Render Internal server error
+            $dataError = [
+                'statusCode' => 500,
+                'message' => "An error occurred while deleting job attachment",
+            ];
+
+            $res->renderError($dataError);
         }
 
         // Success
@@ -547,7 +691,26 @@ class CompanyController extends Controller
         if ($req->getMethod() == "GET") {
             // GET
             // Get initial data
-            $companyDetail = $this->companyService->getCompanyProfile($currentUserId);
+            try {
+                $companyDetail = $this->companyService->getCompanyProfile($currentUserId);
+            } catch (BaseHttpException $e) {
+                // Render error page
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+
+                $res->renderError($dataError);
+            } catch (Exception $e) {
+                // Render Internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => "An error occurred while fetching company profile",
+                ];
+
+                $res->renderError($dataError);
+            }
+
             $data['fields'] = [
                 'name' => $companyDetail->getName(),
                 'location' => $companyDetail->getLocation(),
@@ -555,7 +718,7 @@ class CompanyController extends Controller
             ];
 
             // render
-            $this->renderPage($viewPathFromPages, $data);
+            $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
             // PUT
             // Validate request body
@@ -569,7 +732,7 @@ class CompanyController extends Controller
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
             }
 
             // Update company profile
@@ -588,10 +751,21 @@ class CompanyController extends Controller
                     'location' => [$message],
                 ];
                 $data['fields'] = $req->getBody();
-                $this->renderPage($viewPathFromPages, $data);
+                $res->renderPage($viewPathFromPages, $data);
+            } catch (BaseHttpException $e) {
+                // Http error
+                $dataError = [
+                    'statusCode' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                ];
+                $res->renderError($dataError);
             } catch (Exception $e) {
-                // Internal server error
-                // TODO: render error view
+                // Treat as internal server error
+                $dataError = [
+                    'statusCode' => 500,
+                    'message' => 'An error occurred while updating company profile',
+                ];
+                $res->renderError($dataError);
             }
 
             // Success
