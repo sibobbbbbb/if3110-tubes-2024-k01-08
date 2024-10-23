@@ -153,7 +153,14 @@ class ApplicationRepository extends Repository
      */
     public function getJobAplicationByUserIdJobId(int $userId, int $jobId): ApplicationDao | null
     {
-        $query = "SELECT * FROM applications WHERE user_id = :user_id AND job_id = :job_id";
+        $query = "
+            SELECT * 
+            FROM
+                applications
+                INNER JOIN jobs ON applications.job_id = jobs.job_id 
+            WHERE
+                user_id = :user_id AND job_id = :job_id";
+
         $params = [
             ':user_id' => $userId,
             ':job_id' => $jobId,
@@ -162,7 +169,10 @@ class ApplicationRepository extends Repository
         $result = $this->db->queryOne($query, $params);
         if ($result == false) return null;
 
+        $job = JobDao::fromRaw($result);
         $application = ApplicationDao::fromRaw($result);
+        $application->setJob($job);
+
         return $application;
     }
 

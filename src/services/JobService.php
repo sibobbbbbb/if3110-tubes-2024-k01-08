@@ -92,6 +92,30 @@ class JobService extends Service
     }
 
     /**
+     * Check if a request for cv/video is authorized to be proceeded 
+     */
+    public function validateCvVideoRequest(int $currentUserId, int $jobId, int $userId)
+    {
+        // Get application job id & user id
+        try {
+            $application = $this->applicationRepository->getJobAplicationByUserIdJobId($userId, $jobId);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
+        }
+
+        // If application not found
+        if ($application == null) {
+            throw HttpExceptionFactory::createNotFound("Job application not found");
+        }
+
+        // Check if current user is company of the job or the user who applied
+        if ($currentUserId != $application->getUserId() && $currentUserId != $application->getJob()->getCompanyId()) {
+            throw HttpExceptionFactory::createForbidden("You are not authorized to proceed this request");
+        }
+
+        return true;
+    }
+
      * Check if user has already applied for the job
      */
     public function isApplied(int $user_id, int $job_id): bool

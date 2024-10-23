@@ -1,13 +1,10 @@
-<!-- Additional tags -->
-<?= $additionalTags ?>
-
 <main class="main">
     <div class="error-container">
         <!-- Error Icon -->
         <div class="error-icon"></div>
-        <h1><?= $statusCode ?></h1>
-        <p><?= $subHeading ?></p>
-        <p><?= $message ?></p>
+        <h1 class="status-code"><?= $statusCode ?></h1>
+        <p class="sub-heading"><?= $subHeading ?></p>
+        <p class="message"><?= $message ?></p>
 
         <!-- Error Button -->
         <?php if ($statusCode === 500): ?>
