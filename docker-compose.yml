@@ -10,7 +10,7 @@ services:
       - "5436:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./src/database/migrations:/docker-entrypoint-initdb.d
+      - ./php/src/database/migrations:/docker-entrypoint-initdb.d
     networks:
       - linkinpurry-network
     healthcheck:
@@ -29,7 +29,7 @@ services:
     env_file: .env
     volumes:
       - ./:/var/www/html/ # Live reload if source code changes (bind mount)
-      - upload-data:/var/www/html/public/uploads # Uploads data persistence (named volume)
+      - upload-data:/var/www/html/php/public/uploads # Uploads data persistence (named volume)
     ports:
       - "8080:80"
     depends_on:
@@ -47,7 +47,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - upload-data:/var/www/html/public/uploads
+      - upload-data:/var/www/html/php/public/uploads
     depends_on:
       - linkinpurry-db
     networks:
