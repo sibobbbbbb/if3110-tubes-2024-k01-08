@@ -93,9 +93,24 @@
   gap: 0.75rem;
 }
 
-.header__action-button {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
+.application-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.application-status__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.application-status__title {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+  font-weight: 700;
 }
 
 .about-job {
@@ -104,6 +119,17 @@
   gap: 0.5rem;
   padding: 1.25rem 1.5rem;
   border-top: 1px solid hsl(var(--border));
+}
+
+.attachments {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.attachment__button {
+  padding: 0.5rem 1.5rem;
 }
 
 .about-company {

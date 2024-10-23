@@ -1,5 +1,6 @@
 <?php
 
+use src\dao\ApplicationStatus;
 use src\dao\JobType;
 use src\dao\LocationType;
 use src\utils\UserSession;
@@ -95,38 +96,92 @@ use src\utils\UserSession;
                 </div>
 
                 <!-- Application -->
-                <div class="header__application">
-                    <?php if (!UserSession::isLoggedIn()): ?>
+                <?php if (!UserSession::isLoggedIn()): ?>
+                    <div class="header__application">
+
                         <a href="/auth/sign-in">
                             <button class="button button--default-color button--sm rounded-full header__action-button">
                                 Sign in to Apply
                             </button>
                         </a>
-                    <?php elseif ($application == null): ?>
+                    </div>
+                <?php elseif ($application == null): ?>
+                    <div class="header__application">
+
                         <a href="/jobs/<?= htmlspecialchars($job->getJobId(), ENT_QUOTES, 'utf-8') ?>/apply">
                             <button class="button button--default-color button--sm rounded-full header__action-button">
                                 Apply
                             </button>
                         </a>
-                    <?php else: ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </header>
+
+        <!-- Application status -->
+        <?php if (UserSession::isLoggedIn() && $application != null): ?>
+            <section class="application-status">
+                <h2 class="content__title">
+                    Application Information
+                </h2>
+
+                <!-- Status -->
+                <div class="application-status__group">
+                    <h3 class="application-status__title">Status</h3>
+
+                    <!-- Status -->
+                    <div class="application-status__group">
+                        <div>
+                            <?php if ($application->getStatus() == ApplicationStatus::ACCEPTED): ?>
+                                <div class="badge badge--green">
+                                    Accepted
+                                </div>
+                            <?php elseif ($application->getStatus() == ApplicationStatus::REJECTED): ?>
+                                <div class="badge badge--destructive">
+                                    Rejected
+                                </div>
+                            <?php else: ?>
+                                <div class="badge badge--yellow">
+                                    Pending
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attachments -->
+                <div class="application-status__group">
+                    <h3 class="application-status__title">Attachments</h3>
+
+                    <div class="attachments">
                         <!-- <?= $application->getCvPath() ?> -->
                         <a target="_blank" href="<?= htmlspecialchars($application->getCvPath(), ENT_QUOTES, 'utf-8') ?>">
-                            <button class="button button--default-color button--sm rounded-full header__action-button">
+                            <button class="button button--default-color button--sm rounded-full attachment__button">
                                 CV
                             </button>
                         </a>
 
                         <?php if ($application->getVideoPath() != null): ?>
                             <a target="_blank" href="<?= htmlspecialchars($application->getVideoPath(), ENT_QUOTES, 'utf-8') ?>">
-                                <button class="button button--secondary button--sm rounded-full header__action-button">
+                                <button class="button button--secondary button--sm rounded-full attachment__button">
                                     Video
                                 </button>
                             </a>
                         <?php endif; ?>
-                    <?php endif; ?>
+                    </div>
                 </div>
-            </div>
-        </header>
+
+                <!-- Status reason if exists -->
+                <?php if ($application->getStatusReason() != null) : ?>
+                    <div class="application-status__group">
+                        <h3 class="application-status__title">Status Reason</h3>
+                        <div class="content__rich-text">
+                            <?= $application->getStatusReason() ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
 
 
         <!-- About the job -->
