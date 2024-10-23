@@ -237,6 +237,30 @@ class Application
                 ];
             },
         );
+                
+        /**
+         * Apply for a job & handle the form submission
+         */
+        $applyJobFactoryFunction = function () {
+            $controller = $this->container->get(JobController::class);
+            $method = 'renderAndHandleApplyJob';
+            return [
+                'controller' => $controller,
+                'method' => $method
+            ];
+        };
+        // Render
+        $router->get(
+            '/jobs/[jobId]/apply',
+            $applyJobFactoryFunction,
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
+        // Handle
+        $router->post(
+            '/jobs/[jobId]/apply',
+            $applyJobFactoryFunction,
+            [$jobSeekerAuthMiddlewareFactoryFunction]
+        );
 
         /**
          * Get job seeeker's application history
@@ -574,7 +598,8 @@ class Application
                 $jobRepository = $c->get(JobRepository::class);
                 $applicationRepository = $c->get(ApplicationRepository::class);
                 $userRepository = $c->get(UserRepository::class);
-                return new JobService($jobRepository, $applicationRepository, $userRepository);
+                $uploadService = $c->get(UploadService::class);
+                return new JobService($jobRepository, $applicationRepository, $userRepository, $uploadService);
             }
         );
 

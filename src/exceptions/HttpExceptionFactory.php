@@ -24,6 +24,11 @@ class HttpExceptionFactory
         return new NotFoundHttpException($message);
     }
 
+    static function createConflict(string $message): ConflictHttpException
+    {
+        return new ConflictHttpException($message);
+    }
+
     static function createInternalServerError(string $message): InternalServerErrorHttpException
     {
         return new InternalServerErrorHttpException($message);

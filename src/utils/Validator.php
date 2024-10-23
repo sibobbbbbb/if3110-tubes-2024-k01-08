@@ -86,7 +86,7 @@ class Validator
                         break;
                     case 'file':
                         // only check if file exists
-                        if ($value['error'][0] == UPLOAD_ERR_NO_FILE) {
+                        if ($value['error'] == UPLOAD_ERR_NO_FILE) {
                             continue 2;
                         }
                         // allowed types

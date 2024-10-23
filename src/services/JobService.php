@@ -5,8 +5,10 @@ namespace src\services;
 use DateTime;
 use Exception;
 use src\dao\{LocationType, JobType, JobDao, CompanyDetailDao};
+use src\dao\ApplicationDao;
 use src\exceptions\HttpExceptionFactory;
 use src\repositories\{ApplicationRepository, JobRepository, UserRepository};
+use src\services\UploadService;
 use src\utils\UserSession;
 
 /* Job seeker */
@@ -18,12 +20,14 @@ class JobService extends Service
     private JobRepository $jobRepository;
     private ApplicationRepository $applicationRepository;
     private UserRepository $userRepository;
+    private UploadService $uploadService;
 
-    public function __construct(JobRepository $jobRepository, ApplicationRepository $applicationRepository, UserRepository $userRepository)
+    public function __construct(JobRepository $jobRepository, ApplicationRepository $applicationRepository, UserRepository $userRepository, UploadService $uploadService)
     {
         $this->jobRepository = $jobRepository;
         $this->applicationRepository = $applicationRepository;
         $this->userRepository = $userRepository;
+        $this->uploadService = $uploadService;
     }
 
     /**
@@ -87,6 +91,74 @@ class JobService extends Service
         return [$job, null];
     }
 
+    /**
+     * Check if user has already applied for the job
+     */
+    public function isApplied(int $user_id, int $job_id): bool
+    {
+        // Check if user has already applied for the job
+        try {
+            $application = $this->applicationRepository->getJobAplicationByUserIdJobId($user_id, $job_id);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
+        }
+        return $application != null;
+    }
+
+    /**
+     * Apply for a job
+     * Userid is validated through middleware
+     * @param int $user_id
+     * @param int $job_id
+     * @param string $cv
+     * @param string $video
+     * @return string - file path of the uploaded
+     */
+    public function applyJob(int $user_id, int $job_id, array $rawCv, array $rawVideo): ApplicationDao
+    {
+        // Check if user has already applied for the job
+        try {
+            $application = $this->applicationRepository->getJobAplicationByUserIdJobId($user_id, $job_id);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching user's job application");
+        }
+
+        // If application exists, cannot apply again
+        if ($application != null) {
+            throw HttpExceptionFactory::createConflict("You have already applied for this job");
+        }
+
+        // Upload CV to server
+        try {
+            $directoryCvFromPublic = '/uploads/applications/jobs/[jobId]/users/[userId]/';
+            $uploadedCvPath = $this->uploadService->uploadOneFile($directoryCvFromPublic, $rawCv);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading CV");
+        }
+        // echo var_dump($rawVideo);
+        $isVideoEmpty = $rawVideo['error'] == UPLOAD_ERR_NO_FILE;
+        if (!$isVideoEmpty) {
+            // Upload video to server
+            try {
+                $directoryVideoFromPublic = '/uploads/applications/video/';
+                $uploadedVideoPath = $this->uploadService->uploadOneFile($directoryVideoFromPublic, $rawVideo);
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                throw HttpExceptionFactory::createInternalServerError("An error occurred while uploading video");
+            }
+        }        
+
+        // Create application
+        try {
+            $application = $this->applicationRepository->createApplication($user_id, $job_id, $uploadedCvPath, $uploadedVideoPath);
+        } catch (Exception $e) {
+            throw HttpExceptionFactory::createInternalServerError("An error occurred while applying for job");
+        }
+
+        return $application;
+    }
 
     /**
      * Get user's job application history (paginated)
