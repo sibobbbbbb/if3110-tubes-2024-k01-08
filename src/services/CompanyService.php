@@ -445,6 +445,13 @@ class CompanyService extends Service
             throw HttpExceptionFactory::createForbidden("You are not authorized to delete this job posting");
         }
 
+        // // Get all the applications
+        // try {
+        //     $applications = $this->applicationRepository->getAllJobApplicationsUnpaginated($currentUserId, $jobId);
+        // } catch (Exception $e) {
+        //     throw HttpExceptionFactory::createInternalServerError("An error occurred while fetching job applications");
+        // }
+
         // Delete job
         try {
             $this->jobRepository->deleteJob($job);
@@ -452,7 +459,32 @@ class CompanyService extends Service
             throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job posting");
         }
 
-        // Delete files from server
+        // Delete job attachment files from server
+        // NOTE: DUMMY DATA DOESN'T ACTUALLY STORE FILE PATHS
+        // try {
+        //     // Delete all the cv path and the video path (if any)
+        //     $applicationFiles = [];
+        //     foreach ($applications as $application) {
+        //         $cvPath = $application->getCVPath();
+        //         $videoPath = $application->getVideoPath();
+
+        //         if ($cvPath) {
+        //             $applicationFiles[] = $cvPath;
+        //         }
+
+        //         if ($videoPath) {
+        //             $applicationFiles[] = $videoPath;
+        //         }
+        //     }
+
+        //     if (count($applicationFiles) > 0) {
+        //         $this->uploadService->deleteMultipleFiles($applicationFiles);
+        //     }
+        // } catch (Exception $e) {
+        //     throw HttpExceptionFactory::createInternalServerError("An error occurred while deleting job attachments");
+        // }
+
+        // Delete job attachment files from server
         // NOTE: DUMMY DATA DOESN'T ACTUALLY STORE FILE PATHS
         // try {
         //     $fileDirectories = array_map(fn($attachment) => $attachment->getFilePath(), $job->getAttachments());

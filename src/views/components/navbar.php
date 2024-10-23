@@ -35,13 +35,13 @@ if (UserSession::isLoggedIn()) {
 
             <!-- Search input -->
             <search class="header__search">
-                <form action="<?= htmlspecialchars($searchFormAction) ?>" method="GET" class="header__form-search">
+                <form id="navbar-search-form" action="<?= htmlspecialchars($searchFormAction) ?>" method="GET" class="header__form-search">
                     <svg class="header__search-logo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
 
-                    <input type="text" name="search" class="input header__search-input" placeholder="Search for jobs"
+                    <input id="navbar-search-input" type="text" name="search" class="input header__search-input" placeholder="Search for jobs"
                         <?php if (isset($filters['search'])) : ?>
                         value="<?= htmlspecialchars($filters['search'], ENT_QUOTES, 'utf-8') ?>"
                         <?php else: ?>

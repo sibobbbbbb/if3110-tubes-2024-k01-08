@@ -213,8 +213,11 @@ SELECT
     ROW_NUMBER() OVER () AS application_id,
     user_id,
     job_id,
-    '/uploads/applications/cv_' || (ROW_NUMBER() OVER ()) || '.pdf',
-    CASE WHEN random() > 0.5 THEN '/uploads/applications/video_' || (ROW_NUMBER() OVER ()) || '.mp4' ELSE NULL END,
+    '/uploads/applications/jobs/' || job_id || '/users/' || user_id || '/cv/cv_' || (ROW_NUMBER() OVER ()) || '.pdf',
+    CASE WHEN random() > 0.5 
+        THEN '/uploads/applications/jobs/' || job_id || '/users/' || user_id || '/video/video_' || (ROW_NUMBER() OVER ()) || '.mp4' 
+        ELSE NULL 
+    END,
     (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)],
     CASE 
         WHEN (ARRAY['accepted', 'rejected', 'waiting']::application_status_enum[])[floor(random() * 3 + 1)] = 'rejected' 

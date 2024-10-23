@@ -1,3 +1,22 @@
+class Debouncer {
+  constructor(delay = 300) {
+    this.delay = delay;
+    this.timeoutId = null;
+  }
+
+  debounce(callback) {
+    return (...args) => {
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+      }
+
+      this.timeoutId = setTimeout(() => {
+        callback.apply(this, args);
+      }, this.delay);
+    };
+  }
+}
+
 class NavbarManager {
   constructor() {
     this.bodyElement = document.querySelector("body");
@@ -11,6 +30,10 @@ class NavbarManager {
     this.sidebarCloseButton = document.getElementById("sidebar-close-button");
 
     this.signOutButton = document.getElementById("sign-out-button");
+
+    this.searchForm = document.getElementById("navbar-search-form");
+
+    this.searchInput = document.getElementById("navbar-search-input");
 
     this.init();
   }
@@ -57,12 +80,25 @@ class NavbarManager {
       this.onCloseSidebar();
     });
 
+    // Search form debounce
+    const debouncer = new Debouncer(750);
+    this.searchInput.addEventListener(
+      "input",
+      debouncer.debounce(async () => {
+        this.handleDebounceSearch();
+      })
+    );
+
     // Sign out button
     if (this.signOutButton) {
       this.signOutButton.addEventListener("click", () => {
         this.handleSignOut();
       });
     }
+  }
+
+  async handleDebounceSearch() {
+    this.searchForm.submit();
   }
 
   async handleSignOut() {
