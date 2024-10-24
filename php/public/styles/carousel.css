@@ -6,6 +6,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 8px;
+  display: flex;
 }
 
 .carousel-inner {
@@ -19,7 +20,7 @@
 
 .carousel-item img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
 }
 
