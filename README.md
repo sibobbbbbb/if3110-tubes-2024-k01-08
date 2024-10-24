@@ -129,8 +129,6 @@ LinkinPurry is a sophisticated job market platform designed to connect talented 
    docker volume rm linkinpurry-upload-data
    ```
 
-## Screenshots
-
 ## Lighthouse
 
 Most of the issue from the light house benchmark is in the Accessibility section. It was easily fixed by adding `aria-label` attribute to a `button` or `anchor` that doesn't have any text in it (e.g. icon). The other issue was that the form fields doesn't have a label to it (even though it is already there). The fix was by simply adding `id` attribute to the input field that matches the `for` attribute in the label field. All pages successfully achieve > 90 lighthouse score on mobile.
@@ -196,3 +194,73 @@ Most of the issue from the light house benchmark is in the Accessibility section
 13. Profile Page (Company): 13522011
 
 14. Error Page: 13522009
+
+## Screenshots
+
+### Home Page
+
+![Home Page](docs/milestone-1/home.png)
+
+### Register Page
+
+![Register Page](docs/milestone-1/register.png)
+
+### Sign In Page
+
+![Sign In Page](docs/milestone-1/signIn.png)
+
+### Home Page (Company)
+
+![Home Page (Company)](docs/milestone-1/company/homeCompany.png)
+
+### Sign Up Page (Company)
+
+![Sign Up Page (Company)](docs/milestone-1/company/signUpCompany.png)
+
+### Profile Page (Company)
+
+![Profile Page (Company)](docs/milestone-1/company/profile.png)
+
+### Create Jobs Page (Company)
+
+![Create Jobs Page (Company)](docs/milestone-1/company/createJobs.png)
+
+### Edit Jobs Page (Company)
+
+![Edit Jobs Page (Company)](docs/milestone-1/company/editJob.png)
+
+### Jobs Detail (Company)
+
+![Jobs Detail (Company)](docs/milestone-1/company/jobsDetail.png)
+
+### Applications Detail (Company)
+
+![Applications Detail (Company)](docs/milestone-1/company/applicationsDetail.png)
+
+### Home Page (Job Seeker)
+
+![Home Page (Job Seeker)](docs/milestone-1/job-seeker/homeJobSeeker.png)
+
+### Sign Up (Job Seeker)
+
+![Sign Up (Job Seeker)](docs/milestone-1/job-seeker/signUpJobSeeker.png)
+
+### Job Detail (Job Seeker)
+
+![Job Detail (Job Seeker)](docs/milestone-1/job-seeker/jobDetail.png)
+
+### Job Suggestion (Job Seeker)
+
+![Job Suggestion (Job Seeker)](docs/milestone-1/job-seeker/jobSuggestion.png)
+
+### Apply Job (Job Seeker)
+
+![Apply Job (Job Seeker)](docs/milestone-1/job-seeker/applyJob.png)
+
+### Applied Job Detail (Job Seeker)
+
+![Applied Job Detail (Job Seeker)](docs/milestone-1/job-seeker/appliedJobDetail.png)
+
+### Applications History (Job Seeker)
+
+![Applications History (Job Seeker)](docs/milestone-1/job-seeker/applicationsHistory.png)
