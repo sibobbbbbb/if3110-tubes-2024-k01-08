@@ -28,10 +28,10 @@ class UploadService
         $folderDirectoryToMove = PathResolver::resolve(__DIR__ . '/../../public/' . $directoryFromPublic);
         $fileDirectoryToMove = PathResolver::resolve($folderDirectoryToMove . '/' . $finalFilename);
         $fileDirectoryFromPublic = PathResolver::resolve($directoryFromPublic . '/' . $finalFilename);
-
         // Create the target directory if it doesn't exist
+
         if (!file_exists($folderDirectoryToMove)) {
-            if (!mkdir($folderDirectoryToMove, 0755, true)) {
+            if (!mkdir($folderDirectoryToMove, 0775, true)) {
                 throw new \Exception('Failed to create directory: ' . $folderDirectoryToMove);
             }
         }
@@ -54,7 +54,6 @@ class UploadService
     public function uploadMultipleFiles(string $directoryFromPublic, array $rawFiles): array
     {
         $uploadedFiles = [];
-
         for ($i = 0; $i < count($rawFiles['name']); $i++) {
             $normalizedFile = [
                 'name' => $rawFiles['name'][$i],
