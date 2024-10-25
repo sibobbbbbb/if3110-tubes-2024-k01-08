@@ -164,6 +164,7 @@ Most of the issue from the light house benchmark is in the Accessibility section
 13. Profile Page (Company): 13522011
 
 14. Error Page: 13522009
+15. Job Recommendation Page: 13522009
 
 ### Client-side
 
@@ -194,6 +195,7 @@ Most of the issue from the light house benchmark is in the Accessibility section
 13. Profile Page (Company): 13522011
 
 14. Error Page: 13522009
+15. Job Recommendation Page : 13522009
 
 ## Screenshots
 
