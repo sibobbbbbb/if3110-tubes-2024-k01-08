@@ -160,57 +160,79 @@ INSERT INTO users (name, email, password, role) VALUES
 ('jobseeker1', 'jobseeker1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
 ('jobseeker2', 'jobseeker2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
 ('jobseeker3', 'jobseeker3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker4', 'jobseeker4@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker5', 'jobseeker5@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker6', 'jobseeker6@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker7', 'jobseeker7@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker8', 'jobseeker8@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker9', 'jobseeker9@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
+('jobseeker10', 'jobseeker10@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker'),
 ('company1', 'company1@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('company2', 'company2@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('company3', 'company3@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company4', 'company4@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company5', 'company5@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company6', 'company6@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),  
+('company7', 'company7@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company8', 'company8@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),  
+('company9', 'company9@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
+('company10', 'company10@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('Dewo', 'dewo@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'company'),
 ('Bas', 'bas@gmail.com', '$2y$10$TU9rBqa2AMCjlPlKuN/KxujIvnhfVteNxygzoOVhdvEEzVW5kkDpW', 'jobseeker');
 
--- Company Details
+-- Company Details for all 10 companies (user_id 11-20)
 INSERT INTO company_details (user_id, location, about) VALUES
-(4, 'New York, USA', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
-(5, 'London, UK', 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-(6, 'Tokyo, Japan', 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'),
-(7, 'Jakarta, Indonesia', 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');
+(11, 'New York, USA', 'Leading technology company specializing in AI solutions'),
+(12, 'London, UK', 'Global financial services provider with innovative fintech products'),
+(13, 'Tokyo, Japan', 'Pioneer in robotics and automation systems'),
+(14, 'Jakarta, Indonesia', 'Southeast Asia''s largest e-commerce platform'),
+(15, 'Singapore', 'Leading telecommunications and digital services provider'),
+(16, 'Sydney, Australia', 'Innovative startup in renewable energy solutions'),
+(17, 'Berlin, Germany', 'Advanced manufacturing and engineering company'),
+(18, 'Toronto, Canada', 'Healthcare technology and research organization'),
+(19, 'Dubai, UAE', 'International consulting and business services firm'),
+(20, 'São Paulo, Brazil', 'Leading software development and IT services company');
 
-
--- Jobs (300 jobs, 100 for each company)
-INSERT INTO jobs (job_id, company_id, position, description, job_type, location_type, is_open, created_at, updated_at)
+-- Jobs Posting (1000 for each company, 10000 total)
+INSERT INTO jobs (company_id, position, description, job_type, location_type, is_open, created_at, updated_at)
 SELECT 
-    generate_series,
-    (CASE WHEN generate_series <= 100 THEN 4 WHEN generate_series <= 200 THEN 5 ELSE 6 END),
-    'Position ' || generate_series,
+    company_id,
+    'Position ' || job_number,
     '<h2>Job Description</h2><p>' || random_text(100, 500) || '</p><h3>Requirements</h3><ul><li>' || random_text(10, 50) || '</li><li>' || random_text(10, 50) || '</li><li>' || random_text(10, 50) || '</li></ul>',
     (ARRAY['full-time', 'part-time', 'internship']::job_type_enum[])[floor(random() * 3 + 1)],
     (ARRAY['on-site', 'hybrid', 'remote']::location_type_enum[])[floor(random() * 3 + 1)],
     random() > 0.2,
     now() - (random() * (interval '90 days')),
     now() - (random() * (interval '30 days'))
-FROM generate_series(1, 300);
+FROM (
+    SELECT 
+        company_id,
+        generate_series % 1000 + 1 as job_number
+    FROM 
+        generate_series(1, 10000),
+        (SELECT generate_series(11, 20) as company_id) c
+) subquery;
 
--- Job Attachments (3 attachments per job, 900 total)
-INSERT INTO job_attachments (attachment_id, job_id, file_path)
+-- Job Attachments (3 attachments per job, 30000 total)
+INSERT INTO job_attachments (job_id, file_path)
 SELECT 
-    generate_series,
     ceil(generate_series / 3.0),
     '/uploads/jobs/attachment_' || generate_series || '.jpg'
-FROM generate_series(1, 900);
+FROM generate_series(1, 30000);
 
-
--- Applications (50 unique applications per job seeker, 150 total)
+-- Applications (100 unique applications per job seeker, 1000 total per job seeker)
 WITH job_seeker_applications AS (
     SELECT 
         user_id,
         job_id,
         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY random()) AS row_num
     FROM 
-        (SELECT generate_series(1, 3) AS user_id) u
+        (SELECT id as user_id FROM users WHERE role = 'jobseeker' AND id <= 10) u
     CROSS JOIN 
         (SELECT job_id FROM jobs ORDER BY random()) j
 )
-INSERT INTO applications (application_id, user_id, job_id, cv_path, video_path, status, status_reason, created_at)
+INSERT INTO applications (user_id, job_id, cv_path, video_path, status, status_reason, created_at)
 SELECT 
-    ROW_NUMBER() OVER () AS application_id,
     user_id,
     job_id,
     '/uploads/applications/jobs/' || job_id || '/users/' || user_id || '/cv/cv_' || (ROW_NUMBER() OVER ()) || '.pdf',
@@ -226,8 +248,7 @@ SELECT
     END,
     now() - (random() * (interval '60 days'))
 FROM job_seeker_applications
-WHERE row_num <= 50;
-
+WHERE row_num <= 100;
 -- Update users sequence
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
 
