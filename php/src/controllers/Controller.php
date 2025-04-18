@@ -2,6 +2,7 @@
 
 namespace src\controllers;
 
+use src\utils\CSRFHandler;
 use src\exceptions\HttpExceptionFactory;
 
 /**
@@ -11,5 +12,16 @@ use src\exceptions\HttpExceptionFactory;
  */
 abstract class Controller
 {
-
+    /**
+     * Verifikasi token CSRF
+     */
+    protected function verifyCSRFToken(array $requestBody): void
+    {
+        if (!isset($requestBody['csrf_token']) || !CSRFHandler::verifyToken($requestBody['csrf_token'])) {
+            throw HttpExceptionFactory::createBadRequest('Invalid CSRF token');
+        }
+        
+        // Regenerate token CSRF setelah digunakan
+        CSRFHandler::regenerateToken();
+    }
 }

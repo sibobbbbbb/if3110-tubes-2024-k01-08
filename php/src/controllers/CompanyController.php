@@ -104,6 +104,9 @@ class CompanyController extends Controller
         } else if ($req->getMethod() == "POST") {
             // POST
 
+            // Validate CSRF token
+            $this->verifyCSRFToken($req->getBody());
+
             // Validate request 
             // attachment is optional (QnA No. 30)
             $rules = [
@@ -509,6 +512,9 @@ class CompanyController extends Controller
             // GET
             $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
+            // Validate the CSRF token
+            $this->verifyCSRFToken($req->getBody());
+
             // POST
             // Validate request body
             $rules = [
@@ -609,6 +615,9 @@ class CompanyController extends Controller
             // Render
             $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
+            // Validate the CSRF token
+            $this->verifyCSRFToken($req->getBody());
+
             // POST
             // Validate request body
             // attachment is optional (QnA No. 30)
@@ -810,7 +819,11 @@ class CompanyController extends Controller
             // render
             $res->renderPage($viewPathFromPages, $data);
         } else if ($req->getMethod() == "POST") {
-            // PUT
+            // POST
+
+            // Validate CSRF token
+            $this->verifyCSRFToken($req->getBody());
+
             // Validate request body
             $rules = [
                 'name' => ['required', "max" => 128],

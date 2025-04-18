@@ -18,6 +18,8 @@
 
         <!-- Form -->
         <form class="form" action="/company/profile" method="POST">
+            <!-- CSRF Token -->
+            <?= \src\utils\CSRFHandler::renderTokenField() ?>
             <!-- Name -->
             <div class="form__group">
                 <label for="name" class="form__label 

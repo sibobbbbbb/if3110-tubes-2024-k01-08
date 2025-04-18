@@ -4,6 +4,9 @@
         <h1 class="signin__title">Sign In</h1>
         <!-- Form -->
         <form class="form" action="/auth/sign-in" method="POST">
+            <!-- CSRF Token -->
+            <?= \src\utils\CSRFHandler::renderTokenField() ?>
+
             <!-- Email -->
             <div class="form__group">
                 <label for="email" class="form__label 

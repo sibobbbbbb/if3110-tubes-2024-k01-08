@@ -111,6 +111,15 @@ class Request
     }
 
     /**
+     * Get header value
+     */
+    public function getHeader(string $name): string | null
+    {
+        $headerName = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+        return $_SERVER[$headerName] ?? null;
+    }
+
+    /**
      * Get body of the request
      */
     public function getBody(): array

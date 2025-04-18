@@ -148,6 +148,9 @@ use src\dao\LocationType;
                 </h2>
 
                 <form class="application-verdict__form" id="application-detail-form" action="/company/jobs/<?= htmlspecialchars($application->getJob()->getJobId(), ENT_QUOTES, 'utf-8'); ?>/applications/<?= htmlspecialchars($application->getApplicationId(), ENT_QUOTES, 'utf-8'); ?>" method="POST">
+                    <!-- CSRF Token -->
+                    <?= \src\utils\CSRFHandler::renderTokenField() ?>
+
                     <!-- Radio fields -->
                     <div class="form__group">
                         <label class="form__label
@@ -212,7 +215,7 @@ use src\dao\LocationType;
 
 
                     <!-- Submit button -->
-                    <button class="button button--default-size button--default-color">Submit</button>
+                    <button class="button button--default-size button--default-color">Submit TESTTTT</button>
                 </form>
             </section>
         <?php endif; ?>

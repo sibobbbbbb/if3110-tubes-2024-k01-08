@@ -3,6 +3,9 @@
 namespace src\core;
 
 
+use src\utils\CSRFHandler;
+use src\exceptions\HttpExceptionFactory;
+
 class Router
 {
     // Store registered routes for the app
@@ -74,20 +77,34 @@ class Router
             if ($this->matchPath($route['path'], $reqPath) && $route['method'] === $reqMethod) {
                 // Initialize request & response
                 $req = new Request($route['path']);
-
-                // Call all middlewares
-                $middlewareFactories = $route['middlewaresFactory'];
-                foreach ($middlewareFactories as $mf) {
-                    $mf()->handle($req, $res);
+                
+                try {
+                    // Verify CSRF for non-GET requests
+                    if ($reqMethod !== 'GET') {
+                        $this->verifyCSRF($req);
+                    }
+                    
+                    // Call all middlewares
+                    $middlewareFactories = $route['middlewaresFactory'];
+                    foreach ($middlewareFactories as $mf) {
+                        $mf()->handle($req, $res);
+                    }
+    
+                    // Call the handler
+                    $handler = $route['handlerFactory']();
+                    $controller = $handler['controller'];
+                    $method = $handler['method'];
+                    $controller->$method($req, $res);
+                    
+                    return;
+                } catch (\Exception $e) {
+                    $data = [
+                        'statusCode' => 400,
+                        'message' => $e->getMessage(),
+                    ];
+                    $res->renderError($data);
+                    return;
                 }
-
-                // Call the handler
-                $handler = $route['handlerFactory']();
-                $controller = $handler['controller'];
-                $method = $handler['method'];
-                $controller->$method($req, $res);
-
-                return;
             }
         }
 
@@ -142,5 +159,33 @@ class Router
         }
 
         return true;
+    }
+
+    private function verifyCSRF(Request $req): void
+    {
+        // Skip CSRF check for GET requests
+        if ($req->getMethod() === 'GET') {
+            return;
+        }
+        
+        // Exclude certain paths from CSRF verification
+        $excludedPaths = [
+            '/auth/sign-out',
+            '/auth/sign-up/job-seeker',
+            '/auth/sign-up/company'
+        ];
+        
+        if (in_array($req->getPath(), $excludedPaths)) {
+            return;
+        }         
+
+        // Verify CSRF token from header or body
+        $headerToken = $req->getHeader('X-CSRF-TOKEN');
+        $bodyToken = $req->getBody()['csrf_token'] ?? null;
+        $token = $headerToken ?? $bodyToken;
+        
+        if (!$token || !CSRFHandler::verifyToken($token)) {
+            throw HttpExceptionFactory::createBadRequest('Invalid CSRF token');
+        }
     }
 }

@@ -53,6 +53,8 @@ class AuthController extends Controller
             $res->renderPage($viewPathFromPages, $data);
         } else {
             // Post
+            // Validate the CSRF token
+            $this->verifyCSRFToken($req->getBody());
             // Validate the request body
             $rules = [
                 'email' => ['required', 'email'],

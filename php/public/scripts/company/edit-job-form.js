@@ -14,6 +14,8 @@ class AttachmentsManager {
     );
     this.submitButton = document.getElementById("edit-job-submit");
 
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
     this.init();
   }
 
@@ -32,6 +34,11 @@ class AttachmentsManager {
   }
 
   handleDeleteAttachment(currentButton, event) {
+
+    console.log("Delete attachment clicked");
+    console.log("Attachment ID:", currentButton.getAttribute("data-attachment-id"));
+    console.log("CSRF Token:", this.csrfToken);
+    
     // Disable all delete buttons
     this.deleteButtons.forEach((button) => {
       button.disabled = true;
@@ -46,6 +53,10 @@ class AttachmentsManager {
     // Initialize ajax
     const xhr = new XMLHttpRequest();
     xhr.open("DELETE", `/company/jobs/attachments/${attachmentId}`, true);
+
+    // Header CSRF token
+    xhr.setRequestHeader('X-CSRF-TOKEN', this.csrfToken);
+
     xhr.onreadystatechange = async () => {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 200) {

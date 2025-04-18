@@ -4,6 +4,7 @@ namespace src\middlewares;
 
 use src\core\{Request, Response};
 use src\utils\UserSession;
+use src\utils\CSRFHandler;
 
 abstract class AuthMiddleware extends Middleware
 {
@@ -44,6 +45,20 @@ abstract class AuthMiddleware extends Middleware
             ];
     
             $res->renderError($data);
+        }
+
+        // Verify CSRF for non-GET requests
+        if ($req->getMethod() !== 'GET') {
+            $token = $req->getHeader('X-CSRF-TOKEN') ?? $req->getBody()['csrf_token'] ?? null;
+            
+            if (!CSRFHandler::verifyToken($token)) {
+                $data = [
+                    'statusCode' => 403,
+                    'message' => "Invalid CSRF token.",
+                ];
+                
+                $res->renderError($data);
+            }
         }
 
         // continue

@@ -105,6 +105,9 @@ use src\dao\LocationType;
             action="/jobs/<?= htmlspecialchars($jobId, ENT_QUOTES, 'UTF-8') ?>/apply"
             method="POST"
             enctype="multipart/form-data">
+            <!-- CSRF Token -->
+            <?= \src\utils\CSRFHandler::renderTokenField() ?>
+
             <!-- Title -->
             <h1 class="card__title">
                 Apply For This Job

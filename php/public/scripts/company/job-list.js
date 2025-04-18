@@ -5,6 +5,8 @@ class JobListManager {
     this.deleteButtons = this.jobList.querySelectorAll(
       ".job-list__delete-button"
     );
+    
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 
     this.init();
   }
@@ -35,6 +37,10 @@ class JobListManager {
     // Initialize ajax
     const xhr = new XMLHttpRequest();
     xhr.open("DELETE", `/company/jobs/${jobId}`, true);
+
+    // Tambahkan header CSRF token
+    xhr.setRequestHeader('X-CSRF-TOKEN', this.csrfToken);
+    
     xhr.onreadystatechange = async () => {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 200) {

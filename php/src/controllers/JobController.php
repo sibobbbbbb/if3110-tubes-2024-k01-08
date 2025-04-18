@@ -288,6 +288,9 @@ class JobController extends Controller
             } else if ($req->getMethod() == "POST") {
                 // Handle form submission
 
+                // Validate CSRF token
+                $this->verifyCSRFToken($req->getBody());
+                
                 // Validate request
                 $rules = [
                     'cv' => ['requiredFile', 'file' => ['maxSize' => 5 * 1024 * 1024, 'allowedTypes' => ['application/pdf']]],

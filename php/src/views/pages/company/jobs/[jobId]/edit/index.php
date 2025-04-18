@@ -23,6 +23,10 @@
             action="/company/jobs/<?= htmlspecialchars($currentJobId, ENT_QUOTES, 'UTF-8') ?>/edit"
             method="POST"
             enctype="multipart/form-data">
+
+            <!-- CSRF Token -->
+            <?= \src\utils\CSRFHandler::renderTokenField() ?>
+
             <!-- Position -->
             <div class="form__group">
                 <label for="position" class="form__label 

@@ -76,6 +76,8 @@
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" />
     </noscript>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="<?= \src\utils\CSRFHandler::generateToken() ?>">
 </head>
 
 <body>
