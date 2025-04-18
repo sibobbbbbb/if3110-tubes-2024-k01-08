@@ -48,6 +48,16 @@ class AuthController extends Controller
             'additionalTags' => $additionalTags,
         ];
 
+        // rate limit
+        if (session_id() && isset($_SESSION['rate_limit_error'])) {
+            $msg = $_SESSION['rate_limit_error'];
+            unset($_SESSION['rate_limit_error']);
+            $data['errorFields'] = [
+                'email'    => [$msg],
+                'password' => [$msg],
+            ];
+        }
+
         if ($req->getMethod() == "GET") {
             // Get
             $res->renderPage($viewPathFromPages, $data);

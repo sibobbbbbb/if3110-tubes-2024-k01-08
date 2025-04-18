@@ -7,7 +7,7 @@ use src\exceptions\BaseHttpException;
 use src\core\{Config, Router, Container};
 use src\database\Database;
 use src\services\{UserService, AuthService, CompanyService, JobService, UploadService};
-use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware};
+use src\middlewares\{AnyAuthMiddleware, CompanyAuthMiddleware, JobSeekerAuthMiddleware, RateLimitMiddleware};
 use src\controllers\{AuthController, CompanyController, HomeController, JobController};
 use src\repositories\{ApplicationRepository, UserRepository, JobRepository};
 use src\utils\UserSession;
@@ -137,7 +137,8 @@ class Application
         // handle
         $router->post(
             '/auth/sign-in',
-            $signInFactoryFunction
+            $signInFactoryFunction,
+            [ fn() => $this->container->get(RateLimitMiddleware::class) ]
         );
 
         /**
@@ -682,6 +683,10 @@ class Application
         );
 
         // Add more middlewares here
+        $this->container->bind(
+            RateLimitMiddleware::class,
+            fn($c) => new \src\middlewares\RateLimitMiddleware(5, 60)
+        );
     }
 
     /**
