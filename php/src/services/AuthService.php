@@ -38,16 +38,25 @@ class AuthService extends Service
         return $user;
     }
 
+    private function validatePasswordComplexity(string $password): void {
+        // Regex: minimal 8, maksimal 12 karakter; harus ada setidaknya 1 huruf, 1 angka, dan 1 simbol
+        if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,12}$/', $password)) {
+            throw new \Exception('Password harus 8-12 karakter dan wajib mengandung huruf, angka, dan simbol.');
+        }
+    }
+
     /**
      * Register a company
      */
     public function createCompany(string $name, string $email, string $password, string $location, string $about): void
     {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
+        // Validasi kompleksitas password
+        
         try {
+            $this->validatePasswordComplexity($password);
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $user = new UserDao(0, $name, $email, $hashed_password, 'company');
-            $companyDetails = new CompanyDetailDao(0,  $name, $location, $about);
+            $companyDetails = new CompanyDetailDao(0, $name, $location, $about);
             $this->userRepository->createUserandCompany($user, $companyDetails);
             return;
         } catch (\PDOException $e) {
@@ -55,16 +64,21 @@ class AuthService extends Service
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
             }
             throw HttpExceptionFactory::createInternalServerError("An error occurred while creating your account");
+        } catch (\Exception $e) {
+            // Tangkap error validasi dan tampilkan pesan bad request
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
         }
     }
+
     /**
      * Register a job seeker
      */
     public function createJobSeeker(string $name, string $email, string $password): void
     {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
         try {
+            // Validasi kompleksitas password
+            $this->validatePasswordComplexity($password);
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $user = new UserDao(0, $name, $email, $hashed_password, 'jobseeker');
             $this->userRepository->createUser($user);
         } catch (\PDOException $e) {
@@ -72,6 +86,9 @@ class AuthService extends Service
                 throw HttpExceptionFactory::createBadRequest($e->getMessage());
             }
             throw HttpExceptionFactory::createInternalServerError("An error occurred while creating account");
+        } catch (\Exception $e) {
+            // Tangkap error validasi dan tampilkan pesan bad request
+            throw HttpExceptionFactory::createBadRequest($e->getMessage());
         }
     }
 }

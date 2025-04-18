@@ -167,15 +167,9 @@ class AuthController extends Controller
     /**
      * Render the sign up job seeker page
      */
-    public function renderandhandleSignUpJobSeeker(Request $req, Response $res): void
+    public function renderAndHandleSignUpJobSeeker(Request $req, Response $res): void
     {
-        // Redirect if user is authenticated
-        $this->redirectIfAuthenticated($req, $res);
-
-        // Render the view
         $viewPathFromPages = 'auth/sign-up/job-seeker/index.php';
-
-        // Data to pass to the view (SSR)
         $title = 'LinkInPurry | Job Seeker Sign Up';
         $description = 'Sign up for a LinkInPurry account as a job seeker';
         $additionalTags = <<<HTML
@@ -189,55 +183,31 @@ class AuthController extends Controller
         ];
 
         if ($req->getMethod() == "GET") {
-            // Get
             $res->renderPage($viewPathFromPages, $data);
         } else {
-            // Post
-            $name = $req->getBody()['name'];
-            $email = $req->getBody()['email'];
-            $password = $req->getBody()['password'];
-
-            $rules = [
-                'name' => ['required'],
-                'email' => ['required', 'email'],
-                'password' => ['required'],
+            $name = $req->getBody()['name'] ?? '';
+            $email = $req->getBody()['email'] ?? '';
+            $password = $req->getBody()['password'] ?? '';
+            $fields = [
+                'name' => $name,
+                'email' => $email,
+                'password' => $password
             ];
-
-            $validator = new Validator();
-            $isValid = $validator->validate($req->getBody(), $rules);
-            // Invalid request body
-            if (!$isValid) {
-                $data['errorFields'] = $validator->getErrorFields();
-                $data['fields'] = $req->getBody();
-                $res->renderPage($viewPathFromPages, $data);
-            }
-
-            // Authenticate the transaction
             try {
                 $this->authService->createJobSeeker($name, $email, $password);
-            } catch (BadRequestHttpException $e) {
-                $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
-                $data['fields'] = $req->getBody();
+                // redirect ke halaman sukses atau sign in
+            } catch (\Exception $e) {
+                // Misalnya error validasi password dilempar sebagai exception
+                $errorFields = [];
+                // Jika pesan error ada hubungannya dengan password, masukkan ke key 'password'
+                if (strpos($e->getMessage(), 'Password') !== false) {
+                    $errorFields['password'] = [$e->getMessage()];
+                }
+                // Bisa juga tambahkan error untuk field lain jika ada
+                $data['fields'] = $fields;
+                $data['errorFields'] = $errorFields;
                 $res->renderPage($viewPathFromPages, $data);
-            } catch (BaseHttpException $e) {
-                // Render error page
-                $dataError = [
-                    'statusCode' => $e->getCode(),
-                    'message' => $e->getMessage(),
-                ];
-
-                $res->renderError($dataError);
-            } catch (Exception $e) {
-                // Render Internal server error
-                $dataError = [
-                    'statusCode' => 500,
-                    'message' => "Internal server error",
-                ];
-
-                $res->renderError($dataError);
             }
-
-            $res->redirect('/auth/sign-in');
         }
     }
 
@@ -275,7 +245,7 @@ class AuthController extends Controller
             $password = $req->getBody()['password'];
             $location = $req->getBody()['location'];
             $about = $req->getBody()['about'];
-
+        
             $rules = [
                 'name' => ['required'],
                 'email' => ['required', 'email'],
@@ -283,40 +253,44 @@ class AuthController extends Controller
                 'location' => ['required'],
                 'about' => ['required']
             ];
-
+        
             $validator = new Validator();
             $isValid = $validator->validate($req->getBody(), $rules);
-            // Invalid request body
             if (!$isValid) {
                 $data['errorFields'] = $validator->getErrorFields();
                 $data['fields'] = $req->getBody();
                 $res->renderPage($viewPathFromPages, $data);
+                return;
             }
-
-
-            // Authenticate the transaction
+        
             try {
                 $this->authService->createCompany($name, $email, $password, $location, $about);
             } catch (BadRequestHttpException $e) {
-                $data['errorFields'] = $this->handleDatabaseError($e->getMessage());
+                // Jika error terkait validasi password, tampilkan error khusus untuk field 'password'
+                $errorFields = [];
+                if (strpos($e->getMessage(), 'Password') !== false) {
+                    $errorFields['password'] = [$e->getMessage()];
+                } else {
+                    $errorFields = $this->handleDatabaseError($e->getMessage());
+                }
+                $data['errorFields'] = $errorFields;
                 $data['fields'] = $req->getBody();
                 $res->renderPage($viewPathFromPages, $data);
+                return;
             } catch (BaseHttpException $e) {
-                // Render error page
                 $dataError = [
                     'statusCode' => $e->getCode(),
                     'message' => $e->getMessage(),
                 ];
-
                 $res->renderError($dataError);
+                return;
             } catch (Exception $e) {
-                // Render Internal server error
                 $dataError = [
                     'statusCode' => 500,
                     'message' => "Internal server error",
                 ];
-
                 $res->renderError($dataError);
+                return;
             }
             $res->redirect('/auth/sign-in');
         }

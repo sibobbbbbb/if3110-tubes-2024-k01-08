@@ -54,11 +54,7 @@
 
             <!-- Password -->
             <div class="form__group">
-                <label for="password" class="form__label 
-                    <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
-                        <?= htmlspecialchars($errorFields['password'][0] ? 'form__error-message' : '', ENT_QUOTES, 'UTF-8') ?>
-                    <?php endif; ?>
-                ">
+                <label for="password" class="form__label">
                     Password
                 </label>
                 <input
@@ -68,7 +64,7 @@
                     value="<?= htmlspecialchars($fields['password'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                     class="input" />
                 <p class="form__error-message">
-                    <?php if (isset($errorFields) && isset($errorFields['password'])):  ?>
+                    <?php if (isset($errorFields) && isset($errorFields['password'])): ?>
                         <?= htmlspecialchars($errorFields['password'][0] ?? '') ?>
                     <?php endif; ?>
                 </p>
